@@ -390,7 +390,7 @@ const BestProducts = () => {
           <TabsContent value="blockchain" className='flex flex-col gap-5'>
             <div className='w-full grid lg:grid-cols-5 grid-cols-1 gap-5'>
               {productsData.slice(0, 10).map((item, index) => (
-                <CardProduct img={item.img} title={item.title} desc={item.desc} priceType={item.priceType} price={item.price} category={item.category} />
+                <CardProduct img={item.img} title={item.title} desc={item.desc} priceType={item.priceType} price={item.price} category={item.category} key={index}/>
               ))}
             </div>
             <PaginationComponent />
