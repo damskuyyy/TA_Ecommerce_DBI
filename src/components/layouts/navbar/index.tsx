@@ -45,7 +45,7 @@ const Navbar = () => {
           <Link href={'/#about'} className='font-medium hover:opacity-80'>About</Link>
           <Link href={'/#products'} className='font-medium hover:opacity-80'>Products</Link>
         </div>
-        <Link href={'/#about'}><Button size={'sm'}>Login or Signup</Button></Link>
+        <Link href={'/user/login'}><Button size={'sm'}>Login or Signup</Button></Link>
       </div>
     </div>
   );
