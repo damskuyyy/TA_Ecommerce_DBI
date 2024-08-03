@@ -64,7 +64,7 @@ const ModalCheckout = ({ img, title, desc, price, priceType, category }: Product
   return (
     <Dialog>
       <DialogTrigger>
-        <Button size={'sm'} className='font-medium'>Buy now!</Button>
+        <Button size={'default'} className='font-medium w-full'>Buy now!</Button>
       </DialogTrigger>
       <DialogContent className='flex justify-between gap-5'>
         <DialogHeader className='w-1/2'>

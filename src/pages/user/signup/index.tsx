@@ -43,7 +43,20 @@ export default function Signup() {
               />
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="email">Phone Number</Label>
+              <Input
+                id="email"
+                type="tel"
+                placeholder="896xxxx"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Confirm Password</Label>
               <Input id="password" type="password" />
             </div>
             <Button type="submit" className="w-full">

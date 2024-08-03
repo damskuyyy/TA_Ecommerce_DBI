@@ -1,7 +1,9 @@
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../card';
 import { ProductDataType } from '@/types/productDataTypes';
-const ModalCheckout = dynamic(() => import('@/components/ui/modals/checkout'), { ssr: false })
+import Link from 'next/link';
+import { Button } from '../button';
+
 
 
 const CardProduct = ({ img, title, desc, price, priceType, category }: ProductDataType) => {
@@ -21,7 +23,8 @@ const CardProduct = ({ img, title, desc, price, priceType, category }: ProductDa
       </div>
       <CardFooter className='flex items-center justify-between'>
         <p className='font-medium text-xs'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price)}</p>
-        <ModalCheckout category={category} desc={desc} img={img} price={price} priceType={priceType} title={title} />
+        {/* <ModalCheckout category={category} desc={desc} img={img} price={price} priceType={priceType} title={title} /> */}
+        <Link href={`/products/details/${title.replace(/ /g, '-').toLowerCase()}`}><Button size={'sm'} className='font-medium'>Buy now!</Button></Link>
       </CardFooter>
     </Card>
   );
