@@ -481,7 +481,7 @@ const Details = () => {
           <Card className='flex flex-col lg:fixed static lg:w-1/4 w-full top-32'>
             <CardHeader className='font-bold text-lg'>Set Amount and Notes</CardHeader>
             <CardContent className='flex flex-col gap-3'>
-              <p className='text-gray-500'>Variant: <span className='font-medium text-black'>Base</span></p>
+              <p className='text-gray-500'>Variant: <span className='font-medium text-black capitalize'>{variant}</span></p>
               <hr />
               <div className='flex items-center gap-2'>
                 <div className='border rounded-md flex justify-between items-center gap-1'>
