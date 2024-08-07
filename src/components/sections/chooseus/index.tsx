@@ -10,7 +10,7 @@ const ChooseUs = () => {
         <img src="/bghero.png" alt="" className="lg:w-5/6 w-full h-full" />
       </div>
       <div className="w-full md:w-1/2">
-        <h1 className="text-4xl font-bold mb-4 lg:text-5xl">Why Choose Us</h1>
+        <h1 className="text-4xl font-semibold mb-4 lg:text-5xl">Why Choose Us</h1>
         <p className="text-lg mb-5 text-gray-600">
           Get to Know Our Company Better
         </p>

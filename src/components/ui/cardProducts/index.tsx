@@ -22,9 +22,9 @@ const CardProduct = ({ img, title, desc, price, priceType, category }: ProductDa
         </CardContent>
       </div>
       <CardFooter className='flex items-center justify-between'>
-        <p className='font-medium text-xs'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(price)}</p>
+        <p className='font-medium text-xs'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(price))}</p>
         {/* <ModalCheckout category={category} desc={desc} img={img} price={price} priceType={priceType} title={title} /> */}
-        <Link href={`/products/details/${title.replace(/ /g, '-').toLowerCase()}`}><Button size={'sm'} className='font-medium'>Buy now!</Button></Link>
+        <Link href={`/products/details/${title && title.replace(/ /g, '-').toLowerCase()}`}><Button size={'sm'} className='font-medium'>Buy now!</Button></Link>
       </CardFooter>
     </Card>
   );

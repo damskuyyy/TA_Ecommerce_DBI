@@ -64,7 +64,6 @@ const Navbar = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem>About Us</DropdownMenuItem>
-              <DropdownMenuItem>Our Team</DropdownMenuItem>
               <DropdownMenuItem>Faq's</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -72,7 +71,7 @@ const Navbar = () => {
           <Link href={"/#service"} className="font-medium hover:opacity-80">
             Services
           </Link>
-          <Link href={"/#contact"} className="font-medium hover:opacity-80">
+          <Link href={"/contact"} className="font-medium hover:opacity-80">
             Contact
           </Link>
         </div>
@@ -90,14 +89,13 @@ const Navbar = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem>About Us</DropdownMenuItem>
-              <DropdownMenuItem>Our Team</DropdownMenuItem>
               <DropdownMenuItem>Faq's</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link href={"/#service"} className="font-medium hover:opacity-80">
+          <Link href={"/#services"} className="font-medium hover:opacity-80">
             Service
           </Link>
-          <Link href={"/#contact"} className="font-medium hover:opacity-80">
+          <Link href={"/contact"} className="font-medium hover:opacity-80">
             Contact
           </Link>
         </div>

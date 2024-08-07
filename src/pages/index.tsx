@@ -5,6 +5,8 @@ import Services from "@/components/sections/services";
 import ChooseUs from "@/components/sections/chooseus";
 import BestProducts from "@/components/sections/bestProducts";
 import Discussion from "@/components/sections/discussion";
+import Stats from "@/components/sections/stats";
+import Faq from "@/components/sections/faq";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +21,8 @@ export default function Home() {
         <Services />
         <ChooseUs/>
         <BestProducts />
+        <Stats />
+        <Faq />
         <Discussion />
       </div>
     </>

@@ -4,11 +4,12 @@ import Link from "next/link";
 
 const Discussion = () => {
   return (
-    <div className="flex flex-col md:flex-row items-center md:items-start p-8 gap-[115px]">
-      <div className="w-full  flex justify-center mb-8 md:mb-0">
-        <img src="/bghero.png" alt="" className="lg:w-5/6 w-full h-full" />
+    <section className="lg:max-h-screen lg:flex lg:items-center">
+    <div className="flex flex-col md:flex-row items-center p-8 gap-[115px] lg:h-max ">
+      <div className="w-full h-full mb-8 md:mb-0">
+        <img src="/bghero.png" alt="" className="h-full object-cover" />
       </div>
-      <div className="w-full">
+      <div className="w-full h-fit ">
         <div className="flex flex-col gap-5">
           <h1 className="text-4xl font-bold mb-4 lg:text-5xl">
             Wujudkan impian Anda menjadi kenyataan!
@@ -22,6 +23,7 @@ const Discussion = () => {
         <Button size={"default"}>Diskusi Sekarang</Button>
       </div>
     </div>
+    </section>
   );
 };
 
