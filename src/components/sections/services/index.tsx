@@ -3,7 +3,7 @@ import React from "react";
 
 const Services = () => {
   return (
-    <div>
+    <div id="services">
       <h1 className="text-center text-5xl font-semibold leading-8 ">
         Our Services
       </h1>

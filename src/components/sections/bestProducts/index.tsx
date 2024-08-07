@@ -367,7 +367,7 @@ const BestProducts = () => {
   ];
 
   return (
-    <div className="w-full flex flex-col gap-16 lg:mt-5">
+    <div className="w-full flex flex-col gap-16 lg:mt-5" id="products">
       <div className="flex flex-col gap-3 items-center">
         <h1 className="text-5xl capitalize text-center font-semibold">
           Products

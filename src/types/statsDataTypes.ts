@@ -1,5 +1,7 @@
+import { ReactElement } from "react";
+
 export interface StatsDataType {
-    icon?: string,
+    icon?: ReactElement,
     title?: string,
     value?: string,
   }

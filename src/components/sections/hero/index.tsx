@@ -18,8 +18,8 @@ const Hero = () => {
             web.
           </p>
           <div className="flex justify-center gap-3 lg:justify-normal ">
-            <Link href={"/#bestProduct"}>
-            <Button size={"default"}>Products</Button>
+            <Link href={"/#products"}>
+              <Button size={"default"}>Products</Button>
             </Link>
             <Link href={"/aboutus"}>
               <Button size={"default"}>About Us</Button>

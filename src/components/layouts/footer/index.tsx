@@ -65,21 +65,21 @@ const Footer = () => {
           <ul className="flex space-x-4">
             <li>
               <a href="#" className="hover:underline">
-                <div className=" bg-white">
+                <div className=" bg-white rounded-sm">
                   <FacebookIcon />
                 </div>
               </a>
             </li>
             <li>
               <a href="#" className="hover:underline">
-                <div className="bg-white">
+                <div className="bg-white rounded-sm">
                   <YoutubeIcon />
                 </div>
               </a>
             </li>
             <li>
               <a href="#" className="hover:underline">
-                <div className="bg-white">
+                <div className="bg-white rounded-sm">
                   <InstagramIcon />
                   </div>
               </a>

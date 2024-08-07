@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -7,8 +7,11 @@ import {
 } from "@/components/ui/accordion";
 
 const Faq = () => {
+
+  const [value, setValue] = useState('value')
+
   return (
-    <div>
+    <div id="faqs">
       <div className="flex flex-col gap-3 items-center">
         <h1 className="text-5xl capitalize text-center font-semibold">
           Frequently Asked Questions
@@ -23,9 +26,10 @@ const Faq = () => {
         className="px-16 py-10 rounded-lg border border-[#D4CFCF] mt-[57px]"
         type="single"
         collapsible
+        defaultValue="item-1"
       >
-        <AccordionItem className="border-none" value="item-1">
-          <AccordionTrigger className="text-2xl font-semibold">
+        <AccordionItem className={`border-none p-3 ${value === 'item-1' ? 'bg-secondary': ''}`} value="item-1" >
+          <AccordionTrigger className="text-xl font-semibold" onClick={() => setValue('item-1')}>
             How can I schedule an appointment?
           </AccordionTrigger>
           <AccordionContent className="text-[16px]">
@@ -36,8 +40,8 @@ const Faq = () => {
             secure an appointment.
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem className="border-none" value="item-2">
-          <AccordionTrigger className="text-2xl font-semibold">
+        <AccordionItem className={`border-none p-3 ${value === 'item-2' ? 'bg-secondary': ''}`} value="item-2">
+          <AccordionTrigger className="text-xl font-semibold" onClick={() => setValue('item-2')}>
             Where can I find a list of prices?
           </AccordionTrigger>
           <AccordionContent className="text-[16px]">
@@ -48,8 +52,8 @@ const Faq = () => {
             secure an appointment.
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem className="border-none" value="item-3">
-          <AccordionTrigger className="text-2xl font-semibold">
+        <AccordionItem className={`border-none p-3 ${value === 'item-3' ? 'bg-secondary': ''}`} value="item-3">
+          <AccordionTrigger className="text-xl font-semibold" onClick={() => setValue('item-3')}>
             How can I pay?
           </AccordionTrigger>
           <AccordionContent className="text-[16px]">
@@ -60,8 +64,8 @@ const Faq = () => {
             secure an appointment.
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem className="border-none" value="item-4">
-          <AccordionTrigger className="text-2xl font-semibold">
+        <AccordionItem className={`border-none p-3 ${value === 'item-4' ? 'bg-secondary': ''}`} value="item-4">
+          <AccordionTrigger className="text-xl font-semibold" onClick={() => setValue('item-4')}>
             Do you take away all the generated waste?
           </AccordionTrigger>
           <AccordionContent className="text-[16px]">
@@ -72,8 +76,8 @@ const Faq = () => {
             secure an appointment.
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem className="border-none" value="item-5">
-          <AccordionTrigger className="text-2xl font-semibold">
+        <AccordionItem className={`border-none p-3 ${value === 'item-5' ? 'bg-secondary': ''}`} value="item-5">
+          <AccordionTrigger className="text-xl font-semibold" onClick={() => setValue('item-5')}>
             Can you maintain my garden after the initial tidy-up?
           </AccordionTrigger>
           <AccordionContent className="text-[16px]">
