@@ -5,11 +5,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         const data = await prisma.product.findMany()
         res.status(200).json(data)
-       
+
     } catch (error) {
-        res.status(500).json({msg: 'Data Product Error!'})
+        res.status(500).json({ msg: 'Data Product Error!', error })
+        console.log(error)
     }
 
 }
- 
+
 export default handler; 

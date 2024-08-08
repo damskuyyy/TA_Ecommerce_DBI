@@ -17,7 +17,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             msg: ' Update Success'})
             
     } catch (error) {
-        res.status(500).json({msg: 'Data Product Error!'})
+        res.status(500).json({ msg: 'Data Product Error!', error })
+        console.log(error)
     }
 
 }
