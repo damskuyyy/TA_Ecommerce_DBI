@@ -3,11 +3,12 @@ import { NextApiRequest, NextApiResponse } from "next"
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
-        const data = await prisma.product.findMany()
+        const data = await prisma.customer.findMany()
         res.status(200).json(data)
        
     } catch (error) {
-        res.status(500).json({msg: 'Data Product Error!'})
+        console.log(error)
+        res.status(500).json({msg: 'Data User Error!'})
     }
 
 }

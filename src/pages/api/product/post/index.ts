@@ -1,18 +1,23 @@
-import prisma from "@/utils/prisma";
+import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next"
+
+const prisma = new PrismaClient();
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
- const {name, email} = req.body
+ const {code_product, name, price, image } = req.body
     try {
-        const data = await prisma.user.create({
+        const data = await prisma.product.create({
             data: {
+                code_product,
                 name,
-                email
+                price,
+                image
             }
         })
+        
         res.status(200).send(data)
        
     } catch (error) {
-        res.status(500).json({msg: 'Internal server error!'})
+        res.status(500).json({msg: 'Data Product Error!'})
     }
 
 }
