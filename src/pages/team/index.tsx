@@ -51,7 +51,7 @@ const Team: React.FC = () => {
           Tim Digital Blockchain Indonesia
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-[60px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-[60px]">
         {teamMembers.map((member) => (
           <CardTeam key={member.email} {...member} />
         ))}

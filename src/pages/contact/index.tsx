@@ -5,10 +5,10 @@ import React from "react";
 
 const Contact = () => {
   return (
-    <div className="w-full grid lg:grid-cols-2 grid-cols-1 gap-5">
+    <div className="w-full grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-5">
       <div className="w-full flex justify-start items-center">
         <div className="flex flex-col gap-8">
-          <h1 className="lg:text-6xl text-5xl font-semibold lg:text-left text-center">
+          <h1 className="lg:text-6xl text-2xl font-semibold lg:text-left text-center">
             Hubungi Kami Sekarang
           </h1>
           <p className="lg:text-lg text-sm lg:text-left text-center leading-normal text-[#455A64]">
