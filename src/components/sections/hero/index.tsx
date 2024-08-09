@@ -4,10 +4,10 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <div className="w-full grid lg:grid-cols-2 grid-cols-1 gap-5">
+    <div className="w-full flex justify-between lg:flex-row flex-col-reverse gap-10">
       <div className="w-full flex justify-start items-center">
         <div className="flex flex-col gap-8">
-          <h1 className="lg:text-6xl text-5xl font-semibold lg:text-left text-center">
+          <h1 className="lg:text-6xl text-2xl font-semibold lg:text-left text-center">
             Software E-Shop DBIX
           </h1>
           <p className="lg:text-lg text-sm lg:text-left text-center leading-normal">
@@ -28,7 +28,7 @@ const Hero = () => {
         </div>
       </div>
       <div className="w-full flex lg:justify-end justify-center items-center">
-        <img src="/bghero.png" alt="" className="lg:w-5/6 w-full h-full" />
+        <img src="/bghero.png" alt="" className="lg:w-5/6 w-2/3 h-full" />
       </div>
     </div>
   );
