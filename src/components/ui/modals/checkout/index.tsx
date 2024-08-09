@@ -13,10 +13,10 @@ const ModalCheckout = ({ img, title, desc, price, priceType, category }: Product
   const tax = 0.05
   const appFee = 0.002
   const total = (price + (fee + price * tax + price * appFee))
-  const [invoiceResponse, setInvoiceResponse] = useState<InvoiceDataType.Main>(Object)
+  // const [invoiceResponse, setInvoiceResponse] = useState<InvoiceDataType.Main>(Object)
   const [url, setUrl] = useState('')
   const [load, setLoad] = useState(false)
-  const [successCreatingInvoice, setSuccesCreatingInvoice] = useState(false)
+  // const [successCreatingInvoice, setSuccesCreatingInvoice] = useState(false)
 
   const handleDebitCardPayment = async () => {
     const body = {

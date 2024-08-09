@@ -1,16 +1,19 @@
 import prisma from '@/utils/prisma';
-import nextAuth, { NextAuthOptions } from 'next-auth';
-import NextAuth from 'next-auth/next';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
+import bcrypt from 'bcrypt'
+
+
+const secret = process.env.NEXT_PRIVATE_SECRET_PASS_KEY
 
 const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
-    maxAge: 5 * 60 * 60
+    maxAge: 12 * 60 * 60,
   },
   jwt: {
-    maxAge: 5 * 60 * 60
+    maxAge: 12 * 60 * 60,
   },
   providers: [
     CredentialsProvider({
@@ -21,16 +24,23 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials: any) {
         if (!credentials) {
-          throw new Error('no credentials provider!')
+          throw new Error('No credentials provider!');
         }
-        const { email, password } = credentials
+        const { email, password } = credentials;
 
-        const users = await prisma.user.findMany({ where: { email } })
+        const users = await prisma.user.findMany({ where: { email } });
         if (users.length === 0) {
-          throw new Error('Invalid Email or Password')
+          throw new Error('Invalid Email or Password');
         }
         const user = users[0]
-        return user
+
+        const isPassMatch = bcrypt.compareSync(password + secret, user.password)
+
+        if (isPassMatch) {
+          return user
+        } else {
+          throw new Error('failed to auth!')
+        }
       }
     }),
     GoogleProvider({
@@ -40,31 +50,22 @@ const authOptions: NextAuthOptions = {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
-      }
-    })
+          response_type: "code",
+        },
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, account, user }: any) {
       if (account?.provider === 'credentials' && user) {
         token.id = user.id
-        token.name = user.name
-        token.email = user.email
-        token.emailVerified = user.emailVerified
-        token.items = user.items
       }
 
       if (account?.provider === 'google') {
-        const existingUser = await prisma.user.findMany({ where: { email: user.email } })
+        const existingUser = await prisma.user.findFirst({ where: { email: user.email } });
 
-        if (existingUser.length > 0) {
-          const user = existingUser[0]
-          token.id = user.id
-          token.name = user.name
-          token.email = user.email
-          token.emailVerified = user.emailVerified
-          token.items = user.items
+        if (existingUser) {
+          token.id = existingUser.id
         } else {
           const newUser = await prisma.user.create({
             data: {
@@ -73,33 +74,27 @@ const authOptions: NextAuthOptions = {
               password: "",
               emailVerified: true,
               type: 'google',
+              image: user.image || '',
               items: [],
-            }
-          })
-          token.id = newUser.id
-          token.name = newUser.name
-          token.email = newUser.email
-          token.emailVerified = newUser.emailVerified
-          token.items = newUser.items
+              phone: user.phone || ''
+            },
+          });
+          token.id = newUser.id;
         }
-        return token
       }
+
+      return token;
     },
     async session({ session, token }: any) {
       if (token) {
         session.user = {
-          id: token.id,
-          name: token.name,
-          email: token.email,
-          emailVerified: token.emailVerified,
-          items: token.items,
-          type: token.type
-        } as any
+          id: token.id
+        }
       }
 
-      return session
-    }
-  }
-}
+      return session;
+    },
+  },
+};
 
-export default nextAuth(authOptions)
+export default NextAuth(authOptions);

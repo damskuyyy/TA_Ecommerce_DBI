@@ -14,13 +14,15 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String   @unique
-  emailVerified Boolean  @default(false)
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String  @unique
+  phone         String
+  emailVerified Boolean @default(false)
   password      String
-  items         String[]
-  type          String   @default("crendetials")
+  items         Json[]  @default([]) //prod-ID qty 
+  image         String  @default("https://cactusthemes.com/blog/wp-content/uploads/2018/01/tt_avatar_small.jpg")
+  type          String  @default("crendetials")
 }
 
 model Product {
