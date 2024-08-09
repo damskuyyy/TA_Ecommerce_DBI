@@ -17,17 +17,43 @@ model User {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   email         String   @unique
-  emailVerified Boolean  @default(true)
+  emailVerified Boolean  @default(false)
   password      String
   items         String[]
+  type          String   @default("crendetials")
 }
 
 model Product {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  code_product String   @unique
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  code_product String    @unique
   name         String?
   price        Float
   image        String[]
+  variants     String[]
+  details      String
+  spec         String
+  information  String
+  sold         Int
+  rate         Int
+  reviews      Review[]
+  discusses    Discuss[]
+  stock        Int
+}
+
+model Review {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+  context   String
+}
+
+model Discuss {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+  context   String
 }
 
 model Customer {
@@ -42,7 +68,7 @@ model Order {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   date        DateTime
   total       Float
-  customer_id String @db.ObjectId
+  customer_id String   @db.ObjectId
   customer    Customer @relation(fields: [customer_id], references: [id])
   product     String[]
   xendit_id   String?
