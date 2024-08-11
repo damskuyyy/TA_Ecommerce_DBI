@@ -1,491 +1,103 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CardProduct from "@/components/ui/cardProducts";
-import PaginationComponent from "@/components/ui/paginations";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useEffect, useState } from "react";
+import { ProductDataType } from "@/types/productDataTypes";
+import axios from "axios";
+import SkeletonGrid from "@/components/ui/skeletonGrid";
+import Lottie from "lottie-react";
+import upcommingAnimation from '../../../../public/animations/upcomming.json'
 
 const BestProducts = () => {
-  const productsData = [
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Development Kit",
-      desc: "Complete toolkit for blockchain development including tutorials, software, and support.",
-      price: 100000,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Smart Contract Deployment Service",
-      desc: "Professional service for deploying smart contracts on Ethereum and other blockchains.",
-      price: 150000,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Cryptocurrency Wallet",
-      desc: "Secure hardware wallet for storing your cryptocurrencies safely.",
-      price: 95000,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Consultation",
-      desc: "Expert consultation service for blockchain integration and development.",
-      price: 150000,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Certification Course",
-      desc: "Comprehensive online course for getting certified in blockchain technology.",
-      price: 65000,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Decentralized Finance App",
-      desc: "App to manage your decentralized finance activities with ease.",
-      price: 160500,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Mining Rig",
-      desc: "High-performance mining rig for cryptocurrency mining.",
-      price: 1500000,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Data Analytics Tool",
-      desc: "Advanced tool for analyzing blockchain data.",
-      price: 500000,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Payment Gateway",
-      desc: "Secure gateway for accepting cryptocurrency payments.",
-      price: 249.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Security Audit",
-      desc: "Comprehensive security audit for blockchain applications.",
-      price: 999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "NFT Marketplace",
-      desc: "Platform for buying and selling NFTs.",
-      price: 399.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Tax Software",
-      desc: "Software to help you manage and file your cryptocurrency taxes.",
-      price: 59.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Research Report",
-      desc: "In-depth research report on the latest blockchain trends and technologies.",
-      price: 149.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Investment Fund",
-      desc: "Managed fund for investing in a diversified portfolio of cryptocurrencies.",
-      price: 9999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Education Platform",
-      desc: "Online platform offering various courses on blockchain technology.",
-      price: 199.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Decentralized Application (DApp) Development Service",
-      desc: "Service for developing decentralized applications on Ethereum and other platforms.",
-      price: 799.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Based Identity Verification",
-      desc: "Secure identity verification service using blockchain technology.",
-      price: 129.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Portfolio Tracker",
-      desc: "App to track and manage your cryptocurrency portfolio.",
-      price: 19.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Based Voting System",
-      desc: "Secure and transparent voting system using blockchain technology.",
-      price: 499.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Supply Chain Solution",
-      desc: "Solution for managing supply chains using blockchain technology.",
-      price: 699.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Certification Exam",
-      desc: "Certification exam to validate your blockchain skills and knowledge.",
-      price: 99.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Exchange Platform",
-      desc: "Platform for trading various cryptocurrencies.",
-      price: 2499.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain Game Development",
-      desc: "Service for developing games based on blockchain technology.",
-      price: 1499.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Based Healthcare Solutions",
-      desc: "Solutions for healthcare industry using blockchain technology.",
-      price: 999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Based Real Estate Platform",
-      desc: "Platform for real estate transactions using blockchain technology.",
-      price: 1999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Lending Platform",
-      desc: "Platform for lending and borrowing cryptocurrencies.",
-      price: 299.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for IoT Solutions",
-      desc: "Integrating blockchain with Internet of Things (IoT) for enhanced security and transparency.",
-      price: 499.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Powered Voting Machine",
-      desc: "Secure and transparent voting machine powered by blockchain.",
-      price: 999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for Supply Chain Traceability",
-      desc: "Solution for enhancing traceability in supply chains using blockchain.",
-      price: 599.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Payment Processing Service",
-      desc: "Service for processing cryptocurrency payments securely.",
-      price: 149.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for Digital Advertising",
-      desc: "Platform for transparent and secure digital advertising using blockchain.",
-      price: 199.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Asset Management",
-      desc: "Service for managing and growing your cryptocurrency assets.",
-      price: 499.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for Media and Entertainment",
-      desc: "Solutions for the media and entertainment industry using blockchain technology.",
-      price: 799.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Savings Account",
-      desc: "High-interest savings account for your cryptocurrency holdings.",
-      price: 0.0,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for Voting and Elections",
-      desc: "Secure and transparent solutions for voting and elections using blockchain technology.",
-      price: 1299.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Custody Service",
-      desc: "Secure custody service for storing large amounts of cryptocurrencies.",
-      price: 999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Based Loyalty Program",
-      desc: "Loyalty program for businesses using blockchain technology.",
-      price: 249.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Powered Supply Chain Financing",
-      desc: "Solution for supply chain financing using blockchain.",
-      price: 799.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto ATM",
-      desc: "ATM machine for buying and selling cryptocurrencies.",
-      price: 4999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain-Based Insurance Solutions",
-      desc: "Insurance solutions using blockchain technology.",
-      price: 599.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Payment Card",
-      desc: "Payment card for spending your cryptocurrencies anywhere.",
-      price: 19.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for Energy Trading",
-      desc: "Platform for trading energy using blockchain technology.",
-      price: 999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for Intellectual Property Management",
-      desc: "Solution for managing intellectual property rights using blockchain.",
-      price: 699.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Crypto Derivatives Trading Platform",
-      desc: "Platform for trading cryptocurrency derivatives.",
-      price: 999.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-    {
-      img: "https://imilkom.usu.ac.id/wp-content/uploads/2019/03/blockchain.png",
-      title: "Blockchain for Government Services",
-      desc: "Solutions for enhancing government services using blockchain technology.",
-      price: 1499.99,
-      priceType: "IDR",
-      category: "blockchain",
-    },
-  ];
+  const categoryView = [
+    "Website",
+    "Web 3",
+    "Android Application",
+    "IOS Application",
+    "Blockchain Service",
+    "Bussiness Platform",
+    "Gaming Exchange Based Token",
+    "Payment Gateway",
+    "Decentralized Exchange",
+    "IOT",
+    "Create Robot Trading",
+    "Exchanger Platform",
+    "Android Exchange",
+    "IOS Exchange",
+    "NFT Platform",
+    "(COIN) - Sha 256",
+    "(TOKEN) - ERC 20, BSC 20, TRC 20",
+  ]
+  const [productsData, setProductsData] = useState<ProductDataType[]>([])
+  const [category, setCategory] = useState('website')
+  const [load, setLoad] = useState(false)
+
+  const getData = async () => {
+    setLoad(true)
+    try {
+      const resp = await axios(`/api/product/get/categories?name=${category}`)
+      setProductsData(resp.data)
+      setTimeout(() => {
+        // setLoad(false)
+      }, 1000)
+      setLoad(false)
+    } catch (error) {
+      setLoad(false)
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    getData()
+  }, [category])
+
 
   return (
-    <div className="w-full flex flex-col gap-16 lg:mt-5" id="products">
+    <div className="w-full flex flex-col gap-8 lg:mt-5" id="products">
       <div className="flex flex-col gap-3 items-center">
         <h1 className="text-2xl lg:text-5xl capitalize text-center font-semibold">
           Products
+          <p className="text-sm text-[#455A64] mt-3">There are numbers of reasons</p>
         </h1>
-        <p className="text-sm text-[#455A64] ">There are numbers of reasons</p>
       </div>
       <div className="w-full">
-        <Tabs
-          defaultValue="blockchain"
-          className="w-full flex flex-col gap-5  lg:justify-center items-center overflow-x-scroll"
-        >
-          <div className="w-full lg:overflow-hidden overflow-x-scroll md:w-fit">
-            <TabsList className="w-fit h-full">
-              <TabsTrigger value="blockchain">Blockchain</TabsTrigger>
-              <TabsTrigger value="website">Website</TabsTrigger>
-              <TabsTrigger value="android">Android App</TabsTrigger>
-              <TabsTrigger value="web">Web 3</TabsTrigger>
-              <TabsTrigger value="ios">IOS Application</TabsTrigger>
-              <TabsTrigger value="bussiness">Bussiness Platform</TabsTrigger>
+        <Tabs defaultValue={categoryView[0]} className="w-full flex flex-col gap-5 lg:justify-center items-center h-fit">
+          <ScrollArea className="w-full max-w-screen-xl pb-4 h-fit">
+            <TabsList className="w-full">
+              {categoryView.map(item => (
+                <TabsTrigger key={item} value={item} onClick={() => setCategory(item.toLowerCase())}>
+                  {item}
+                </TabsTrigger>
+              ))}
             </TabsList>
-          </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
-          <TabsContent value="blockchain" className="">
-            <div className="w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-5">
-              {productsData.slice(0, 10).map((item, index) => (
-                <CardProduct
-                  img={item.img}
-                  title={item.title}
-                  desc={item.desc}
-                  priceType={item.priceType}
-                  price={item.price}
-                  category={item.category}
-                  key={index}
-                />
-              ))}
-            </div>
-            <PaginationComponent />
-          </TabsContent>
-          <TabsContent value="website" className="">
-            <div className="w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-5">
-              {productsData.slice(0, 10).map((item, index) => (
-                <CardProduct
-                  img={item.img}
-                  title={item.title}
-                  desc={item.desc}
-                  priceType={item.priceType}
-                  price={item.price}
-                  category={item.category}
-                  key={index}
-                />
-              ))}
-            </div>
-            <PaginationComponent />
-          </TabsContent>
-          <TabsContent value="android" className="">
-            <div className="w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-5">
-              {productsData.slice(0, 10).map((item, index) => (
-                <CardProduct
-                  img={item.img}
-                  title={item.title}
-                  desc={item.desc}
-                  priceType={item.priceType}
-                  price={item.price}
-                  category={item.category}
-                  key={index}
-                />
-              ))}
-            </div>
-            <PaginationComponent />
-          </TabsContent>
-          <TabsContent value="web" className="">
-            <div className="w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-5">
-              {productsData.slice(0, 10).map((item, index) => (
-                <CardProduct
-                  img={item.img}
-                  title={item.title}
-                  desc={item.desc}
-                  priceType={item.priceType}
-                  price={item.price}
-                  category={item.category}
-                  key={index}
-                />
-              ))}
-            </div>
-            <PaginationComponent />
-          </TabsContent>
-          <TabsContent value="ios" className="">
-            <div className="w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-5">
-              {productsData.slice(0, 10).map((item, index) => (
-                <CardProduct
-                  img={item.img}
-                  title={item.title}
-                  desc={item.desc}
-                  priceType={item.priceType}
-                  price={item.price}
-                  category={item.category}
-                  key={index}
-                />
-              ))}
-            </div>
-            <PaginationComponent />
-          </TabsContent>
-          <TabsContent value="bussiness" className="">
-            <div className="w-full grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-5">
-              {productsData.slice(0, 10).map((item, index) => (
-                <CardProduct
-                  img={item.img}
-                  title={item.title}
-                  desc={item.desc}
-                  priceType={item.priceType}
-                  price={item.price}
-                  category={item.category}
-                  key={index}
-                />
-              ))}
-            </div>
-            <PaginationComponent />
-          </TabsContent>
+          {categoryView.map((item, index) => (
+            <TabsContent key={index} value={item} className="w-full">
+              {load ? (
+                <div className="w-full grid grid-cols-5 gap-5">
+                  <SkeletonGrid length={10} />
+                </div>
+              ) : (
+                <div className="w-full flex flex-col gap-8 items-center justify-center">
+                  {productsData.length > 0 ? (
+                    <div className="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-5 w-full">
+                      {productsData.map((item, index) => (
+                        <CardProduct data={item} key={index} />
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="max-w-xl mx-auto w-full">
+                        <Lottie animationData={upcommingAnimation} size={16} />
+                        <h1 className="text-center font-medium text-xl italic leading-snug">Sorry the products is incomming as soon as posible 😊 <br /> <span className="font-normal text-sm">Please stay tune on this website to see our new products 🚀</span></h1>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+          ))}
         </Tabs>
       </div>
     </div>

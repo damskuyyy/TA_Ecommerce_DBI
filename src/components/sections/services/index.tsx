@@ -1,4 +1,5 @@
-import CheckIcon from "@/components/ui/icons/check";
+
+import { CheckCircle } from "lucide-react";
 import React from "react";
 
 const Services = () => {
@@ -8,84 +9,84 @@ const Services = () => {
         Our Services
       </h1>
       <p className="text-[#455A64] text-center font-extralight mt-4">
-        providing manufacturing services
+        Providing manufacturing services
       </p>
-      <div className="grid lg:grid-cols-2 md:grid-cols-2 gap-[54px] lg:px-[258px] mt-16 ">
-        <ul className="flex flex-col gap-[14px] ">
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+      <div className="grid lg:grid-cols-2 grid-cols-2 gap-[54px] lg:px-[258px] mt-16 ">
+        <ul className="flex flex-col gap-[14px]">
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Website</span>
           </li>
-          <li className="flex gap-8 text-sm lg:text-base font-semibold">
-            <CheckIcon />
+          <li className="flex lg:gap-8 gap-3 text-sm lg:text-base font-semibold">
+            <CheckCircle />
             <span>Web 3</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Android Application</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>IOS Application</span>
           </li>
         </ul>
         <ul className="flex flex-col gap-[14px] ">
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Blockchain Service</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Bussiness Platform</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Gaming Exchange Based Token</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Payment Gateway</span>
           </li>
         </ul>
         <ul className="flex flex-col gap-[14px] ">
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Decentralized Exchange</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Internet of Things (IOT)</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Create Robot Trading</span>
           </li>
         </ul>
         <ul className="flex flex-col gap-[14px] ">
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Exchanger Platform</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>Android Exchange</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>IOS Exchange</span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>NFT Platform</span>
           </li>
         </ul>
         <ul className="flex flex-col gap-[14px] ">
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>(COIN) - Sha 256 </span>
           </li>
-          <li className="flex text-sm lg:text-base gap-8 font-semibold">
-            <CheckIcon />
+          <li className="flex text-sm lg:text-base lg:gap-8 gap-3 font-semibold">
+            <CheckCircle />
             <span>(TOKEN) - ERC 20, BSC 20, TRC 20</span>
           </li>
         </ul>

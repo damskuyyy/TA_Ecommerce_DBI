@@ -45,10 +45,10 @@ const Team: React.FC = () => {
     <div className="container mx-auto py-8">
       <div className="flex flex-col gap-3 items-center">
         <h1 className="text-5xl capitalize text-center font-semibold">
-          Tim Kami
+          Our Team
         </h1>
         <p className="text-[#455A64] ">
-          Tim Digital Blockchain Indonesia
+          Team Digital Blockchain Indonesia
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-[60px]">

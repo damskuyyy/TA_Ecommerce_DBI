@@ -1,13 +1,14 @@
 import CodeIcon from "@/components/ui/icons/code";
 import MedalIcon from "@/components/ui/icons/medal";
 import TrophyIcon from "@/components/ui/icons/trophy";
+import Lottie from "lottie-react";
 import React from "react";
-
+import bussinessAnimation from '../../../../public/animations/business-sales-profit.json'
 const ChooseUs = () => {
   return (
-    <div className="flex flex-col items-center lg:p-8 lg:flex-row">
+    <div className="flex flex-col items-center lg:p-8 lg:flex-row gap-10">
       <div className="w-full lg:w-1/2 md:w-2/3 flex justify-center mb-8 md:mb-0">
-        <img src="/bghero.png" alt="" className="lg:w-5/6 w-full h-full" />
+        <Lottie animationData={bussinessAnimation} />
       </div>
       <div className="w-full lg:w-1/2">
         <h1 className="text-4xl font-semibold mb-4 lg:text-5xl">

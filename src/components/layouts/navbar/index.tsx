@@ -29,7 +29,7 @@ import { useRouter } from "next/router";
 const Navbar = () => {
   const [view, setView] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const { data }: any = useSession()
+  const { data: session, status }: any = useSession()
   const [load, setLoad] = useState(false)
   const { push } = useRouter()
 
@@ -56,10 +56,9 @@ const Navbar = () => {
   const getUserData = async () => {
     setLoad(true)
     try {
-      if (data?.user) {
-        const resp = await axios(`/api/user/get/${data.user.id}`)
+      if (session?.user) {
+        const resp = await axios(`/api/user/get/${session?.user.id}`)
         setUserdata(resp.data)
-        
       }
     } catch (error) {
       console.error("Error fetching user data:", error)
@@ -69,11 +68,10 @@ const Navbar = () => {
   }
 
   useEffect(() => {
-    if (data?.user) {
+    if (status === "authenticated" && session?.user?.id) {
       getUserData()
-      console.log(userData)
     }
-  }, [data])
+  }, [status, session?.user?.id])
 
   return (
     <div className="w-full flex py-5 relative px-6 justify-between">
@@ -146,7 +144,7 @@ const Navbar = () => {
         </div>
       </div>
       <div className="items-center gap-3 flex">
-        {userData?.name === '' && <div className="flex items-center gap-3 lg:hidden">
+        {status === 'unauthenticated' && <div className="flex items-center gap-3 lg:hidden">
           <Link href={"/user/login"}>
             <Button size={"sm"} variant={"default"}>
               Login or Signup
@@ -154,7 +152,7 @@ const Navbar = () => {
           </Link>
         </div>}
 
-        {!load && userData?.name ? (
+        {!load && status === 'authenticated' ? (
           <div className="flex items-center gap-5">
             <Sheet>
               <SheetTrigger className="relative">
@@ -184,14 +182,14 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <p className="p-2 py-1 text-sm font-medium">{userData.email}</p>
-                <hr className="mb-2"/>
+                <hr className="mb-2" />
                 <DropdownMenuItem>
                   <Link href={'/profile'}>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href={'/cart'}>Cart</Link>
                 </DropdownMenuItem>
-                
+
                 <div className="flex justify-center items-center p-2 py-1 w-full">
                   <AlertLogout ok={async () => {
                     await signOut({ redirect: false })

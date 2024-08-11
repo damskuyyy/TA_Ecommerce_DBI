@@ -10,10 +10,10 @@ const secret = process.env.NEXT_PRIVATE_SECRET_PASS_KEY
 const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
-    maxAge: 12 * 60 * 60,
+    maxAge: 5 * 60 * 60,
   },
   jwt: {
-    maxAge: 12 * 60 * 60,
+    maxAge: 5 * 60 * 60,
   },
   providers: [
     CredentialsProvider({

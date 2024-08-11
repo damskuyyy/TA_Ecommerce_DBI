@@ -9,18 +9,13 @@ const Contact = () => {
       <div className="w-full flex justify-start items-center">
         <div className="flex flex-col gap-8">
           <h1 className="lg:text-6xl text-2xl font-semibold lg:text-left text-center">
-            Hubungi Kami Sekarang
+            Contact Us Now!
           </h1>
           <p className="lg:text-lg text-sm lg:text-left text-center leading-normal text-[#455A64]">
-            Anda dapat menghubungi kami kapan saja dan di mana saja dengan
-            mudah. Setelah Anda mengirimkan formulir, tim kami akan segera
-            menanggapi pesan Anda.
+            You can reach out to us anytime, anywhere, with ease. Once you submit the form, our team will promptly respond to your message.
           </p>
           <p className="lg:text-lg text-sm lg:text-left text-center leading-normal text-[#455A64]">
-            Kami siap membantu menjawab semua pertanyaan mengenai kebutuhan
-            proyek Anda dan memberikan solusi terbaik. Jangan ragu untuk
-            menghubungi para ahli kami agar kami dapat membantu menyelesaikan
-            masalah bisnis Anda
+            We're here to answer all your project-related questions and provide the best solutions. Don’t hesitate to connect with our experts so we can help resolve your business challenges.
           </p>
           <ul>
             <li className="mb-2 flex items-center">
@@ -67,11 +62,11 @@ const Contact = () => {
             </li>
           </ul>
         </div>
-        
+
       </div>
       <div className='w-full'>
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.6229865106893!2d114.34893827505692!3d-8.24061209179255!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd15abdd13e4fb5%3A0x1d2dcf43663aacf!2sJl.%20Sutawijaya%20No.89%2C%20Sumberrejo%2C%20Kec.%20Banyuwangi%2C%20Kabupaten%20Banyuwangi%2C%20Jawa%20Timur%2068419!5e0!3m2!1sen!2sid!4v1722494184473!5m2!1sen!2sid" width={600} height={450} className='rounded-md w-full' allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-        </div>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.6229865106893!2d114.34893827505692!3d-8.24061209179255!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd15abdd13e4fb5%3A0x1d2dcf43663aacf!2sJl.%20Sutawijaya%20No.89%2C%20Sumberrejo%2C%20Kec.%20Banyuwangi%2C%20Kabupaten%20Banyuwangi%2C%20Jawa%20Timur%2068419!5e0!3m2!1sen!2sid!4v1722494184473!5m2!1sen!2sid" width={600} height={450} className='rounded-md w-full' allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+      </div>
     </div>
   );
 };

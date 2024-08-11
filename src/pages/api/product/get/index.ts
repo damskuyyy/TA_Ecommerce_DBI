@@ -1,16 +1,19 @@
-import prisma from "@/utils/prisma";
+import prisma from "@/utils/prisma"
 import { NextApiRequest, NextApiResponse } from "next"
+
+
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-
-    try {
-        const data = await prisma.product.findMany()
-        res.status(200).json(data)
-
-    } catch (error) {
-        res.status(500).json({ msg: 'Data Product Error!', error })
-        console.log(error)
-    }
-
+  const { code } = req.query
+  try {
+    const data = await prisma.product.findFirst({ where: { code_product: String(code) } })
+    res.status(200).send(data)
+  } catch (error) {
+    res.status(500).json({
+      msg: "internal server error!",
+      error
+    })
+  }
 }
 
-export default handler; 
+export default handler

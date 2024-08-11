@@ -4,7 +4,7 @@ const AboutUs = () => {
   return (
     <div className="flex flex-col items-center lg:p-8 lg:flex-row ">
       <div className="w-full md:w-2/3 lg:w-1/2 flex justify-center mb-8 md:mb-0">
-        <img src="/bghero.png" alt="" className="lg:w-5/6 w-full h-full justify-center" />
+        <img src="/logo.png" alt="" className="lg:w-5/6 w-full h-full justify-center" />
       </div>
       <div className="w-full lg:w-1/2">
         <h1 className="text-4xl font-semibold mb-4 lg:text-5xl ">
