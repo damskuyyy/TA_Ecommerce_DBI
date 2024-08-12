@@ -98,7 +98,7 @@ const Details = () => {
     setLoad(true)
     if (id) {
       try {
-        const resp = await axios(`http://localhost:3000/api/product/get?code=${String(id)}`)
+        const resp = await axios(`/api/product/get?code=${String(id)}`)
         setProduct(resp.data)
         setLoad(false)
       } catch (error) {
