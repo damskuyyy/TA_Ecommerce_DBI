@@ -184,7 +184,7 @@ const Navbar = () => {
                 <p className="p-2 py-1 text-sm font-medium">{userData.email}</p>
                 <hr className="mb-2" />
                 <DropdownMenuItem>
-                  <Link href={'/profile'}>Profile</Link>
+                  <Link href={'/userprofile'}>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href={'/cart'}>Cart</Link>
