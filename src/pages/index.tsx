@@ -16,7 +16,7 @@ export default function Home() {
       <Head>
         <title>PT. Digital Blockchain Indonesia</title>
       </Head>
-      <div className={`flex w-full flex-col gap-16 ${inter.className}`}>
+      <div className={`flex w-full flex-col lg:gap-16 gap-8 ${inter.className}`}>
         <Hero />
         <Services />
         <ChooseUs/>
