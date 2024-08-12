@@ -1,9 +1,12 @@
 import { Inter } from "next/font/google";
 import Hero from "@/components/sections/hero";
 import Head from "next/head";
-import About from "@/components/sections/about";
+import Services from "@/components/sections/services";
+import ChooseUs from "@/components/sections/chooseus";
 import BestProducts from "@/components/sections/bestProducts";
-import Contact from "@/components/sections/contact";
+import Discussion from "@/components/sections/discussion";
+import Stats from "@/components/sections/stats";
+import Faq from "@/components/sections/faq";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +18,12 @@ export default function Home() {
       </Head>
       <div className={`flex w-full flex-col gap-16 ${inter.className}`}>
         <Hero />
-        <About />
+        <Services />
+        <ChooseUs/>
         <BestProducts />
-        <Contact />
+        <Stats />
+        <Faq />
+        <Discussion />
       </div>
     </>
   );

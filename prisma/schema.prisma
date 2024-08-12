@@ -14,21 +14,52 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String   @unique
-  emailVerified Boolean  @default(true)
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String  @unique
+  phone         String
+  emailVerified Boolean @default(false)
   password      String
-  items         String[]
+  items         Json[]  @default([]) //prod-ID qty 
+  image         String  @default("https://cactusthemes.com/blog/wp-content/uploads/2018/01/tt_avatar_small.jpg")
+  type          String  @default("crendetials")
 }
 
 model Product {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  code_product String   @unique
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  code_product String    @unique
   name         String?
   price        Float
   image        String[]
+  category     String
+  variants     String[]
+  details      String
+  spec         String
+  information  String
+  sold         Int
+  rate         Int
+  reviews      Json[]
+  discusses    Json[]
+  stock        Int
+  minOrder     Int
+  desc         String
 }
+
+// model Review {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   userId    String
+//   product   Product @relation(fields: [productId], references: [id])
+//   productId String  @db.ObjectId
+//   context   String
+// }
+
+// model Discuss {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   userId    String
+//   product   Product @relation(fields: [productId], references: [id])
+//   productId String  @db.ObjectId
+//   context   String
+// }
 
 model Customer {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -42,7 +73,7 @@ model Order {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   date        DateTime
   total       Float
-  customer_id String
+  customer_id String   @db.ObjectId
   customer    Customer @relation(fields: [customer_id], references: [id])
   product     String[]
   xendit_id   String?
