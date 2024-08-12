@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt'
 const secret = process.env.NEXT_PRIVATE_SECRET_PASS_KEY
 
 const authOptions: NextAuthOptions = {
+  secret: process.env.NEXT_PRIVATE_JWT_SECRET,
   session: {
     strategy: 'jwt',
     maxAge: 5 * 60 * 60,
