@@ -6,7 +6,7 @@ const SkeletonGrid = ({ length }: { length: number }) => {
   return (
     <>
       {Array.from({ length: length }, () => (
-        <Card className='flex flex-col justify-between'>
+        <Card className='flex flex-col justify-between' key={length}>
           <div>
             <CardHeader>
               <Skeleton className='w-full h-36'/>

@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 
 const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) => {
   const { toast } = useToast()
-  const fee = (price * 0.004)
+  const fee = price && (price * 0.004)
   const tax = 0.05
   const appFee = 0.002
   const total = (price + (fee + price * tax + price * appFee))
