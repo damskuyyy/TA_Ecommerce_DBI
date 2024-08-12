@@ -75,7 +75,7 @@ const BestProducts = () => {
           {categoryView.map((item, index) => (
             <TabsContent key={index} value={item} className="w-full">
               {load ? (
-                <div className="w-full grid grid-cols-5 gap-5">
+                <div className="w-full grid lg:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-5">
                   <SkeletonGrid length={10} />
                 </div>
               ) : (

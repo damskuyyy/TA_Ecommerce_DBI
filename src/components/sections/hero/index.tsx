@@ -6,7 +6,7 @@ import bussinessAnimation from '../../../../public/animations/business-team.json
 
 const Hero = () => {
   return (
-    <div className="w-full justify-between flex items-center gap-10 lg:flex-row flex-col-reverse">
+    <div className="w-full justify-between flex items-center lg:gap-10 gap-3 lg:flex-row flex-col-reverse lg:pb-0 pb-10">
       <div className="lg:w-1/2 w-full flex justify-start items-center">
         <div className="flex flex-col gap-6">
           <h1 className="text-6xl font-semibold lg:text-left text-center">
@@ -25,7 +25,7 @@ const Hero = () => {
           </div>
         </div>
       </div>
-      <div className="lg:w-1/2 w-full flex lg:justify-center justify-center items-center lg:h-[65vh] md:h-[65vh] h-[40vh] overflow-hidden">
+      <div className="lg:w-1/2 flex lg:justify-center justify-center items-center lg:h-[65vh] md:h-[65vh] h-[40vh] overflow-hidden">
         <Lottie animationData={bussinessAnimation} />
       </div>
     </div>

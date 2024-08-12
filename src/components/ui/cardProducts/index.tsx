@@ -28,7 +28,7 @@ const CardProduct = ({ data }: Props) => {
           </CardDescription>
         </CardContent>
       </div>
-      <CardFooter className="flex items-center justify-between">
+      <CardFooter className="flex lg:items-center items-start lg:flex-row flex-col gap-3 justify-between">
         <p className="font-medium text-xs">
           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(data.price) || 0)}
         </p>

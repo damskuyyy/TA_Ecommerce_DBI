@@ -4,7 +4,7 @@ import { ProductDataType } from '@/types/productDataTypes';
 import { MinusIcon, Pencil2Icon, PlusIcon, StarIcon } from '@radix-ui/react-icons';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { TabsContent } from '@radix-ui/react-tabs';
 import Gallery from '@/components/ui/galery';
@@ -16,10 +16,12 @@ import Lottie from 'lottie-react';
 import notfoundData from '../../../../../public/animations/notfound.json';
 import { Textarea } from '@/components/ui/textarea';
 import { PenBoxIcon, Trash2Icon } from 'lucide-react';
+import { ItemDataType } from '@/types/itemsDataTypes';
+import { useToast } from '@/components/ui/use-toast';
 const ModalCheckout = dynamic(() => import('@/components/ui/modals/checkout'), { ssr: false })
 const ModalAddReview = dynamic(() => import('@/components/ui/modals/addReview'), { ssr: false })
 
-const Details = () => {
+const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>> }) => {
   const { id } = useRouter().query
   const { data: status }: any = useSession()
   const [product, setProduct] = useState<ProductDataType>({
@@ -52,6 +54,7 @@ const Details = () => {
   const [notes, setNotes] = useState('')
   const [notesDone, setNotesDone] = useState(false)
   const notesRef = useRef<HTMLTextAreaElement>(null)
+  const { toast } = useToast()
 
   const handleQtyPlus = () => {
     setQty(qty + 1)
@@ -120,6 +123,30 @@ const Details = () => {
 
   const calculateSubtotal = (price: number) => {
     return price * qty
+  }
+
+  const handlePushItems = () => {
+    setItems((prevItems) => {
+      const itemExists = prevItems.some(item => item.code_product === String(id));
+
+      if (itemExists) {
+        toast({
+          title: 'Ouch!',
+          description: 'You have added into cart 😒! If you wanna update quantity, please update it on cart icon in the top right😁',
+          variant: 'destructive',
+        })
+        return prevItems
+      } else {
+        toast({
+          title: 'Thank you 😁',
+          description: 'The product has been added in your cart. Click "Cart icon" on top right to view your recent cart 😊',
+          variant: 'default',
+        })
+        return [...prevItems, { code_product: String(id), qty, variant, notes }];
+      }
+    })
+
+    console.log(items)
   }
 
 
@@ -286,7 +313,6 @@ const Details = () => {
                       <Lottie animationData={notfoundData} />
                     </div>
                     <h1 className='text-gray-500 text-center'>Unfortunately, our product has no reviews. <br /> Click "Add review" button below to add review into our product 😊</h1>
-                    {/* <Button size={'sm'} className='mt-2'>Add review</Button> */}
                     <ModalAddReview />
                   </div>
                 )
@@ -370,7 +396,7 @@ const Details = () => {
                       <PlusIcon />
                     </Button>
                   </div>
-                  <p className='font-medium capitalize flex items-center gap-1 justify-center'>remaining stock : <span className={`${product.stock && product.stock >= 99 ? "underline" : ''}`}>{product.stock && product?.stock >= 99 ? 'Unlimited' : product.stock}</span> </p>
+                  <p className='font-medium capitalize flex items-center gap-1 justify-center '>remaining stock : <span className={`${product.stock && product.stock >= 99 ? "underline" : ''}`}>{product.stock && product?.stock >= 99 ? 'Unlimited' : product.stock}</span> </p>
                 </div>
                 {notesView ? (
                   <div className='flex flex-col gap-3 w-full items-end mb-3'>
@@ -408,7 +434,7 @@ const Details = () => {
                   <h1 className='font-medium'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(calculateSubtotal(product.price)))}</h1>
                 </div>
                 <div className='mt-5 w-full flex flex-col gap-3'>
-                  <Button variant={'outline'}>Add to cart</Button>
+                  <Button disabled={items.some(item => item.code_product === String(id))} variant={'outline'} onClick={handlePushItems}>Add to cart</Button>
                   <ModalCheckout name={product.name} price={calculateSubtotal(product.price)} image={product.image} variants={[variant]} spec={''} information={''} sold={0} rate={0} reviews={[]} discusses={[]} stock={0} minOrder={0} desc={product.desc} category={''} />
                 </div>
               </CardContent>
