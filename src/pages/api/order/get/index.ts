@@ -4,6 +4,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     try {
         const data = await prisma.order.findMany()
+        console.log(data)
         res.status(200).json(data)
        
     } catch (error) {
