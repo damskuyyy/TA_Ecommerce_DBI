@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { PenBoxIcon, Trash2Icon } from 'lucide-react';
 import { ItemDataType } from '@/types/itemsDataTypes';
 import { useToast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
 const ModalCheckout = dynamic(() => import('@/components/ui/modals/checkout'), { ssr: false })
 const ModalAddReview = dynamic(() => import('@/components/ui/modals/addReview'), { ssr: false })
 
@@ -126,25 +127,36 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
   }
 
   const handlePushItems = () => {
-    setItems((prevItems) => {
-      const itemExists = prevItems.some(item => item.code_product === String(id));
+    if (status === 'authenticated') {
+      setItems((prevItems) => {
+        const itemExists = prevItems.some(item => item.code_product === String(id));
 
-      if (itemExists) {
-        toast({
-          title: 'Ouch!',
-          description: 'You have added into cart 😒! If you wanna update quantity, please update it on cart icon in the top right😁',
-          variant: 'destructive',
-        })
-        return prevItems
-      } else {
-        toast({
-          title: 'Thank you 😁',
-          description: 'The product has been added in your cart. Click "Cart icon" on top right to view your recent cart 😊',
-          variant: 'default',
-        })
-        return [...prevItems, { code_product: String(id), qty, variant, notes }];
-      }
-    })
+        if (itemExists) {
+          toast({
+            title: 'Ouch!',
+            description: 'You have added into cart 😒! If you wanna update quantity, please update it on cart icon in the top right😁',
+            variant: 'destructive',
+          })
+          return prevItems
+        } else {
+          toast({
+            title: 'Thank you 😁',
+            description: 'The product has been added in your cart. Click "Cart icon" on top right to view your recent cart 😊',
+            variant: 'default',
+          })
+          return [...prevItems, { code_product: String(id), qty, variant, notes }];
+        }
+      })
+    } else {
+      toast({
+        className: cn(
+          'flex fixed md:max-w-[420px] md:top-4 md:right-4 top-0 right-0'
+        ),
+        title: 'Uh Oh! 😒',
+        variant: 'destructive',
+        description: "You're not logged in 😑. Please login first to product into cart!"
+      })
+    }
 
     console.log(items)
   }

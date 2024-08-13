@@ -295,25 +295,25 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                   </div>
 
                   {items.length > 0 && (
-                    <SheetDescription className="w-full flex flex-col gap-3 text-lg p-0">
+                    <SheetDescription className="w-full flex flex-col gap-2 text-lg p-0">
                       <div className="flex w-full justify-between">
-                        <h1 className="font-semibold text-primary text-sm">Subtotal :</h1>
-                        <p className="text-gray-500 text-sm">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(subtotal)}</p>
+                        <h1 className="font-semibold text-primary text-xs">Subtotal :</h1>
+                        <p className="text-gray-500 text-xs">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(subtotal)}</p>
                       </div>
                       <hr />
                       <div className="flex w-full justify-between">
-                        <h1 className="font-semibold text-primary text-sm">TAX :</h1>
-                        <p className="text-gray-500 text-sm text-right">({taxRate * 100}%) <br /> {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)} </p>
+                        <h1 className="font-semibold text-primary text-xs">TAX :</h1>
+                        <p className="text-gray-500 text-xs text-right">({taxRate * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)} </p>
                       </div>
                       <hr />
                       <div className="flex w-full justify-between">
-                        <h1 className="font-semibold text-primary text-sm">Transaction fee :</h1>
-                        <p className="text-gray-500 text-sm text-right">({transactionValue * 100}%) <br /> {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transactionFee)} </p>
+                        <h1 className="font-semibold text-primary text-xs">Transaction fee :</h1>
+                        <p className="text-gray-500 text-xs text-right">({transactionValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transactionFee)} </p>
                       </div>
                       <hr />
                       <div className="flex w-full justify-between">
-                        <h1 className="font-semibold text-primary text-sm">TOTAL :</h1>
-                        <p className="text-primary font-bold text-lg">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(subtotal)}</p>
+                        <h1 className="font-semibold text-primary text-xs">TOTAL :</h1>
+                        <p className="text-primary font-bold text-sm">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}</p>
                       </div>
                       <div className="w-full flex flex-col gap-3 mt-5">
                         <Button size={'sm'}>Credit Card</Button>
@@ -355,6 +355,8 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                           name: "",
                           type: "",
                         })
+                        setItems([])
+                        setProducts([])
                         setTimeout(() => {
                           push('/user/login')
                         }, 500);
