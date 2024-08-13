@@ -337,7 +337,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                     <p className="p-2 py-1 text-sm font-bold">{userData.email}</p>
                     <hr className="mb-2" />
                     <DropdownMenuItem>
-                      <Link className="font-medium hover:opacity-80 w-full" href={'/profile'}>Profile</Link>
+                      <Link className="font-medium hover:opacity-80 w-full" href={'/userprofile'}>Profile</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Link className="font-medium hover:opacity-80 w-full" href={'/cart'}>Cart</Link>
