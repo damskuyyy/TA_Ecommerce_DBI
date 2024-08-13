@@ -15,6 +15,8 @@ import Lottie from 'lottie-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Scrollbar } from '@radix-ui/react-scroll-area';
 
 const ProfilePage = () => {
   const { data: session, status }: any = useSession()
@@ -59,24 +61,27 @@ const ProfilePage = () => {
         <title>DBIX | User - {user.name}</title>
       </Head>
       <Tabs className='max-w-screen-lg mx-auto pb-8' defaultValue='myProfile'>
-        <TabsList className='w-full'>
-          <TabsTrigger value='myProfile' className='flex items-center gap-2'>
-            <CircleUserRound size={20} />
-            Profile
-          </TabsTrigger>
-          <TabsTrigger value='security' className='flex items-center gap-2'>
-            <LockKeyholeIcon size={20} />
-            Security
-          </TabsTrigger>
-          <TabsTrigger value='recentOrder' className='flex items-center gap-2'>
-            <ShoppingBasketIcon size={20} />
-            Recent Order
-          </TabsTrigger>
-          <TabsTrigger value='settings' className='flex items-center gap-2'>
-            <CogIcon size={20} />
-            Settings
-          </TabsTrigger>
-        </TabsList>
+        <ScrollArea className="w-full max-w-screen-xl lg:pb-0 pb-4 h-fit">
+          <TabsList className='w-full'>
+            <TabsTrigger value='myProfile' className='flex items-center gap-2'>
+              <CircleUserRound size={20} />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value='security' className='flex items-center gap-2'>
+              <LockKeyholeIcon size={20} />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value='recentOrder' className='flex items-center gap-2'>
+              <ShoppingBasketIcon size={20} />
+              Recent Order
+            </TabsTrigger>
+            <TabsTrigger value='settings' className='flex items-center gap-2'>
+              <CogIcon size={20} />
+              Settings
+            </TabsTrigger>
+          </TabsList>
+          <Scrollbar orientation='horizontal' />
+        </ScrollArea>
         {load ? (
           <div className='w-full h-[50vh] opacity-50 flex justify-center items-center'>
             <div className='flex items-center gap-3'>
@@ -187,7 +192,7 @@ const ProfilePage = () => {
                     {user.emailVerified ? (
                       <Card className='bg-primary'>
                         <CardContent className='flex flex-col gap-2 items-center pt-3'>
-                          <Lottie animationData={emailVerified} className='w-1/5'/>
+                          <Lottie animationData={emailVerified} className='w-1/5' />
                           <h1 className='font-semibold text-primary-foreground'>Your email has been verified!</h1>
                         </CardContent>
                       </Card>
