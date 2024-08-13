@@ -24,7 +24,7 @@ const ModalAddReview = dynamic(() => import('@/components/ui/modals/addReview'),
 
 const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>> }) => {
   const { id } = useRouter().query
-  const { data: status }: any = useSession()
+  const { data: session, status }: any = useSession()
   const [product, setProduct] = useState<ProductDataType>({
     code_product: '',
     name: '',
@@ -157,8 +157,6 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
         description: "You're not logged in 😑. Please login first to product into cart!"
       })
     }
-
-    console.log(items)
   }
 
 

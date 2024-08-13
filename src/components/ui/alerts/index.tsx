@@ -12,19 +12,19 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 
-const AlertLogout = ({ ok }: { ok: () => void }) => {
+const Alerts = ({ ok, desc, btn }: { ok: () => void, desc: string, btn: string }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger className='w-full'>
         <Button variant={"destructive"} size={'sm'} className="w-full font-bold">
-          Signout
+          {btn}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className='lg:max-w-lg md:max-w-md max-w-sm mx-auto w-full rounded-xl'>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            As a result, you will be logged out from your account and your session will end.
+            {desc}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -36,4 +36,4 @@ const AlertLogout = ({ ok }: { ok: () => void }) => {
   );
 };
 
-export default AlertLogout;
+export default Alerts;

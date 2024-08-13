@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sheet";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
-import AlertLogout from "@/components/ui/alertLogout";
+import Alerts from "@/components/ui/alerts";
 import { useRouter } from "next/router";
 import { ItemDataType } from "@/types/itemsDataTypes";
 import noData from '../../../../public/animations/nodata.json'
@@ -315,9 +315,12 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                         <h1 className="font-semibold text-primary text-xs">TOTAL :</h1>
                         <p className="text-primary font-bold text-sm">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}</p>
                       </div>
-                      <div className="w-full flex flex-col gap-3 mt-5">
-                        <Button size={'sm'}>Credit Card</Button>
-                        <Button size={'sm'} variant={'outline'}>Wallet (Solana)</Button>
+                      <div className="w-full flex flex-col gap-2 mt-5">
+                        <Button size={'sm'}>Confirm</Button>
+                        <Alerts btn="Delete all" desc="As a result, the cart will be empty. and you must add your items again." ok={() =>{
+                          setProducts([])
+                          setItems([])
+                        }}/>
                       </div>
                     </SheetDescription>
                   )}
@@ -344,7 +347,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                     </DropdownMenuItem>
 
                     <div className="flex justify-center items-center p-2 py-1 w-full">
-                      <AlertLogout ok={async () => {
+                      <Alerts ok={async () => {
                         await signOut({ redirect: false })
                         setUserdata({
                           id: "",
@@ -360,7 +363,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                         setTimeout(() => {
                           push('/user/login')
                         }, 500);
-                      }} />
+                      }} desc="As a result, you will be logged out from your account and your session will end." btn="Signout"/>
                     </div>
                   </DropdownMenuContent>
                 </div>
