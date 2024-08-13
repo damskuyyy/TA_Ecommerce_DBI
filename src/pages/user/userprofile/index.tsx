@@ -1,6 +1,6 @@
 import React from 'react';
-import Profile from '../profile';
-import Sidebar from '../sidebar';
+import Profile from '../../../components/profile';
+import Sidebar from '../../../components/sidebar';
 
 const userData = {
   id: '08954657382',
@@ -15,7 +15,7 @@ const userData = {
 
 const Home: React.FC = () => {
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="lg:bg-gray-100 flex-col">
       <Sidebar />
       <main className="flex-grow p-6">
         <Profile user={userData} />
