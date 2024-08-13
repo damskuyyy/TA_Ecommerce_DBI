@@ -32,7 +32,7 @@ export function ModalEditProfile() {
       <div className="lg:block hidden">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="default">Edit</Button>
+            <Button variant="default" size={'sm'}>Edit</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>

@@ -49,7 +49,8 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
     type: "",
   })
   const [products, setProducts] = useState<ProductDataType[]>([])
-  const [itemsLoad, setItemsLoad] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [dropdownOpen2, setDropdownOpen2] = useState(false)
 
   useEffect(() => {
     if (view) {
@@ -156,7 +157,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
     <div className="w-full flex py-5 relative lg:px-0  px-6 justify-between">
       <div className="font-bold text-lg flex items-center gap-5">
         <div className="flex gap-4 lg:hidden">
-          <button onClick={() => setView(!view)} className="lg:hidden block">
+          <button name="buttonnav" onClick={() => setView(!view)} className="lg:hidden block">
             {view ? <CrossCircledIcon width={20} height={20} /> : <ButtoNavIcon />}
           </button>
         </div>
@@ -195,7 +196,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
           <Link href={"/"} className="hover:opacity-80 font-semibold">
             Home
           </Link>
-          <DropdownMenu>
+          <DropdownMenu open={dropdownOpen2} onOpenChange={setDropdownOpen2}>
             <DropdownMenuTrigger>
               <div className="flex items-center gap-2 font-semibold">
                 Company
@@ -204,13 +205,13 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem className="font-semibold w-full">
-                <Link className="w-full" href={"/aboutus"}>About Us</Link>
+                <Link onClick={() => setDropdownOpen2(false)} className="w-full" href={"/aboutus"}>About Us</Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="font-semibold w-full">
-                <Link className="w-full" href={"/team"}>Our Team</Link>
+                <Link onClick={() => setDropdownOpen2(false)} className="w-full" href={"/team"}>Our Team</Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="font-semibold w-full">
-                <Link className="w-full" href={"/#faqs"}>Faq's</Link>
+                <Link onClick={() => setDropdownOpen2(false)} className="w-full" href={"/#faqs"}>Faq's</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -240,8 +241,8 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
           status === 'authenticated' ? (
             <div className="flex items-center gap-5">
               <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                <SheetTrigger className="relative">
-                  {products.length > 0 && <Badge className="absolute -top-3 -right-3">{products.length}</Badge>}
+                <SheetTrigger className="relative" name="shoppingcartbutton">
+                  {products.length > 0 && <Badge className="absolute -top-3 -right-3 p-1 py-0.5 bg-transparent font-bold text-zinc-950">{products.length}</Badge>}
                   <ShoppingCart color="#000000" className="" />
                 </SheetTrigger>
                 <SheetContent className={`flex flex-col gap-5 w-full items-start justify-between`}>
@@ -305,10 +306,14 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                         <h1 className="font-semibold text-primary text-xs">TAX :</h1>
                         <p className="text-gray-500 text-xs text-right">({taxRate * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)} </p>
                       </div>
-                      <hr />
+                      
                       <div className="flex w-full justify-between">
                         <h1 className="font-semibold text-primary text-xs">Transaction fee :</h1>
                         <p className="text-gray-500 text-xs text-right">({transactionValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transactionFee)} </p>
+                      </div>
+                      <div className="flex w-full justify-between">
+                        <h1 className="font-semibold text-primary text-xs">Application fee :</h1>
+                        <p className="text-gray-500 text-xs text-right">({applicationValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(applicationFee)} </p>
                       </div>
                       <hr />
                       <div className="flex w-full justify-between">
@@ -326,7 +331,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                   )}
                 </SheetContent>
               </Sheet>
-              <DropdownMenu>
+              <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                 <div className="w-fit hover:opacity-70 transition-opacity">
                   <DropdownMenuTrigger className="flex items-center gap-2">
                     <img
@@ -340,10 +345,10 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                     <p className="p-2 py-1 text-sm font-bold">{userData.email}</p>
                     <hr className="mb-2" />
                     <DropdownMenuItem>
-                      <Link className="font-medium hover:opacity-80 w-full" href={'/userprofile'}>Profile</Link>
+                      <Link onClick={() => setDropdownOpen(false)} className="font-medium hover:opacity-80 w-full" href={'/user/profile'}>Profile</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Link className="font-medium hover:opacity-80 w-full" href={'/cart'}>Cart</Link>
+                      <Link onClick={() => setDropdownOpen(false)} className="font-medium hover:opacity-80 w-full" href={'/user/profile#cart'}>Cart</Link>
                     </DropdownMenuItem>
 
                     <div className="flex justify-center items-center p-2 py-1 w-full">

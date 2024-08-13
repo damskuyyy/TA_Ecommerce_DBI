@@ -23,6 +23,7 @@ model User {
   items         Json[]  @default([]) //prod-ID qty 
   image         String  @default("https://cactusthemes.com/blog/wp-content/uploads/2018/01/tt_avatar_small.jpg")
   type          String  @default("crendetials")
+  orders        Json[]  @default([]) //prod-ID
 }
 
 model Product {
