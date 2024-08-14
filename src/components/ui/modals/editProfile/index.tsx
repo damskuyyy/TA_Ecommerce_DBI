@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import EditIcon from "../../icons/edit";
 
 export function ModalEditProfile() {
   const [open, setOpen] = React.useState(false);
@@ -32,7 +33,7 @@ export function ModalEditProfile() {
       <div className="lg:block hidden">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="default" size={'sm'}>Edit</Button>
+            <Button variant="ghost"><EditIcon /></Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -49,7 +50,7 @@ export function ModalEditProfile() {
       <div className="lg:hidden block">
         <Drawer open={openMobile} onOpenChange={setOpenMobile}>
           <DrawerTrigger asChild>
-            <Button variant="default">Edit</Button>
+          <Button variant="ghost"><EditIcon /></Button>
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader className="text-left">
@@ -81,18 +82,6 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
       <div className="grid gap-2">
         <Label htmlFor="email">Email</Label>
         <Input id="username" defaultValue="shadcn@example.com" />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="phone">Phone</Label>
-        <Input id="username" defaultValue="567890" />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="items">Items</Label>
-        <Input id="username" defaultValue="@shadcn" />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="type">Type</Label>
-        <Input id="username" defaultValue="@shadcn" />
       </div>
       <Button type="submit">Save changes</Button>
     </form>
