@@ -5,15 +5,7 @@ import Head from "next/head";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
-import {
-  CheckCircleIcon,
-  CircleUserRound,
-  CogIcon,
-  LoaderCircle,
-  LockKeyholeIcon,
-  PenSquareIcon,
-  ShoppingBasketIcon,
-} from "lucide-react";
+import { CheckCircleIcon, CircleUserRound, CogIcon, LoaderCircle, LockKeyholeIcon, PenSquareIcon, ShoppingBasketIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import noData from "../../../../public/animations/nodata.json";
@@ -24,13 +16,15 @@ import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+
 
 const ProfilePage = () => {
-  const { data: session, status }: any = useSession();
-  const [load, setLoad] = useState(false);
-  const { toast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isEditing1, setIsEditing1] = useState(false);
+  const { data: session, status }: any = useSession()
+  const [load, setLoad] = useState(false)
+  const { toast } = useToast()
+  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing1, setIsEditing1] = useState(false)
   const [user, setUser] = useState<UserDataType>({
     id: "",
     name: "",
@@ -40,60 +34,84 @@ const ProfilePage = () => {
     items: [],
     type: "",
     orders: [],
-  });
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const inputRef1 = useRef<HTMLInputElement>(null);
+  })
+  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef1 = useRef<HTMLInputElement>(null)
+  const [updated, setUpdated] = useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [nameLoad, setNameLoad] = useState(false)
+  const [emailLoad, setEmailLoad] = useState(false)
 
   const getDataUser = async () => {
-    setLoad(true);
+    setLoad(true)
     if (session?.user) {
       try {
-        const resp = await axios(`/api/user/get/${session?.user.id}`);
-        setUser(resp.data);
-        setLoad(false);
+        const resp = await axios(`/api/user/get/${session?.user.id}`)
+        setUser(resp.data)
+        setLoad(false)
       } catch (error) {
-        setLoad(true);
+        setLoad(true)
         toast({
           title: "Uh Oh! 😒",
           description:
             "Failed to get user data. Please check your connection or contact the developer!",
           variant: "destructive",
-        });
+        })
       }
     }
-  };
+  }
 
   const handleEditClick = () => {
-    setIsEditing(true);
-  };
+    setIsEditing(true)
+  }
   const handleEditClick1 = () => {
-    setIsEditing1(true);
-  };
-  const handleCancelClick = () => {
-    setIsEditing(false);
-  };
+    setIsEditing1(true)
+  }
 
   useEffect(() => {
-    getDataUser();
-  }, [session?.user.id]);
+    getDataUser()
+  }, [session?.user.id, updated])
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.value = String(user.name);
+      inputRef.current.value = String(user.name)
+      inputRef.current.focus()
+      inputRef.current.select()
     }
-  }, [isEditing]);
+  }, [isEditing])
 
   useEffect(() => {
     if (inputRef1.current) {
-      inputRef1.current.value = String(user.email);
+      inputRef1.current.value = String(user.email)
+      inputRef1.current.focus()
+      inputRef1.current.select()
     }
-  }, [isEditing1]);
+  }, [isEditing1])
+
+  const handleSubmitName = async () => {
+    if (session?.user) {
+      setNameLoad(true)
+      try {
+        await axios.put(`/api/user/update/name/${String(session.user.id)}`, { name })
+        toast({
+          title: 'Success ✅',
+          description: 'The name has been updated!'
+        })
+        setNameLoad(false)
+        setUpdated(!updated)
+        setIsEditing(false)
+      } catch (error) {
+        setNameLoad(false)
+        console.log(error)
+      }
+    }
+  }
 
   return (
     <>
       <Head>
-        <title>DBIX | User - {user.name}</title>
+        <title>DBIX | User - {String(user.name)}</title>
       </Head>
       <Tabs className="max-w-screen-lg mx-auto pb-8" defaultValue="myProfile">
         <ScrollArea className="w-full max-w-screen-xl lg:pb-0 pb-4 h-fit">
@@ -136,11 +154,10 @@ const ProfilePage = () => {
                     <div className="flex-grow bg-white w-full flex flex-col gap-5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 group">
-                          <img
-                            src={user.image}
-                            alt="userImage"
-                            className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-foreground"
-                          />
+                          <div className="relative">
+                            <img src={user.image} alt="userImage" className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-foreground" />
+                            <button className="p-1 absolute"></button>
+                          </div>
                           <div>
                             <div className="flex items-center gap-2">
                               <h2 className="text-xl font-semibold capitalize">
@@ -155,17 +172,20 @@ const ProfilePage = () => {
                         Personal Information
                       </h3>
                     </div>
-                    <table className="">
-                      <tbody>
-                        <tr>
-                          <td className="text-gray-500 font-semibold py-2">
-                            Name
-                          </td>
-                          <td className="text-gray-500 font-semibold">:</td>
-                          <td className="text-gray-500 capitalize flex items-center gap-2">
-                            {isEditing ? <Input ref={inputRef} /> : user.name}
+                    <Table className="w-fit">
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-medium text-gray-500">Name</TableCell>
+                          <TableCell className="w-[0px] text-gray-500 font-medium">:</TableCell>
+                          <TableCell className="font-medium text-gray-500 flex items-center justify-start gap-2">
+                            {isEditing ? <Input className="capitalize" ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} /> : user.name}
                             {isEditing ? (
-                              <Button size={"sm"}>Save</Button>
+                              <>
+                                <Button size={"sm"} onClick={handleSubmitName} disabled={nameLoad}>{nameLoad ? (
+                                  <LoaderCircle size={16} className="animate-spin" />
+                                ) : "Save"}</Button>
+                                <Button size={"sm"} variant={"destructive"} onClick={() => setIsEditing(false)}>Cancel</Button>
+                              </>
                             ) : (
                               <button
                                 onClick={handleEditClick}
@@ -174,21 +194,22 @@ const ProfilePage = () => {
                                 <PenSquareIcon size={16} />
                               </button>
                             )}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="text-gray-500 font-semibold py-2">
-                            Email
-                          </td>
-                          <td className="text-gray-500 font-semibold">:</td>
-                          <td className="text-gray-500 flex items-center gap-2">
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-gray-500">Email</TableCell>
+                          <TableCell className="w-[0px] text-gray-500 font-medium">:</TableCell>
+                          <TableCell className="font-medium text-gray-500 flex items-center justify-start gap-2">
                             {isEditing1 ? (
                               <Input ref={inputRef1} />
                             ) : (
                               user.email
                             )}
                             {isEditing1 ? (
-                              <Button size={"sm"}>Save</Button>
+                              <>
+                                <Button size={"sm"}>Save</Button>
+                                <Button size={"sm"} variant={"destructive"} onClick={() => setIsEditing1(false)}>Cancel</Button>
+                              </>
                             ) : (
                               <button
                                 onClick={handleEditClick1}
@@ -197,27 +218,23 @@ const ProfilePage = () => {
                                 <PenSquareIcon size={16} />
                               </button>
                             )}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="text-gray-500 font-semibold py-2">
-                            Phone
-                          </td>
-                          <td className="text-gray-500 font-semibold">:</td>
-                          <td className="text-gray-500">
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-gray-500">Phone</TableCell>
+                          <TableCell className="w-[0px] text-gray-500 font-medium">:</TableCell>
+                          <TableCell className="font-medium text-gray-500 flex items-center justify-start gap-2">
                             {user.phone ? (
                               user.phone
                             ) : (
                               <Badge variant={"destructive"}>No data</Badge>
                             )}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="text-gray-500 font-semibold py-2">
-                            Email Verified
-                          </td>
-                          <td className="text-gray-500 font-semibold">:</td>
-                          <td className="text-gray-500">
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-gray-500">Email verified</TableCell>
+                          <TableCell className="w-[0px] text-gray-500 font-medium">:</TableCell>
+                          <TableCell className="font-medium text-gray-500 flex items-center justify-start gap-2">
                             {user.emailVerified ? (
                               <Badge className="flex items-center gap-1 w-fit">
                                 Verified <CheckCircleIcon size={14} />{" "}
@@ -227,19 +244,17 @@ const ProfilePage = () => {
                                 Not verified
                               </Badge>
                             )}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="text-gray-500 font-semibold py-2">
-                            Type login
-                          </td>
-                          <td className="text-gray-500 font-semibold">:</td>
-                          <td className="text-gray-500 capitalize">
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-gray-500">Type login</TableCell>
+                          <TableCell className="w-[0px] text-gray-500 font-medium">:</TableCell>
+                          <TableCell className="font-medium text-gray-500 flex items-center justify-start gap-2 capitalize">
                             {user.type}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
                   </CardContent>
                 </Card>
                 <div className="" id="cart">

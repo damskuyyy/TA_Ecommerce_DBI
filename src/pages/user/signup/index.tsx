@@ -18,6 +18,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/router"
 import { cn } from "@/lib/utils"
 import { Shell } from "lucide-react"
+import Combobox from "@/components/ui/combobox"
 
 
 export default function Signup() {
@@ -30,6 +31,7 @@ export default function Signup() {
   const { push } = useRouter()
   const { toast } = useToast()
   const [load, setLoad] = useState(false)
+  const [dialCode, setDialCode] = useState('')
 
   const handlesignupGoogle = async () => {
     try {
@@ -46,7 +48,7 @@ export default function Signup() {
       name: firstName + ' ' + lastName,
       email,
       password,
-      phone
+      phone: (dialCode + phone)
     }
     if (!firstName || !lastName || !email || !password || !confirmPassword || !phone) {
       toast({
@@ -60,20 +62,32 @@ export default function Signup() {
       setLoad(false)
     } else {
       try {
-        await axios.post('/api/user/post', body)
-        setLoad(true)
-        toast({
-          className: cn(
-            'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
-          ),
-          title: 'Success!',
-          description: 'The user has been succesfully registered. You will redirect to login page!',
-          variant: 'default'
-        })
-        setTimeout(() => {
-          push('/user/login')
+        if (password === confirmPassword) {
+          await axios.post('/api/user/post', body)
+          setLoad(true)
+          toast({
+            className: cn(
+              'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
+            ),
+            title: 'Success!',
+            description: 'The user has been succesfully registered. You will redirect to login page!',
+            variant: 'default'
+          })
+          setTimeout(() => {
+            push('/user/login')
+            setLoad(false)
+          }, 1500)
+        } else {
+          toast({
+            className: cn(
+              'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
+            ),
+            title: 'Uh oh! Something went wrong.',
+            description: 'Please make the password and confirm password the same!',
+            variant: 'destructive',
+          })
           setLoad(false)
-        }, 1500)
+        }
       } catch (error) {
         setLoad(false)
         console.log(error)
@@ -125,12 +139,15 @@ export default function Signup() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Phone Number</Label>
-                <Input
-                  id="numb"
-                  type="tel"
-                  placeholder="896xxxx"
-                  onChange={(e) => { setPhone(e.target.value) }}
-                />
+                <div className="flex items-center gap-1">
+                  <Combobox dialCode={phone} setDialCode={setPhone} />
+                  <Input
+                    id="numb"
+                    type="tel"
+                    placeholder="896xxxx"
+                    onChange={(e) => { setPhone(e.target.value) }}
+                  />
+                </div>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
