@@ -1,7 +1,7 @@
 import { DashboardData } from '@/types/dashboardDataTypes';
 import React from 'react';
 
-const Card: React.FC<DashboardData> = ({ title, value, description, descriptionColor, icon }) => {
+const CardDashboard: React.FC<DashboardData> = ({ title, value, description, descriptionColor, icon }) => {
   return (
     <div className="bg-white shadow rounded-lg p-4 flex flex-col">
       <div className="flex items-center">
@@ -14,4 +14,4 @@ const Card: React.FC<DashboardData> = ({ title, value, description, descriptionC
   );
 };
 
-export default Card;
+export default CardDashboard;

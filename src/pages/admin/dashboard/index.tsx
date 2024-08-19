@@ -1,5 +1,5 @@
 import React from "react";
-import Card from "@/components/ui/cardDashboard"; // Import the Card component
+import CardDashboard from "@/components/ui/cardDashboard"; // Import the Card component
 import {
   Table,
   TableBody,
@@ -16,25 +16,25 @@ const Dashboard: React.FC = () => {
       <h2 className="font-bold text-2xl text-gray-700">Dashboard</h2>
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card
+        <CardDashboard
           title="Total User"
           value={40689}
           description="8.5% Up from yesterday"
           descriptionColor="text-green-500"
         />
-        <Card
+        <CardDashboard
           title="Total Order"
           value={10293}
           description="1.3% Up from past week"
           descriptionColor="text-green-500"
         />
-        <Card
+        <CardDashboard
           title="Total Sales"
           value="$89,000"
           description="4.3% Down from yesterday"
           descriptionColor="text-red-500"
         />
-        <Card
+        <CardDashboard
           title="Total Pending"
           value={2040}
           description="1.8% Up from yesterday"
