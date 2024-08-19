@@ -1,58 +1,141 @@
-import Link from "next/link"
+import React from "react";
+import Card from "@/components/ui/cardDashboard"; // Import the Card component
 import {
-  Bell,
-  CircleUser,
-  Home,
-  LineChart,
-  Menu,
-  Package,
-  Package2,
-  Search,
-  ShoppingCart,
-  Users,
-} from "lucide-react"
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-
-const Dashboard = () => {
+const Dashboard: React.FC = () => {
   return (
-    <>
-      <div className="flex items-center">
-        <h1 className="text-lg font-semibold md:text-2xl">Inventory</h1>
+    <div className="p-4 space-y-4">
+      <h2 className="font-bold text-2xl text-gray-700">Dashboard</h2>
+      {/* Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card
+          title="Total User"
+          value={40689}
+          description="8.5% Up from yesterday"
+          descriptionColor="text-green-500"
+        />
+        <Card
+          title="Total Order"
+          value={10293}
+          description="1.3% Up from past week"
+          descriptionColor="text-green-500"
+        />
+        <Card
+          title="Total Sales"
+          value="$89,000"
+          description="4.3% Down from yesterday"
+          descriptionColor="text-red-500"
+        />
+        <Card
+          title="Total Pending"
+          value={2040}
+          description="1.8% Up from yesterday"
+          descriptionColor="text-green-500"
+        />
       </div>
-      <div
-        className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm" x-chunk="dashboard-02-chunk-1"
-      >
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h3 className="text-2xl font-bold tracking-tight">
-            You have no products
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            You can start selling as soon as you add a product.
-          </p>
-          <Button className="mt-4">Add Product</Button>
+
+      {/* Table */}
+      <div className="bg-white shadow rounded-lg p-4">
+        <h2 className="text-lg font-semibold text-gray-700">Recent Orders</h2>
+        <div className="overflow-x-auto">
+          <Table className="min-w-full divide-y divide-gray-200 mt-4">
+            <TableCaption>A list of your recent invoices.</TableCaption>
+            <TableHeader className="bg-gray-50">
+            <TableRow>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variant</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="bg-white divide-y divide-gray-200">
+            {[
+                { id: '#25426', date: 'Nov 8th, 2023', customer: 'Kavin', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
+                { id: '#25424', date: 'Nov 6th, 2023', customer: 'Nikhil', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
+                { id: '#25423', date: 'Nov 5th, 2023', customer: 'Shivam', variant: 'Base', quantity: 1, status: 'Canceled', amount: 200 },
+                { id: '#25422', date: 'Nov 4th, 2023', customer: 'Shadab', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
+                { id: '#25421', date: 'Nov 2nd, 2023', customer: 'Yogesh', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
+              ].map((order, idx) => (
+                <TableRow key={idx}>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{`Lorem Ipsum`}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.id}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.date}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.customer}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.variant}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">X{order.quantity}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">₹{order.amount.toFixed(2)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {/* <table className="min-w-full divide-y divide-gray-200 mt-4">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variant</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {[
+                { id: '#25426', date: 'Nov 8th, 2023', customer: 'Kavin', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
+                { id: '#25424', date: 'Nov 6th, 2023', customer: 'Nikhil', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
+                { id: '#25423', date: 'Nov 5th, 2023', customer: 'Shivam', variant: 'Base', quantity: 1, status: 'Canceled', amount: 200 },
+                { id: '#25422', date: 'Nov 4th, 2023', customer: 'Shadab', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
+                { id: '#25421', date: 'Nov 2nd, 2023', customer: 'Yogesh', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
+              ].map((order, idx) => (
+                <tr key={idx}>
+                  <td className="px-6 py-4 whitespace-nowrap">{`Lorem Ipsum`}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{order.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{order.customer}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{order.variant}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">X{order.quantity}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">₹{order.amount.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table> */}
         </div>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;

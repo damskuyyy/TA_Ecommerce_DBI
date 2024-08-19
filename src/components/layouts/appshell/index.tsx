@@ -15,7 +15,7 @@ const Appshell = ({ children }: props) => {
   const { pathname } = useRouter();
   const path = ["/user/login", "/user/signup", "/404"]
   const pathProfile = "/user/profile"
-  const adminPath = ["/admin/dashboard", "/admin/"]
+  const adminPath = ["/admin/dashboard", "/admin/order"]
   const [items, setItems] = useState<ItemDataType[]>([])
 
   return (
