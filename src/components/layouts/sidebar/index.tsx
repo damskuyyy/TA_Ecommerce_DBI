@@ -78,6 +78,15 @@ const Sidebar = () => {
             </Link>
           </nav>
         </div>
+        <div className="px-2 lg:px-4">
+          <Link
+            href="/logout"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+          >
+            <CircleUser className="h-4 w-4" />
+            Logout
+          </Link>
+        </div>
       </div>
     </div>
   );
