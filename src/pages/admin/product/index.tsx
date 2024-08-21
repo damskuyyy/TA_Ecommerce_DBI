@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardFooter } from '@/components/ui/card';
+import Alerts from '@/components/ui/alerts';
+
+
 
 type Product = {
   title: string;
@@ -37,7 +40,8 @@ const ProductCard = ({
       </CardHeader>
       <CardFooter className="flex justify-center gap-2 p-4">
         <Button className="bg-black text-white">Edit Product</Button>
-        <Button variant="outline" className="border border-red-500 text-red-500 hover:bg-red-500 hover:text-white">Delete</Button>
+        <Button variant="outline" className="border border-[#00B69B] text-[#00B69B] hover:bg-[#00B69C] hover:text-white">View Product</Button>
+        <Alerts btn={"Delete"} desc={"Are you sure you want to delete this product?"} ok={()=>{}}/>
       </CardFooter>
     </Card>
 );
