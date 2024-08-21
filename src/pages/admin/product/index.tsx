@@ -42,12 +42,12 @@ const ProductCard = ({
       </CardHeader>
       <CardFooter className="flex justify-center gap-2 p-4">
         <Link href={'/admin/editProduct'}>
-        <Button className="bg-black text-white">Edit Product</Button>
+        <Button className="bg-black text-white" size={'sm'}>Edit Product</Button>
         </Link>
         <Link href={'/admin/viewProduct'}>
-        <Button variant="outline" className="border border-[#00B69B] text-[#00B69B] hover:bg-[#00B69C] hover:text-white">View Product</Button>
+        <Button variant="outline" size={'sm'} className="border border-[#00B69B] text-[#00B69B] hover:bg-[#00B69C] hover:text-white">View Product</Button>
         </Link> 
-        <Alerts btn={"Delete"} desc={"Are you sure you want to delete this product?"} ok={()=>{}}/>
+        <Alerts btn={"Delete"} desc={"Are you sure you want to delete this product?"} ok={()=>{}} full={false}/>
       </CardFooter>
     </Card>
 );
@@ -122,9 +122,9 @@ const ProductsPage = () => {
 
   
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Product grid</h1>
+        <h1 className="text-2xl font-bold">Products</h1>
         <Link href={"/admin/addProduct"}>
         <Button className="bg-black text-white">Add Product +</Button>
         </Link>
@@ -133,7 +133,7 @@ const ProductsPage = () => {
 
       <div className="flex items-center mb-6">
         <Input
-          type="text"
+          type="search"
           placeholder="Search"
           className="bg-[#E0E0E0] w-full max-w-sm"
         />

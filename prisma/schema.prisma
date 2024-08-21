@@ -79,3 +79,9 @@ model Order {
   product     String[]
   xendit_id   String?
 }
+
+model Admin {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  username String
+  password String
+}

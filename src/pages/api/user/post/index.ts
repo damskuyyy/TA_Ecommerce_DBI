@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import bcrypt from 'bcrypt'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { name, email, password, phone, real } = req.body
+  const { name, email, password, phone } = req.body
   const secret = process.env.NEXT_PRIVATE_SECRET_PASS_KEY
   try {
 

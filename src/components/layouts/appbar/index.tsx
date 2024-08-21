@@ -1,20 +1,22 @@
+import Alerts from '@/components/ui/alerts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 
 const Appbar = () => {
-
   const { pathname } = useRouter()
+  const [sheetView, setSheetView] = useState(false)
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-      <Sheet>
+    <header className="flex h-14 items-center gap-4 border-b bg-primary-foreground px-4 lg:h-[60px] lg:px-6 sticky top-0">
+      <Sheet open={sheetView} onOpenChange={setSheetView}>
         <SheetTrigger asChild>
           <Button
             variant="outline"
@@ -30,20 +32,23 @@ const Appbar = () => {
             <Link
               href="/admin/dashboard"
               className="flex items-center gap-2 text-lg font-semibold"
+              onClick={() => setSheetView(false)}
             >
               <Package2 className="h-6 w-6" />
-              <span className="sr-only">E-Shop DBIX</span>
+              <span className="">E-Shop DBIX</span>
             </Link>
             <Link
               href="/admin/dashboard"
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/dashboard' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              onClick={() => setSheetView(false)}
             >
               <Home className="h-5 w-5" />
               Dashboard
             </Link>
             <Link
               href="/admin/product"
-              className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/product' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/product' || pathname === '/admin/addProduct' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              onClick={() => setSheetView(false)}
             >
               <ShoppingCart className="h-5 w-5" />
               Product
@@ -51,6 +56,7 @@ const Appbar = () => {
             <Link
               href="/admin/order"
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/order' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              onClick={() => setSheetView(false)}
             >
               <Package className="h-5 w-5" />
               Order
@@ -61,6 +67,7 @@ const Appbar = () => {
             <Link
               href="/admin/transaction"
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/transaction' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              onClick={() => setSheetView(false)}
             >
               <Users className="h-5 w-5" />
               Transactions
@@ -68,6 +75,7 @@ const Appbar = () => {
             <Link
               href="/admin/discussion"
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/discussion' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              onClick={() => setSheetView(false)}
             >
               <LineChart className="h-5 w-5" />
               Disscussion
@@ -104,7 +112,9 @@ const Appbar = () => {
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <Alerts btn='Signout' desc='this can be changed!' ok={() => {
+            signOut()
+          }} />
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
