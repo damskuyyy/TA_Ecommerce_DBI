@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Head from "next/head"
 import { signIn } from "next-auth/react"
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/router"
@@ -32,6 +32,7 @@ export default function Signup() {
   const { toast } = useToast()
   const [load, setLoad] = useState(false)
   const [dialCode, setDialCode] = useState('')
+  const phoneInputRef = useRef<HTMLInputElement>(null)
 
   const handlesignupGoogle = async () => {
     try {
@@ -48,7 +49,7 @@ export default function Signup() {
       name: firstName + ' ' + lastName,
       email,
       password,
-      phone: (dialCode + phone)
+      phone
     }
     if (!firstName || !lastName || !email || !password || !confirmPassword || !phone) {
       toast({
@@ -62,31 +63,43 @@ export default function Signup() {
       setLoad(false)
     } else {
       try {
-        if (password === confirmPassword) {
-          await axios.post('/api/user/post', body)
-          setLoad(true)
+        if (password.length < 8) {
           toast({
             className: cn(
               'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
             ),
-            title: 'Success!',
-            description: 'The user has been succesfully registered. You will redirect to login page!',
-            variant: 'default'
-          })
-          setTimeout(() => {
-            push('/user/login')
-            setLoad(false)
-          }, 1500)
-        } else {
-          toast({
-            className: cn(
-              'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
-            ),
-            title: 'Uh oh! Something went wrong.',
-            description: 'Please make the password and confirm password the same!',
-            variant: 'destructive',
+            title: 'Uh Oh! 😒',
+            description: 'The password at least 8 character!',
+            variant: 'destructive'
           })
           setLoad(false)
+        } else {
+          if (password === confirmPassword) {
+            setLoad(true)
+            await axios.post('/api/user/post', body)
+            toast({
+              className: cn(
+                'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
+              ),
+              title: 'Success!',
+              description: 'The user has been succesfully registered. You will redirect to login page!',
+              variant: 'default'
+            })
+            setTimeout(() => {
+              push('/user/login')
+              setLoad(false)
+            }, 1500)
+          } else {
+            toast({
+              className: cn(
+                'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
+              ),
+              title: 'Uh oh! Something went wrong.',
+              description: 'Please make the password and confirm password the same!',
+              variant: 'destructive',
+            })
+            setLoad(false)
+          }
         }
       } catch (error) {
         setLoad(false)
@@ -102,6 +115,13 @@ export default function Signup() {
       }
     }
   }
+
+  useEffect(() => {
+    if (phoneInputRef.current) {
+      phoneInputRef.current.value = dialCode
+      phoneInputRef.current.focus()
+    }
+  }, [dialCode])
 
   return (
     <>
@@ -140,12 +160,13 @@ export default function Signup() {
               <div className="grid gap-2">
                 <Label htmlFor="email">Phone Number</Label>
                 <div className="flex items-center gap-1">
-                  <Combobox dialCode={phone} setDialCode={setPhone} />
+                  <Combobox setDialCode={setDialCode} />
                   <Input
                     id="numb"
                     type="tel"
-                    placeholder="896xxxx"
+                    placeholder={`your phone number`}
                     onChange={(e) => { setPhone(e.target.value) }}
+                    ref={phoneInputRef}
                   />
                 </div>
               </div>

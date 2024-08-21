@@ -22,7 +22,7 @@ import {
 import countryCode from '../../../public/data/countryCode.json'
 
 
-const Combobox = ({ dialCode, setDialCode }: { dialCode: string, setDialCode: React.Dispatch<React.SetStateAction<string>> }) => {
+const Combobox = ({ setDialCode }: { setDialCode: React.Dispatch<React.SetStateAction<string>>}) => {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
 
@@ -54,8 +54,8 @@ const Combobox = ({ dialCode, setDialCode }: { dialCode: string, setDialCode: Re
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue)
                     setOpen(false)
-                  }}
-                >
+                    setDialCode(country.dial_code)
+                  }}>
                   {country.name}
                   <CheckIcon
                     className={cn(
