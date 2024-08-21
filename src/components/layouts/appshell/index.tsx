@@ -1,4 +1,4 @@
-import { cloneElement, ReactElement, useState } from "react";
+import { cloneElement, ReactElement, useEffect, useState } from "react";
 import Navbar from "../navbar";
 import { Toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/router";
@@ -6,6 +6,8 @@ import Footer from "../footer";
 import { ItemDataType } from "@/types/itemsDataTypes";
 import Sidebar from "../sidebar";
 import Appbar from "../appbar";
+import { ProductDataType } from "@/types/productDataTypes";
+import axios from "axios";
 
 interface props {
   children: ReactElement;
@@ -17,6 +19,45 @@ const Appshell = ({ children }: props) => {
   const pathProfile = "/user/profile"
   const adminPath = ["/admin/dashboard", "/admin/transaction", "/admin/discussion", "/admin/order", "/admin/addProduct", "/admin/editProduct", "/admin/viewProduct", "/admin/product"]
   const [items, setItems] = useState<ItemDataType[]>([])
+  const [products, setProducts] = useState<ProductDataType[]>([])
+
+  useEffect(() => {
+    getProductsByID()
+  }, [items])
+  const getProductsByID = async () => {
+    if (items.length > 0) {
+      const updatedProducts = await Promise.all(
+        items.map(async (item) => {
+          try {
+            const resp = await axios(`/api/product/get?code=${item.code_product}`)
+            const { code_product, name, price, image } = resp.data
+            return {
+              code_product,
+              name,
+              price,
+              qty: item.qty,
+              image,
+              desc: resp.data.desc || '',
+              category: resp.data.category || '',
+              variants: resp.data.variants || [],
+              variant: item.variant,
+              notes: item.notes
+            }
+          } catch (error) {
+            console.error(`Error fetching product with code ${item.code_product}:`, error)
+            return null
+          }
+        })
+      )
+      const validProducts = updatedProducts.filter(product => product !== null)
+      setProducts(prevProducts => {
+        const newProducts = validProducts.filter(newProduct =>
+          !prevProducts.some(prevProduct => prevProduct.code_product === newProduct.code_product && prevProduct.variant === newProduct.variant)
+        )
+        return [...prevProducts, ...newProducts]
+      })
+    }
+  }
 
   return (
     <>
@@ -38,12 +79,12 @@ const Appshell = ({ children }: props) => {
           <div className="w-full flex flex-col lg:gap-8 gap-4">
             <div className="w-full border-b shadow-lg sticky top-0 left-0 bg-white z-50">
               <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md sm:max-w-screen-sm mx-auto w-full xl:px-0 lg:px-3">
-                <Navbar items={items} setItems={setItems} />
+                <Navbar items={items} setItems={setItems}  products={products} setProducts={setProducts} />
               </div>
             </div>
 
             <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md sm:max-w-screen-sm mx-auto w-full xl:px-0 lg:px-3 px-6">
-              {children && cloneElement(children, { items, setItems })}
+              {children && cloneElement(children, { items, setItems, products, setProducts })}
             </div>
 
             {pathname === pathProfile ? (

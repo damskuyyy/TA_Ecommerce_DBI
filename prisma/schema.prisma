@@ -27,8 +27,8 @@ model User {
 }
 
 model Product {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  code_product String    @unique
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  code_product String   @unique
   name         String?
   price        Float
   image        String[]
@@ -39,8 +39,8 @@ model Product {
   information  String
   sold         Int
   rate         Int
-  reviews      Json[]
-  discusses    Json[]
+  reviews      Json[]   @default([])
+  discusses    Json[]   @default([])
   stock        Int
   minOrder     Int
   desc         String

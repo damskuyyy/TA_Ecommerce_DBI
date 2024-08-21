@@ -23,7 +23,7 @@ import { calculateApplicationFee, calculateSubtotal, calculateTax, calculateTota
 import Alerts from "@/components/ui/alerts";
 
 
-const ProfilePage = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>> }) => {
+const ProfilePage = ({ items, setItems, products, setProducts }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>>, products: ProductDataType[], setProducts: Dispatch<SetStateAction<ProductDataType[]>> }) => {
   const { data: session, status }: any = useSession()
   const [load, setLoad] = useState(false)
   const { toast } = useToast()
@@ -46,7 +46,7 @@ const ProfilePage = ({ items, setItems }: { items: ItemDataType[], setItems: Dis
   const [email, setEmail] = useState('')
   const [nameLoad, setNameLoad] = useState(false)
   const [emailLoad, setEmailLoad] = useState(false)
-  const [products, setProducts] = useState<ProductDataType[]>([])
+
 
   const getDataUser = async () => {
     setLoad(true)
@@ -113,45 +113,6 @@ const ProfilePage = ({ items, setItems }: { items: ItemDataType[], setItems: Dis
     }
   }
 
-  const getProductsByID = async () => {
-    if (items && items.length > 0) {
-      const updatedProducts = await Promise.all(
-        items.map(async (item) => {
-          try {
-            const resp = await axios(`/api/product/get?code=${item.code_product}`)
-            const { code_product, name, price, image } = resp.data
-            return {
-              code_product,
-              name,
-              price,
-              qty: item.qty,
-              image,
-              desc: resp.data.desc || '',
-              category: resp.data.category || '',
-              variants: resp.data.variants || [],
-              variant: item.variant,
-              notes: item.notes
-            }
-          } catch (error) {
-            console.error(`Error fetching product with code ${item.code_product}:`, error)
-            return null
-          }
-        })
-      )
-      const validProducts = updatedProducts.filter(product => product !== null)
-      setProducts(prevProducts => {
-        const newProducts = validProducts.filter(newProduct =>
-          !prevProducts.some(prevProduct => prevProduct.code_product === newProduct.code_product && prevProduct.variant === newProduct.variant)
-        )
-        return [...prevProducts, ...newProducts]
-      })
-    }
-  }
-
-  useEffect(() => {
-    getProductsByID()
-  }, [user.items])
-
   const incrementQty = (index: number) => {
     setProducts(prevProducts =>
       prevProducts.map((item, i) =>
@@ -166,19 +127,38 @@ const ProfilePage = ({ items, setItems }: { items: ItemDataType[], setItems: Dis
   }
 
   const decrementQty = (index: number) => {
-    setProducts(prevProducts =>
-      prevProducts.map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item).filter(item => item.qty && item.qty > 0)
-    )
-    setItems(prevItems =>
-      prevItems.map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item).filter(item => item.qty && item.qty > 0)
-    )
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts
+        .map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item)
+        .filter(item => item.qty && item.qty > 0)
+
+      if (updatedProducts.length === 0) {
+        setProducts([])
+        return []
+      } else {
+        return updatedProducts
+      }
+    })
+
+    setItems(prevItems => {
+      const updatedItems = prevItems
+        .map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item)
+        .filter(item => item.qty && item.qty > 0)
+
+      if (updatedItems.length === 0) {
+        setItems([])
+        return []
+      } else {
+        return updatedItems
+      }
+    })
   }
 
-  const transactionValue = 0.05; // 5% transaction fee
-  const applicationValue = 0.02; // 2% application fee
-  const taxRate = 0.1; // 10% tax
+  const transactionValue = 0.05 // 5% transaction fee
+  const applicationValue = 0.02 // 2% application fee
+  const taxRate = 0.1 // 10% tax
 
-  const subtotal = calculateSubtotal(products);
+  const subtotal = calculateSubtotal(products)
   const transactionFee = calculateTransactionFee(subtotal, transactionValue)
   const applicationFee = calculateApplicationFee(subtotal, applicationValue)
   const tax = calculateTax(subtotal, taxRate)
@@ -337,7 +317,7 @@ const ProfilePage = ({ items, setItems }: { items: ItemDataType[], setItems: Dis
                   <h1 className="text-2xl font-semibold mb-3">Cart</h1>
                   <hr />
                 </div>
-                {user.items && user.items?.length > 0 ? (
+                {items.length > 0 || products.length > 0 ? (
                   <div className="w-full flex lg:flex-row flex-col justify-between gap-2">
                     <div className="lg:w-[70%] w-full pe-2 border-r">
                       <div className="grid lg:grid-cols-2 w-full md:grid-cols-2 grid-cols-1 gap-5">
@@ -372,7 +352,7 @@ const ProfilePage = ({ items, setItems }: { items: ItemDataType[], setItems: Dis
                       </div>
                     </div>
                     <div className="lg:w-[30%] w-full flex flex-col gap-2 px-1">
-                      {items.length > 0 && (
+                      {items.length > 0 && products.length > 0 && (
                         <>
                           <div className="flex w-full justify-between">
                             <h1 className="font-semibold text-primary text-xs">Subtotal :</h1>
