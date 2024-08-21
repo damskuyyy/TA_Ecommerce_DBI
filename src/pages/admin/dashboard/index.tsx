@@ -12,12 +12,12 @@ import {
 
 const Dashboard: React.FC = () => {
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-8">
       <h2 className="font-bold text-2xl text-gray-700">Dashboard</h2>
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 w-fit lg:w-full">
         <CardDashboard
-          title="Total User"
+          title="Total User" 
           value={40689}
           description="8.5% Up from yesterday"
           descriptionColor="text-green-500"
@@ -43,10 +43,10 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white shadow rounded-lg p-4">
+      <div className="bg-white shadow rounded-lg p-4 w-full">
         <h2 className="text-lg font-semibold text-gray-700">Recent Orders</h2>
-        <div className="overflow-x-auto">
-          <Table className="min-w-full divide-y divide-gray-200 mt-4">
+        <div className="relative w-full overflow-auto">
+          <Table className="w-full divide-y divide-gray-200 mt-4">
             <TableCaption>A list of your recent invoices.</TableCaption>
             <TableHeader className="bg-gray-50">
             <TableRow>
@@ -89,49 +89,6 @@ const Dashboard: React.FC = () => {
               ))}
             </TableBody>
           </Table>
-
-          {/* <table className="min-w-full divide-y divide-gray-200 mt-4">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {[
-                { id: '#25426', date: 'Nov 8th, 2023', customer: 'Kavin', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
-                { id: '#25424', date: 'Nov 6th, 2023', customer: 'Nikhil', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
-                { id: '#25423', date: 'Nov 5th, 2023', customer: 'Shivam', variant: 'Base', quantity: 1, status: 'Canceled', amount: 200 },
-                { id: '#25422', date: 'Nov 4th, 2023', customer: 'Shadab', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
-                { id: '#25421', date: 'Nov 2nd, 2023', customer: 'Yogesh', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
-              ].map((order, idx) => (
-                <tr key={idx}>
-                  <td className="px-6 py-4 whitespace-nowrap">{`Lorem Ipsum`}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.customer}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.variant}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">X{order.quantity}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">₹{order.amount.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table> */}
         </div>
       </div>
     </div>
