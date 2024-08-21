@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { UserDataType } from "@/types/userDataTypes";
 import { Badge } from "@/components/ui/badge";
 import Head from "next/head";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
-import { CheckCircleIcon, CircleUserRound, CogIcon, LoaderCircle, LockKeyholeIcon, PenSquareIcon, ShoppingBasketIcon } from "lucide-react";
+import { CheckCircleIcon, CircleUserRound, CogIcon, LoaderCircle, LockKeyholeIcon, MinusIcon, PenSquareIcon, PlusIcon, ShoppingBasketIcon, Trash2Icon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import noData from "../../../../public/animations/nodata.json";
@@ -17,9 +17,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { ProductDataType } from "@/types/productDataTypes";
+import { ItemDataType } from "@/types/itemsDataTypes";
+import { calculateApplicationFee, calculateSubtotal, calculateTax, calculateTotal, calculateTransactionFee } from "@/utils/calcutale";
+import Alerts from "@/components/ui/alerts";
 
 
-const ProfilePage = () => {
+const ProfilePage = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>> }) => {
   const { data: session, status }: any = useSession()
   const [load, setLoad] = useState(false)
   const { toast } = useToast()
@@ -42,6 +46,7 @@ const ProfilePage = () => {
   const [email, setEmail] = useState('')
   const [nameLoad, setNameLoad] = useState(false)
   const [emailLoad, setEmailLoad] = useState(false)
+  const [products, setProducts] = useState<ProductDataType[]>([])
 
   const getDataUser = async () => {
     setLoad(true)
@@ -107,6 +112,77 @@ const ProfilePage = () => {
       }
     }
   }
+
+  const getProductsByID = async () => {
+    if (items && items.length > 0) {
+      const updatedProducts = await Promise.all(
+        items.map(async (item) => {
+          try {
+            const resp = await axios(`/api/product/get?code=${item.code_product}`)
+            const { code_product, name, price, image } = resp.data
+            return {
+              code_product,
+              name,
+              price,
+              qty: item.qty,
+              image,
+              desc: resp.data.desc || '',
+              category: resp.data.category || '',
+              variants: resp.data.variants || [],
+              variant: item.variant,
+              notes: item.notes
+            }
+          } catch (error) {
+            console.error(`Error fetching product with code ${item.code_product}:`, error)
+            return null
+          }
+        })
+      )
+      const validProducts = updatedProducts.filter(product => product !== null)
+      setProducts(prevProducts => {
+        const newProducts = validProducts.filter(newProduct =>
+          !prevProducts.some(prevProduct => prevProduct.code_product === newProduct.code_product && prevProduct.variant === newProduct.variant)
+        )
+        return [...prevProducts, ...newProducts]
+      })
+    }
+  }
+
+  useEffect(() => {
+    getProductsByID()
+  }, [user.items])
+
+  const incrementQty = (index: number) => {
+    setProducts(prevProducts =>
+      prevProducts.map((item, i) =>
+        i === index ? { ...item, qty: (item.qty ?? 1) + 1 } : item
+      )
+    )
+    setItems(prevItems =>
+      prevItems.map((item, i) =>
+        i === index ? { ...item, qty: (item.qty ?? 1) + 1 } : item
+      )
+    )
+  }
+
+  const decrementQty = (index: number) => {
+    setProducts(prevProducts =>
+      prevProducts.map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item).filter(item => item.qty && item.qty > 0)
+    )
+    setItems(prevItems =>
+      prevItems.map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item).filter(item => item.qty && item.qty > 0)
+    )
+  }
+
+  const transactionValue = 0.05; // 5% transaction fee
+  const applicationValue = 0.02; // 2% application fee
+  const taxRate = 0.1; // 10% tax
+
+  const subtotal = calculateSubtotal(products);
+  const transactionFee = calculateTransactionFee(subtotal, transactionValue)
+  const applicationFee = calculateApplicationFee(subtotal, applicationValue)
+  const tax = calculateTax(subtotal, taxRate)
+  const total = calculateTotal(products, transactionValue, applicationValue, taxRate)
 
   return (
     <>
@@ -262,7 +338,77 @@ const ProfilePage = () => {
                   <hr />
                 </div>
                 {user.items && user.items?.length > 0 ? (
-                  <div className="grid lg:grid-cols-4 w-full md:grid-cols-2 grid-cols-1"></div>
+                  <div className="w-full flex lg:flex-row flex-col justify-between gap-2">
+                    <div className="lg:w-[70%] w-full pe-2 border-r">
+                      <div className="grid lg:grid-cols-2 w-full md:grid-cols-2 grid-cols-1 gap-5">
+                        {products.map((item, index) => (
+                          <Card key={index} className="pt-3 w-full flex justify-center items-center">
+                            <CardContent className="flex items-start justify-between w-full">
+                              <div className="flex items-start gap-2">
+                                <img src={item.image[0]} alt={item.name} className={`w-20 ${item.notes ? 'h-20' : 'h-16'} rounded-md object-cover `} />
+                                <div className="flex flex-col h-full items-start justify-between">
+                                  <p className="font-bold first-letter:uppercase">{item.name}</p>
+                                  <p className="font-medium text-sm">Variant : <span className="font-bold capitalize">{item.variant}</span></p>
+                                  <p className="font-medium text-sm">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(item.price))}</p>
+                                  {item.notes && <p className="font-medium text-sm">Notes : <span className="capitalize font-normal text-gray-500 truncate overflow-hidden">{item.notes}</span></p>}
+                                </div>
+                              </div>
+                              <div className={`border rounded-md flex-col flex items-center ${item.notes ? 'h-20' : 'h-16'} justify-between`}>
+                                <button onClick={() => incrementQty(index)} className="p-1 px-2 rounded-md hover:bg-secondary">
+                                  <PlusIcon size={14} />
+                                </button>
+                                <p className='font-medium text-xs cursor-default'>{item.qty}</p>
+                                <button onClick={() => decrementQty(index)} className="p-1 px-2 rounded-md hover:bg-secondary">
+                                  {item.qty && item.qty <= 1 ? (
+                                    <Trash2Icon size={14} />
+                                  ) : (
+                                    <MinusIcon size={14} />
+                                  )}
+                                </button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="lg:w-[30%] w-full flex flex-col gap-2 px-1">
+                      {items.length > 0 && (
+                        <>
+                          <div className="flex w-full justify-between">
+                            <h1 className="font-semibold text-primary text-xs">Subtotal :</h1>
+                            <p className="text-gray-500 text-xs">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(subtotal)}</p>
+                          </div>
+                          <hr />
+                          <div className="flex w-full justify-between">
+                            <h1 className="font-semibold text-primary text-xs">TAX :</h1>
+                            <p className="text-gray-500 text-xs text-right">({taxRate * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)} </p>
+                          </div>
+
+                          <div className="flex w-full justify-between">
+                            <h1 className="font-semibold text-primary text-xs">Transaction fee :</h1>
+                            <p className="text-gray-500 text-xs text-right">({transactionValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transactionFee)} </p>
+                          </div>
+                          <div className="flex w-full justify-between">
+                            <h1 className="font-semibold text-primary text-xs">Application fee :</h1>
+                            <p className="text-gray-500 text-xs text-right">({applicationValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(applicationFee)} </p>
+                          </div>
+                          <hr />
+                          <div className="flex w-full justify-between">
+                            <h1 className="font-semibold text-primary text-xs">TOTAL :</h1>
+                            <p className="text-primary font-bold text-sm">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}</p>
+                          </div>
+                          <div className="w-full flex flex-col gap-2 mt-5">
+                            <Button size={'sm'}>Confirm</Button>
+                            <Alerts btn="Delete all" desc="As a result, the cart will be empty. and you must add your items again." ok={() => {
+                              setProducts([])
+                              setItems([])
+                              location.reload()
+                            }} />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 ) : (
                   <div className="p-3 border rounded-xl pb-4 shadow flex flex-col gap-3">
                     <div className="flex w-full flex-col gap-6 items-center">

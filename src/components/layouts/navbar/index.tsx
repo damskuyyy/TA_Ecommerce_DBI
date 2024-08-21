@@ -68,6 +68,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
       if (session?.user) {
         const resp = await axios(`/api/user/get/${session?.user.id}`)
         setUserdata(resp.data)
+        setItems(resp.data.items)
       }
     } catch (error) {
       console.error("Error fetching user data:", error)
@@ -152,6 +153,21 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
   const applicationFee = calculateApplicationFee(subtotal, applicationValue)
   const tax = calculateTax(subtotal, taxRate)
   const total = calculateTotal(products, transactionValue, applicationValue, taxRate)
+
+  const updateUserItems = async () => {
+    const body = { items }
+    if (status === 'authenticated') {
+      try {
+        await axios.put(`/api/user/update/items/${session.user.id}`, body)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+  useEffect(() => {
+    updateUserItems()
+  }, [items.length])
+
 
   return (
     <div className="w-full flex py-5 relative lg:px-0  px-6 justify-between">
@@ -306,7 +322,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                         <h1 className="font-semibold text-primary text-xs">TAX :</h1>
                         <p className="text-gray-500 text-xs text-right">({taxRate * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)} </p>
                       </div>
-                      
+
                       <div className="flex w-full justify-between">
                         <h1 className="font-semibold text-primary text-xs">Transaction fee :</h1>
                         <p className="text-gray-500 text-xs text-right">({transactionValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transactionFee)} </p>
@@ -322,10 +338,10 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                       </div>
                       <div className="w-full flex flex-col gap-2 mt-5">
                         <Button size={'sm'}>Confirm</Button>
-                        <Alerts btn="Delete all" desc="As a result, the cart will be empty. and you must add your items again." ok={() =>{
+                        <Alerts btn="Delete all" desc="As a result, the cart will be empty. and you must add your items again." ok={() => {
                           setProducts([])
                           setItems([])
-                        }}/>
+                        }} />
                       </div>
                     </SheetDescription>
                   )}
@@ -368,7 +384,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
                         setTimeout(() => {
                           push('/user/login')
                         }, 500);
-                      }} desc="As a result, you will be logged out from your account and your session will end." btn="Signout"/>
+                      }} desc="As a result, you will be logged out from your account and your session will end." btn="Signout" />
                     </div>
                   </DropdownMenuContent>
                 </div>

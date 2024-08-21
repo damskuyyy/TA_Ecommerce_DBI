@@ -1,9 +1,9 @@
-import { DashboardData } from '@/types/dashboardDataTypes';
+import { TransactionsData } from '@/types/transactionsDataTypes'; 
 import React from 'react';
 
-const CardDashboard: React.FC<DashboardData> = ({ title, value, description, descriptionColor, icon }) => {
+const CardTransactions: React.FC<TransactionsData> = ({ title, value, description, descriptionColor, icon }) => {
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col">
+    <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col sm:grid-cols-2">
       <div className="flex items-center">
         {icon && <div className="mr-3">{icon}</div>}
         <h2 className="text-sm font-semibold text-gray-500">{title}</h2>
@@ -14,4 +14,4 @@ const CardDashboard: React.FC<DashboardData> = ({ title, value, description, des
   );
 };
 
-export default CardDashboard;
+export default CardTransactions;
