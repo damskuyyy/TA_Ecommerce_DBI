@@ -15,7 +15,7 @@ const Transaction: React.FC = () => {
     <div className="p-4 space-y-4">
       <h2 className="font-bold text-2xl text-gray-700">Dashboard</h2>
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <CardTransactions
           title="Total User"
           value={40689}
