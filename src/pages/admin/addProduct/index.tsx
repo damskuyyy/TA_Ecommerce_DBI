@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
 import { FolderPlusIcon, ImagePlusIcon, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import axios from 'axios';
 
 const ReactEditor = dynamic(() => import('@/components/ui/reactEditor'), { ssr: false })
 
@@ -14,12 +15,18 @@ const AddProductPage = () => {
   const [productName, setProductName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+  const [spec, setSpesification] = useState('');
+  const [price, setPrice] = useState(0);
   const [quantity, setQuantity] = useState(0);
+  const [stock, setStock] = useState(0);
+  const [minOrder, setMinOrder] = useState(1);
+  const [sold, setSold] = useState(0);
+  const [rate, setRate] = useState(0);
   const [variation, setVariation] = useState<string[]>([]);
   const [variationValue, setVariationValue] = useState('')
   const [image, setImage] = useState<string[]>([]);
   const [imageValue, setImageValue] = useState('')
+  const [information, setInformation] = useState('')
   const [category, setCategory] = useState('website')
   const [variationInputView, setVariationInputView] = useState(false)
   const [imageInputView, setImageInputView] = useState(false)
@@ -45,7 +52,7 @@ const AddProductPage = () => {
     "(COIN) - Sha 256",
     "(TOKEN) - ERC 20, BSC 20, TRC 20",
   ]
-
+    //handleAddVariant menambahkan variant
   const handleAddVariation = (e: FormEvent) => {
     e.preventDefault()
     setVariation((prev) => [...prev, variationValue])
@@ -74,9 +81,37 @@ const AddProductPage = () => {
     setImage(values)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Handle save product logic here
-  };
+  
+  const body = {
+    name: productName,
+    category: category,
+    desc: description,
+    price: price,
+    stock: quantity,
+    variants: variation,
+    image: image,
+    spec:"",
+    information:"",
+    sold:0,
+    rate:0,
+    minOrder:0,
+    reviews:[],
+    discusses:[],
+    details:"",
+  }
+
+  try {
+    await axios.post('/api/product/post', body)
+    alert('Product Added Successfully!')
+    
+  } catch (error) {
+    console.log(error)
+    alert('Product Added Failed!')
+    
+  }
+};
 
   return (
     <div className="container mx-auto p-5">
@@ -131,11 +166,33 @@ const AddProductPage = () => {
                 </div>
               </div>
               <div>
+                <Label htmlFor="spesification">Spesification<span className="text-red-500">*</span></Label>
+                <div className='w-full mt-2'>
+                  <Input
+                    type="textarea"
+                    value={spec}
+                    onChange={(e) => setSpesification(e.target.value)}
+                    placeholder="Type your spectification here ..."
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="information">Information<span className="text-red-500">*</span></Label>
+                <div className='w-full mt-2'>
+                  <Input
+                    type="textarea"
+                    value={information}
+                    onChange={(e) => setInformation(e.target.value)}
+                    placeholder="Type your information here ..."
+                  />
+                </div>
+              </div>
+              <div>
                 <Label htmlFor="price">Price<span className="text-red-500">*</span></Label>
                 <Input
                   id="price"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) => setPrice(Number(e.target.value))}
                   placeholder="Base pricing"
                   required
                   className='mt-2'
@@ -151,6 +208,50 @@ const AddProductPage = () => {
                   min={1}
                   step={1}
                   placeholder="Quantity"
+                  required
+                  className='mt-2'
+                />
+              </div>
+              <div>
+                <Label htmlFor="stock">Stock<span className="text-red-500">*</span></Label>
+                <Input
+                  id="stock"
+                  value={stock}
+                  onChange={(e) => setStock(Number(e.target.value))}
+                  placeholder="Stock"
+                  required
+                  className='mt-2'
+                />
+              </div>
+              <div>
+                <Label htmlFor="minOrder">Minimal Order <span className="text-red-500">*</span></Label>
+                <Input
+                  id="minOrder"
+                  value={minOrder}
+                  onChange={(e) => setMinOrder(Number(e.target.value))}
+                  placeholder="Minimal Order"
+                  required
+                  className='mt-2'
+                />
+              </div>
+              <div>
+                <Label htmlFor="sold">Sold <span className="text-red-500">*</span></Label>
+                <Input
+                  id="sold"
+                  value={sold}
+                  onChange={(e) => setSold(Number(e.target.value))}
+                  placeholder="Sold"
+                  required
+                  className='mt-2'
+                />
+              </div>
+              <div>
+                <Label htmlFor="rate">Rate <span className="text-red-500">*</span></Label>
+                <Input
+                  id="rate"
+                  value={rate}
+                  onChange={(e) => setRate(Number(e.target.value))}
+                  placeholder="Rating"
                   required
                   className='mt-2'
                 />
@@ -188,7 +289,7 @@ const AddProductPage = () => {
                 )}
               </div>
 
-              <Button className='w-full'>Save</Button>
+              <Button className='w-full' onClick={handleSave}>Save</Button>
             </div>
           </CardContent>
         </Card>
