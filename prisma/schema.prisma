@@ -27,8 +27,8 @@ model User {
 }
 
 model Product {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  code_product String   @unique
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  code_product String      @unique
   name         String?
   price        Float
   image        String[]
@@ -39,28 +39,31 @@ model Product {
   information  String
   sold         Int
   rate         Int
-  reviews      Json[]   @default([])
-  discusses    Json[]   @default([])
+  reviews      Review[]
+  discusses    Discusses[]
   stock        Int
   minOrder     Int
   desc         String
 }
 
-// model Review {
-//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-//   userId    String
-//   product   Product @relation(fields: [productId], references: [id])
-//   productId String  @db.ObjectId
-//   context   String
-// }
+model Review {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  context      String
+  name         String
+  image        String
+  rate         Int     @default(0)
+  product      Product @relation(fields: [code_product], references: [code_product])
+  code_product String
+}
 
-// model Discuss {
-//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-//   userId    String
-//   product   Product @relation(fields: [productId], references: [id])
-//   productId String  @db.ObjectId
-//   context   String
-// }
+model Discusses {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  context      String
+  name         String
+  image        String
+  product      Product @relation(fields: [code_product], references: [code_product])
+  code_product String
+}
 
 model Customer {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId

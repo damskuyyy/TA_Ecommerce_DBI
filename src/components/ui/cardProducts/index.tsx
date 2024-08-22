@@ -23,9 +23,7 @@ const CardProduct = ({ data }: Props) => {
           <CardTitle className="leading-snug first-letter:uppercase">
             {data.name || 'Unnamed Product'}
           </CardTitle>
-          <CardDescription className="text-xs first-letter:uppercase">
-            {data.desc || 'No description available.'}
-          </CardDescription>
+          <CardDescription className="text-xs first-letter:uppercase" dangerouslySetInnerHTML={{__html: data.desc || 'No description available.'}}/>
         </CardContent>
       </div>
       <CardFooter className="flex lg:items-center items-start lg:flex-row flex-col gap-3 justify-between">

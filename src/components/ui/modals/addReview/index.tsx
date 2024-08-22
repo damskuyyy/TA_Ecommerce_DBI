@@ -26,13 +26,13 @@ const ModalAddReview = () => {
       <DrawerTrigger>
         <Button size={'sm'} className='mt-2'>Add review</Button>
       </DrawerTrigger>
-      <DrawerContent className='max-w-screen-xl mx-auto w-full'>
+      <DrawerContent className='max-w-screen-md mx-auto w-full'>
         <DrawerHeader>
           <DrawerTitle>Add a review</DrawerTitle>
           <DrawerDescription>Please fill this form to complete a review</DrawerDescription>
         </DrawerHeader>
         <div className='p-3'>
-          <ReactEditor setValue={setContent} value={content} placeholder='Type a review here, you can add a images!'/>
+          <ReactEditor setValue={setContent} value={content} autoFoucus placeholder='Type a review here, you can add a images!'/>
         </div>
         <DrawerFooter className='flex items-end gap-3 w-full flex-row justify-end'>
           <DrawerClose>
@@ -40,7 +40,6 @@ const ModalAddReview = () => {
           </DrawerClose>
           <Button onClick={handleSubmit}>Submit</Button>
         </DrawerFooter>
-        <div dangerouslySetInnerHTML={{__html: content}} />
       </DrawerContent>
     </Drawer>
 

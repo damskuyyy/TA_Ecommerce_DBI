@@ -56,6 +56,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
   const [notesDone, setNotesDone] = useState(false)
   const notesRef = useRef<HTMLTextAreaElement>(null)
   const { toast } = useToast()
+  
 
   const handleQtyPlus = () => {
     setQty(qty + 1)
@@ -127,7 +128,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
   }
 
   const handlePushItems = () => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && session.user.role === 'user') {
       setItems((prevItems) => {
         const itemExists = prevItems.some(item => item.code_product === String(id));
 
@@ -187,7 +188,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                       <Skeleton className='w-full h-2' />
                     </div>
                   ) : (
-                    <p className='text-sm text-gray-500 font-medium'>{product.desc}</p>
+                    <div className='text-sm text-gray-500 font-medium'dangerouslySetInnerHTML={{__html: product.desc}}/>
                   )}
                   <div className='flex justify-between flex-wrap w-fit gap-3 items-center'>
                     <div className='flex items-center gap-1'>
@@ -389,6 +390,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
             </div>
           </div>
         </div>
+        
         <div className='lg:w-[30%] w-full sticky top-24 h-full'>
           <div className='w-full'>
             <Card className='flex flex-col'>
@@ -398,11 +400,11 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                 <hr />
                 <div className='flex items-center gap-2'>
                   <div className='border rounded-md flex justify-between items-center gap-1'>
-                    <Button onClick={handleQtyMinus} variant={'ghost'} size={'icon'}>
+                    <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleQtyMinus} variant={'ghost'} size={'icon'}>
                       <MinusIcon />
                     </Button>
-                    <p className='font-medium'>{qty}</p>
-                    <Button onClick={handleQtyPlus} variant={'ghost'} size={'icon'}>
+                    <p className={`font-medium ${items.some(item => item.code_product === String(id)) ? 'text-muted-foreground': ''}`}>{qty}</p>
+                    <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleQtyPlus} variant={'ghost'} size={'icon'}>
                       <PlusIcon />
                     </Button>
                   </div>
@@ -433,7 +435,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
 
                     </div>
                   ) : (
-                    <Button onClick={handleViewNotes} variant={'outline'} className='flex text-sm items-center justify-start gap-2'>
+                    <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleViewNotes} variant={'outline'} className='flex text-sm items-center justify-start gap-2'>
                       <Pencil2Icon />
                       Add Notes
                     </Button>

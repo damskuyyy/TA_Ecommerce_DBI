@@ -31,7 +31,7 @@ const AdminLoginPage = () => {
     e.preventDefault()
     setLoad(true)
     try {
-      const resp = await signIn('Admin', {
+      const resp = await signIn('admin', {
         redirect: false,
         username,
         password,

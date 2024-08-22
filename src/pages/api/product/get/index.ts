@@ -6,7 +6,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { code } = req.query
   try {
-    const data = await prisma.product.findFirst({ where: { code_product: String(code) } })
+    const data = await prisma.product.findFirst({ where: { code_product: String(code) }, include: { reviews: true, discusses: true } })
     res.status(200).send(data)
   } catch (error) {
     res.status(500).json({

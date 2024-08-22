@@ -15,7 +15,7 @@ const Appbar = () => {
   const [sheetView, setSheetView] = useState(false)
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-primary-foreground px-4 lg:h-[60px] lg:px-6 sticky top-0">
+    <header className="flex h-14 items-center gap-4 border-b bg-primary-foreground px-4 lg:h-[60px] lg:px-6 sticky top-0 z-[9]">
       <Sheet open={sheetView} onOpenChange={setSheetView}>
         <SheetTrigger asChild>
           <Button
