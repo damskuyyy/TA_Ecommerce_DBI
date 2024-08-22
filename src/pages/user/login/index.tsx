@@ -40,7 +40,7 @@ export default function LoginForm() {
       setLoad(false)
     } else {
       try {
-        const resp = await signIn('credentials', { redirect: false, callbackUrl: '/', email, password })
+        const resp = await signIn('Credentials', { redirect: false, callbackUrl: '/', email, password })
         if (resp?.error) {
           toast({
             className: cn(

@@ -4,14 +4,14 @@ import { getToken } from "next-auth/jwt";
 const middleware = async (req: NextRequest) => {
   const token = await getToken({ req, secret: process.env.NEXT_PRIVATE_JWT_SECRET })
   const { pathname } = req.nextUrl
-  if (!token) {
+  if (!token || token.role !== 'admin') {
     if (pathname === '/admin/auth/login') {
       return NextResponse.next()
     }
     return NextResponse.redirect(new URL('/admin/auth/login', req.url))
   }
 
-  if (token && pathname === '/admin/auth/login' || pathname === '/admin') {
+  if (token &&  pathname === '/admin/auth/login' || pathname === '/admin') {
     return NextResponse.redirect(new URL('/admin/dashboard', req.url))
   }
 

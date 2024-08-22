@@ -8,6 +8,7 @@ import Sidebar from "../sidebar";
 import Appbar from "../appbar";
 import { ProductDataType } from "@/types/productDataTypes";
 import axios from "axios";
+import { getToken } from "next-auth/jwt";
 
 interface props {
   children: ReactElement;
@@ -24,6 +25,7 @@ const Appshell = ({ children }: props) => {
   useEffect(() => {
     getProductsByID()
   }, [items])
+
   const getProductsByID = async () => {
     if (items.length > 0) {
       const updatedProducts = await Promise.all(

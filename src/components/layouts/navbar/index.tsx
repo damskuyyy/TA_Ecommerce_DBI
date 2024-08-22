@@ -64,7 +64,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
   const getUserData = async () => {
     setLoad(true)
     try {
-      if (session?.user) {
+      if (session?.user.role === 'user') {
         const resp = await axios(`/api/user/get/${session?.user.id}`)
         setUserdata(resp.data)
         setItems(resp.data.items)
@@ -149,7 +149,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
   }
   useEffect(() => {
     updateUserItems()
-  }, [items.length])
+  }, [session && session?.user.role === 'user' && items.length])
 
 
   return (
@@ -237,7 +237,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
             <p className="text-sm font-medium">Loading user...</p>
           </div>
         ) : (
-          status === 'authenticated' ? (
+          status === 'authenticated' && session.user.role === 'user' ? (
             <div className="flex items-center gap-5">
               <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger className="relative" name="shoppingcartbutton">
