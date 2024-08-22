@@ -36,7 +36,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Discussion = () => {
   return (
-    <>
+    <div className="p-4 flex flex-col gap-3">
       <div className="flex items-stretch">
         <h1 className="text-lg font-semibold md:text-2xl">Discussion</h1>
       </div>
@@ -82,7 +82,7 @@ const Discussion = () => {
           </Card>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

@@ -13,7 +13,7 @@ const Sidebar = () => {
   const { pathname } = useRouter()
 
   return (
-    <div className="hidden border-r bg-muted/40 md:block">
+    <div className="hidden border-r bg-muted/40 md:block w-full h-full">
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
@@ -33,7 +33,7 @@ const Sidebar = () => {
             </Link>
             <Link
               href="/admin/product"
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/product' ? 'text-foreground bg-muted': 'text-muted-foreground'} transition-all hover:text-primary`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/product' || pathname === '/admin/addProduct' ?  'text-foreground bg-muted': 'text-muted-foreground'} transition-all hover:text-primary`}
             >
               <ShoppingCart className="h-4 w-4" />
               Product
@@ -64,15 +64,7 @@ const Sidebar = () => {
             </Link>
           </nav>
         </div>
-        <div className="px-2 lg:px-4">
-          <Link
-            href="/logout"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-          >
-            <CircleUser className="h-4 w-4" />
-            Logout
-          </Link>
-        </div>
+        
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { calculateSubtotal, calculateTransactionFee, calculateApplicationFee, calculateTax, calculateTotal } from "@/utils/calcutale";
 
 
-const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>> }) => {
+const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>>, products: ProductDataType[], setProducts: Dispatch<SetStateAction<ProductDataType[]>> }) => {
   const [view, setView] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const { data: session, status }: any = useSession()
@@ -48,7 +48,6 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
     items: [],
     type: "",
   })
-  const [products, setProducts] = useState<ProductDataType[]>([])
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [dropdownOpen2, setDropdownOpen2] = useState(false)
 
@@ -65,7 +64,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
   const getUserData = async () => {
     setLoad(true)
     try {
-      if (session?.user) {
+      if (session?.user.role === 'user') {
         const resp = await axios(`/api/user/get/${session?.user.id}`)
         setUserdata(resp.data)
         setItems(resp.data.items)
@@ -83,44 +82,9 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
     }
   }, [status, session?.user?.id])
 
-  const getProductsByID = async () => {
-    if (items.length > 0) {
-      const updatedProducts = await Promise.all(
-        items.map(async (item) => {
-          try {
-            const resp = await axios(`/api/product/get?code=${item.code_product}`)
-            const { code_product, name, price, image } = resp.data
-            return {
-              code_product,
-              name,
-              price,
-              qty: item.qty,
-              image,
-              desc: resp.data.desc || '',
-              category: resp.data.category || '',
-              variants: resp.data.variants || [],
-              variant: item.variant,
-              notes: item.notes
-            }
-          } catch (error) {
-            console.error(`Error fetching product with code ${item.code_product}:`, error)
-            return null
-          }
-        })
-      )
-      const validProducts = updatedProducts.filter(product => product !== null)
-      setProducts(prevProducts => {
-        const newProducts = validProducts.filter(newProduct =>
-          !prevProducts.some(prevProduct => prevProduct.code_product === newProduct.code_product && prevProduct.variant === newProduct.variant)
-        )
-        return [...prevProducts, ...newProducts]
-      })
-    }
-  }
 
-  useEffect(() => {
-    getProductsByID()
-  }, [items])
+
+
 
   const incrementQty = (index: number) => {
     setProducts(prevProducts =>
@@ -136,19 +100,38 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
   }
 
   const decrementQty = (index: number) => {
-    setProducts(prevProducts =>
-      prevProducts.map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item).filter(item => item.qty && item.qty > 0)
-    )
-    setItems(prevItems =>
-      prevItems.map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item).filter(item => item.qty && item.qty > 0)
-    )
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts
+        .map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item)
+        .filter(item => item.qty && item.qty > 0)
+
+      if (updatedProducts.length === 0) {
+        setProducts([])
+        return []
+      } else {
+        return updatedProducts
+      }
+    })
+
+    setItems(prevItems => {
+      const updatedItems = prevItems
+        .map((item, i) => i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item)
+        .filter(item => item.qty && item.qty > 0)
+
+      if (updatedItems.length === 0) {
+        setItems([])
+        return []
+      } else {
+        return updatedItems
+      }
+    })
   }
 
   const transactionValue = 0.05; // 5% transaction fee
   const applicationValue = 0.02; // 2% application fee
   const taxRate = 0.1; // 10% tax
 
-  const subtotal = calculateSubtotal(products);
+  const subtotal = calculateSubtotal(products)
   const transactionFee = calculateTransactionFee(subtotal, transactionValue)
   const applicationFee = calculateApplicationFee(subtotal, applicationValue)
   const tax = calculateTax(subtotal, taxRate)
@@ -166,7 +149,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
   }
   useEffect(() => {
     updateUserItems()
-  }, [items.length])
+  }, [session && session?.user.role === 'user' && items.length])
 
 
   return (
@@ -254,7 +237,7 @@ const Navbar = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatch
             <p className="text-sm font-medium">Loading user...</p>
           </div>
         ) : (
-          status === 'authenticated' ? (
+          status === 'authenticated' && session.user.role === 'user' ? (
             <div className="flex items-center gap-5">
               <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger className="relative" name="shoppingcartbutton">

@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 
-const Alerts = ({ ok, desc, btn }: { ok: () => void, desc: string, btn: string }) => {
+const Alerts = ({ ok, desc, btn, full = true }: { ok: () => void, desc: string, btn: string, full?: boolean }) => {
   return (
     <AlertDialog>
-      <AlertDialogTrigger className='w-full'>
+      <AlertDialogTrigger className={`${full ? 'w-full' : 'w-fit'}`}>
         <Button variant={"destructive"} size={'sm'} className="w-full font-bold">
           {btn}
         </Button>

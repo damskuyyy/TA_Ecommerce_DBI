@@ -2,7 +2,7 @@ import prisma from '@/utils/prisma';
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 
 
 const secret = process.env.NEXT_PRIVATE_SECRET_PASS_KEY
@@ -19,24 +19,48 @@ const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
+      id: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'text', placeholder: 'Your email...' },
         password: { label: 'Password', type: 'password', placeholder: 'Your password...' },
       },
       async authorize(credentials: any) {
         if (!credentials) {
-          throw new Error('No credentials provider!');
+          throw new Error('No credentials provider!')
         }
-        const { email, password } = credentials;
+        const { email, password } = credentials
 
-        const users = await prisma.user.findMany({ where: { email } });
+        const users = await prisma.user.findMany({ where: { email } })
         if (users.length === 0) {
-          throw new Error('Invalid Email or Password');
+          throw new Error('Invalid Email or Password')
         }
         const user = users[0]
 
         const isPassMatch = bcrypt.compareSync(password + secret, user.password)
 
+        if (isPassMatch) {
+          return user
+        } else {
+          throw new Error('failed to auth!')
+        }
+      }
+    }),
+    CredentialsProvider({
+      name: 'Admin',
+      id: 'Admin',
+      credentials: {
+        username: { label: 'username', type: 'text', placeholder: 'your username ...' },
+        password: { label: 'password', type: 'password', placeholder: 'your password' }
+      },
+      async authorize(credentials: any) {
+        if (!credentials) {
+          throw new Error('no credentials provider!')
+        }
+        const { username, password } = credentials
+        const users = await prisma.admin.findMany({ where: { username } })
+        const user = users[0]
+
+        const isPassMatch = bcrypt.compareSync(password + secret, user.password)
         if (isPassMatch) {
           return user
         } else {
@@ -58,15 +82,22 @@ const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, account, user }: any) {
-      if (account?.provider === 'credentials' && user) {
+      if (account?.provider === 'Credentials' && user) {
         token.id = user.id
+        token.role = 'user'
+      }
+
+      if(account?.provider === 'Admin' && user) {
+        token.id = user.id
+        token.role = 'admin'
       }
 
       if (account?.provider === 'google') {
-        const existingUser = await prisma.user.findFirst({ where: { email: user.email } });
+        const existingUser = await prisma.user.findFirst({ where: { email: user.email } })
 
         if (existingUser) {
           token.id = existingUser.id
+          token.role = 'user'
         } else {
           const newUser = await prisma.user.create({
             data: {
@@ -79,23 +110,25 @@ const authOptions: NextAuthOptions = {
               items: [],
               phone: user.phone || ''
             },
-          });
-          token.id = newUser.id;
+          })
+          token.id = newUser.id
+          token.role = 'user'
         }
       }
 
-      return token;
+      return token
     },
     async session({ session, token }: any) {
       if (token) {
         session.user = {
-          id: token.id
+          id: token.id,
+          role: token.role
         }
       }
 
-      return session;
+      return session
     },
   },
-};
+}
 
-export default NextAuth(authOptions);
+export default NextAuth(authOptions)

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardFooter } from '@/components/ui/card';
 import Alerts from '@/components/ui/alerts';
-
+import {ProductDataType} from '@/types/productDataTypes';
+import axios from 'axios';
+import Link from "next/link";
 
 
 type Product = {
@@ -39,9 +41,13 @@ const ProductCard = ({
         </div>
       </CardHeader>
       <CardFooter className="flex justify-center gap-2 p-4">
-        <Button className="bg-black text-white">Edit Product</Button>
-        <Button variant="outline" className="border border-[#00B69B] text-[#00B69B] hover:bg-[#00B69C] hover:text-white">View Product</Button>
-        <Alerts btn={"Delete"} desc={"Are you sure you want to delete this product?"} ok={()=>{}}/>
+        <Link href={'/admin/editProduct'}>
+        <Button className="bg-black text-white" size={'sm'}>Edit Product</Button>
+        </Link>
+        <Link href={'/admin/viewProduct'}>
+        <Button variant="outline" size={'sm'} className="border border-[#00B69B] text-[#00B69B] hover:bg-[#00B69C] hover:text-white">View Product</Button>
+        </Link> 
+        <Alerts btn={"Delete"} desc={"Are you sure you want to delete this product?"} ok={()=>{}} full={false}/>
       </CardFooter>
     </Card>
 );
@@ -88,17 +94,21 @@ const Pagination = ({ currentPage, totalPages, onPageChange }:Pagination) => {
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(2);
   const productsPerPage = 6;
+  const [products, setProducts] = useState<ProductDataType[]>([])
+  
+  const getProductsData = async () =>{
+    try{
+     const resp = await axios ('/api/product/get/categories?name=website')
+     setProducts(resp.data)
+     console.log(products)
+    }catch(error){
+      console.log(error)
+    }
+  }
 
-  const products:Product[] = [
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-    { title: 'Cryptocurrency Wallet', description: 'Secure hardware for storing your cryptocurrencies safely', price: 95000 },
-  ];
+  useEffect(()=>{
+    getProductsData()
+  },[]) 
 
   const totalPages = Math.ceil(products.length / productsPerPage);
 
@@ -112,25 +122,36 @@ const ProductsPage = () => {
 
   
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Product grid</h1>
+        <h1 className="text-2xl font-bold">Products</h1>
+        <Link href={"/admin/addProduct"}>
         <Button className="bg-black text-white">Add Product +</Button>
+        </Link>
+        
       </div>
 
       <div className="flex items-center mb-6">
         <Input
-          type="text"
+          type="search"
           placeholder="Search"
           className="bg-[#E0E0E0] w-full max-w-sm"
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {currentProducts.map((product: Product, index) => (
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {currentProducts.map((product, index) => (
           <ProductCard key={index} title={String(product.title)} description={String(product.description)} price={Number(product.price)}/>
-        ))}
-      </div>
+        ))} 
+      </div> */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {products.map((item, index)=>{
+        return(
+          <ProductCard title={item.name} description={item.desc} price={item.price} key={index}/>
+        )
+      }
+    )}
+    </div>
 
       <Pagination
         currentPage={currentPage}
