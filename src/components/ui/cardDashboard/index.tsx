@@ -3,7 +3,7 @@ import React from 'react';
 
 const CardDashboard: React.FC<DashboardData> = ({ title, value, description, descriptionColor, icon }) => {
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col">
+    <div className="bg-white border-2 shadow-md space-y-2 rounded-lg p-4 flex flex-col">
       <div className="flex items-center">
         {icon && <div className="mr-3">{icon}</div>}
         <h2 className="text-sm font-semibold text-gray-500">{title}</h2>

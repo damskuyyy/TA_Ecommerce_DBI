@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import formattedPrice from '@/utils/formattedPrice';
 
 
 const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) => {
@@ -92,19 +93,19 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
           <div className='flex flex-col gap-5'>
             <div className='pb-2 border-b w-full justify-between flex'>
               <h1 className='text-sm'>Transaction fee :</h1>
-              <p className='text-sm'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(fee)}</p>
+              <p className='text-sm'>{formattedPrice.toIDR(fee)}</p>
             </div>
             <div className='pb-2 border-b w-full justify-between flex'>
               <h1 className='text-sm'>TAX :</h1>
-              <p className='text-sm'>{tax * 100}% ({new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax * price)})</p>
+              <p className='text-sm'>{tax * 100}% ({formattedPrice.toIDR(tax * price)})</p>
             </div>
             <div className='pb-2 border-b w-full justify-between flex'>
               <h1 className='text-sm'>Application fee :</h1>
-              <p className='text-sm'>{appFee * 100}% ({new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(appFee * price)})</p>
+              <p className='text-sm'>{appFee * 100}% ({formattedPrice.toIDR(appFee * price)})</p>
             </div>
             <div className='pb-2 border-b w-full justify-between flex'>
               <h1 className='text-xl font-bold text-black'>TOTAL :</h1>
-              <p className='text-sm text-black font-bold'>{(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total))}</p>
+              <p className='text-sm text-black font-bold'>{formattedPrice.toIDR(total)}</p>
             </div>
             <div className='flex flex-col gap-3 w-full'>
               <h1>Payment methods</h1>

@@ -1,16 +1,51 @@
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from'@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from'@/components/ui/select';
-import { Input } from'@/components/ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { StarIcon } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
+import {
+  Breadcrumb, BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
 
 const ProductDetailsPage = () => {
+  const { id } = useRouter().query
+  
   return (
-    <div className="container mx-auto p-4 lg:p-8">
-      <h1 className="text-xl lg:text-2xl font-bold mb-4">Product Details</h1>
+    <div className="w-full mx-auto p-4 space-y-6">
+      <div className='space-y-2'>
+        <h1 className="text-4xl font-bold">Products</h1>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/products">Products</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/admin/products/details/${id}`}>Details</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="font-semibold">{id}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
-      <div className="flex flex-col lg:flex-row justify-between gap-4 lg:gap-6">
+      <div className="flex flex-col lg:flex-row justify-between gap-4 lg:gap-4">
         {/* Product Image and Details */}
         <Card className="w-full lg:w-2/3 shadow-lg">
           <CardContent className="flex">

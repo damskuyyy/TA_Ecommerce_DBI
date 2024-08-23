@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users } from 'lucide-react';
+import { ArrowLeftRightIcon, Bell, CircleUser, FoldersIcon, Home, LogsIcon, Menu, Package2, Search, Users } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const Appbar = () => {
   const { pathname } = useRouter()
@@ -46,19 +46,19 @@ const Appbar = () => {
               Dashboard
             </Link>
             <Link
-              href="/admin/product"
-              className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/product' || pathname === '/admin/addProduct' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              href="/admin/products"
+              className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/products' || pathname === '/admin/products/add' || pathname === '/admin/products/details/[id]' || pathname === '/admin/products/edit/[id]' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
               onClick={() => setSheetView(false)}
             >
-              <ShoppingCart className="h-5 w-5" />
-              Product
+              <FoldersIcon className="h-5 w-5" />
+              Products
             </Link>
             <Link
               href="/admin/order"
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/order' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
               onClick={() => setSheetView(false)}
             >
-              <Package className="h-5 w-5" />
+              <LogsIcon className="h-5 w-5" />
               Order
               <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                 6
@@ -69,7 +69,7 @@ const Appbar = () => {
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/transaction' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
               onClick={() => setSheetView(false)}
             >
-              <Users className="h-5 w-5" />
+              <ArrowLeftRightIcon className="h-5 w-5" />
               Transactions
             </Link>
             <Link
@@ -77,7 +77,7 @@ const Appbar = () => {
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/discussion' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
               onClick={() => setSheetView(false)}
             >
-              <LineChart className="h-5 w-5" />
+              <Users className="h-5 w-5" />
               Disscussion
             </Link>
           </nav>

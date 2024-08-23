@@ -54,6 +54,7 @@ model Review {
   rate         Int     @default(0)
   product      Product @relation(fields: [code_product], references: [code_product])
   code_product String
+  createdAt    DateTime @default(now())
 }
 
 model Discusses {
@@ -63,6 +64,7 @@ model Discusses {
   image        String
   product      Product @relation(fields: [code_product], references: [code_product])
   code_product String
+  createdAt    DateTime @default(now())
 }
 
 model Customer {

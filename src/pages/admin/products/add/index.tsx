@@ -8,6 +8,13 @@ import dynamic from 'next/dynamic';
 import { FolderPlusIcon, ImagePlusIcon, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import axios from 'axios';
+import {
+  Breadcrumb, BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
 
 const ReactEditor = dynamic(() => import('@/components/ui/reactEditor'), { ssr: false })
 
@@ -31,6 +38,7 @@ const AddProductPage = () => {
   const variationInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [load, setLoad] = useState(false)
+
 
   const categoryView = [
     "Website",
@@ -99,7 +107,7 @@ const AddProductPage = () => {
       discusses: [],
       details
     }
-    
+
     try {
       await axios.post('/api/product/post', body)
       setProductName('')
@@ -119,8 +127,29 @@ const AddProductPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">Add Product</h1>
+    <div className="container mx-auto p-4 space-y-6">
+      <div className='space-y-2'>
+        <h1 className="text-4xl font-bold">Products</h1>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/products">Products</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="font-semibold">Add</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
       <div className="flex flex-col lg:flex-row justify-between gap-4 lg:gap-6">
         {/* Product Information Form */}
@@ -234,8 +263,6 @@ const AddProductPage = () => {
                   className='mt-2'
                 />
               </div>
-
-
               <div>
                 <Label htmlFor="variation">Variants<span className="text-red-500">*</span></Label>
                 {variationInputView ? (

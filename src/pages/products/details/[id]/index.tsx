@@ -19,6 +19,7 @@ import { PenBoxIcon, Trash2Icon } from 'lucide-react';
 import { ItemDataType } from '@/types/itemsDataTypes';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
+import formattedPrice from '@/utils/formattedPrice';
 const ModalCheckout = dynamic(() => import('@/components/ui/modals/checkout'), { ssr: false })
 const ModalAddReview = dynamic(() => import('@/components/ui/modals/addReview'), { ssr: false })
 
@@ -207,7 +208,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                 </div>
                 {load ? (
                   <Skeleton className='w-3/4 h-5' />
-                ) : <h1 className='text-3xl font-bold'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(product.price))}</h1>}
+                ) : <h1 className='text-3xl font-bold'>{formattedPrice.toIDR(product.price)}</h1>}
                 <hr />
                 <div className='flex flex-col gap-3'>
                   <h1 className='font-semibold'>Choose Variants :</h1>
@@ -443,7 +444,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                 )}
                 <div className='flex justify-between'>
                   <h1 className='text-gray-500 font-medium'>Subtotal</h1>
-                  <h1 className='font-medium'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(calculateSubtotal(product.price)))}</h1>
+                  <h1 className='font-medium'>{formattedPrice.toIDR(calculateSubtotal(product.price))}</h1>
                 </div>
                 <div className='mt-5 w-full flex flex-col gap-3'>
                   <Button disabled={items.some(item => item.code_product === String(id))} variant={'outline'} onClick={handlePushItems}>Add to cart</Button>

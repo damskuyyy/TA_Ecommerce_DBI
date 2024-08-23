@@ -1,10 +1,7 @@
 import Link from "next/link";
 import {
-  CircleUser,
-  Home,
-  LineChart, Package,
-  Package2, ShoppingCart,
-  Users
+  ArrowLeftRightIcon, FoldersIcon,
+  Home, LogsIcon, Package2, Users
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/router";
@@ -26,23 +23,23 @@ const Sidebar = () => {
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             <Link
               href="/admin/dashboard"
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/dashboard' ? 'text-foreground bg-muted': 'text-muted-foreground'} transition-all hover:text-primary`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/dashboard' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
             >
               <Home className="h-4 w-4" />
               Dashboard
             </Link>
             <Link
-              href="/admin/product"
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/product' || pathname === '/admin/addProduct' ?  'text-foreground bg-muted': 'text-muted-foreground'} transition-all hover:text-primary`}
+              href="/admin/products"
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/products' || pathname === '/admin/products/add' || pathname === '/admin/products/details/[id]' || pathname === '/admin/products/edit/[id]' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
             >
-              <ShoppingCart className="h-4 w-4" />
-              Product
+              <FoldersIcon className="h-4 w-4" />
+              Products
             </Link>
             <Link
               href="/admin/order"
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/order' ? 'text-foreground bg-muted': 'text-muted-foreground'} transition-all hover:text-primary`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/order' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
             >
-              <Package className="h-4 w-4" />
+              <LogsIcon className="h-4 w-4" />
               Order
               <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                 6
@@ -50,21 +47,21 @@ const Sidebar = () => {
             </Link>
             <Link
               href="/admin/transaction"
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/transaction' ? 'text-foreground bg-muted': 'text-muted-foreground'} transition-all hover:text-primary`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/transaction' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
             >
-              <Users className="h-4 w-4" />
+              <ArrowLeftRightIcon className="h-4 w-4" />
               Transactions
             </Link>
             <Link
               href="/admin/discussion"
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/discussion' ? 'text-foreground bg-muted': 'text-muted-foreground'} transition-all hover:text-primary`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/discussion' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
             >
-              <LineChart className="h-4 w-4" />
+              <Users className="h-4 w-4" />
               Disscusion
             </Link>
           </nav>
         </div>
-        
+
       </div>
     </div>
   );

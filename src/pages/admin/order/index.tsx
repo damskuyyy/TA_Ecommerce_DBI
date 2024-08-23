@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 const orders: OrderDataTypes[] = [
   {
@@ -77,8 +78,25 @@ const orders: OrderDataTypes[] = [
 
 const OrderTable: React.FC = () => {
   return (
-    <div className="p-4 space-y-4">
-    <h2 className='font-bold text-2xl text-gray-700'>Order List</h2>
+    <div className="p-4 space-y-6">
+      <div className='space-y-2'>
+        <h1 className="text-4xl font-bold">Orders</h1>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="font-semibold">Orders</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
       {/* filter */}
       <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow mb-4">
         <div className="flex items-center space-x-4">
@@ -98,7 +116,7 @@ const OrderTable: React.FC = () => {
         </div>
         <button className="text-red-500 flex items-center space-x-1">
           <span>Reset Filter</span>
-          
+
         </button>
       </div>
 
@@ -154,13 +172,12 @@ const OrderTable: React.FC = () => {
                   </TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        order.status === "Completed"
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Completed"
                           ? "bg-green-100 text-green-800"
                           : order.status === "Processing"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
                     >
                       {order.status}
                     </span>

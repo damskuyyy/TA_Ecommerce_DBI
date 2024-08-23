@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ProductDataType } from '@/types/productDataTypes';
 import Link from 'next/link';
 import { Button } from '../button';
+import formattedPrice from '@/utils/formattedPrice';
 
 type Props = {
   data: ProductDataType;
@@ -23,12 +24,12 @@ const CardProduct = ({ data }: Props) => {
           <CardTitle className="leading-snug first-letter:uppercase">
             {data.name || 'Unnamed Product'}
           </CardTitle>
-          <CardDescription className="text-xs first-letter:uppercase" dangerouslySetInnerHTML={{__html: data.desc || 'No description available.'}}/>
+          <CardDescription className="text-xs first-letter:uppercase" dangerouslySetInnerHTML={{ __html: data.desc || 'No description available.' }} />
         </CardContent>
       </div>
       <CardFooter className="flex lg:items-center items-start lg:flex-row flex-col gap-3 justify-between">
         <p className="font-medium text-xs">
-          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(data.price) || 0)}
+          {formattedPrice.toIDR(data.price)}
         </p>
         <Link href={productUrl}>
           <Button size="sm" className="font-medium" disabled={!data.name}>
