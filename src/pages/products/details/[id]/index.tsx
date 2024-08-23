@@ -19,6 +19,7 @@ import { PenBoxIcon, Trash2Icon } from 'lucide-react';
 import { ItemDataType } from '@/types/itemsDataTypes';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
+import formattedPrice from '@/utils/formattedPrice';
 const ModalCheckout = dynamic(() => import('@/components/ui/modals/checkout'), { ssr: false })
 const ModalAddReview = dynamic(() => import('@/components/ui/modals/addReview'), { ssr: false })
 
@@ -56,6 +57,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
   const [notesDone, setNotesDone] = useState(false)
   const notesRef = useRef<HTMLTextAreaElement>(null)
   const { toast } = useToast()
+  
 
   const handleQtyPlus = () => {
     setQty(qty + 1)
@@ -127,7 +129,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
   }
 
   const handlePushItems = () => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && session.user.role === 'user') {
       setItems((prevItems) => {
         const itemExists = prevItems.some(item => item.code_product === String(id));
 
@@ -187,7 +189,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                       <Skeleton className='w-full h-2' />
                     </div>
                   ) : (
-                    <p className='text-sm text-gray-500 font-medium'>{product.desc}</p>
+                    <div className='text-sm text-gray-500 font-medium'dangerouslySetInnerHTML={{__html: product.desc}}/>
                   )}
                   <div className='flex justify-between flex-wrap w-fit gap-3 items-center'>
                     <div className='flex items-center gap-1'>
@@ -206,7 +208,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                 </div>
                 {load ? (
                   <Skeleton className='w-3/4 h-5' />
-                ) : <h1 className='text-3xl font-bold'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(product.price))}</h1>}
+                ) : <h1 className='text-3xl font-bold'>{formattedPrice.toIDR(product.price)}</h1>}
                 <hr />
                 <div className='flex flex-col gap-3'>
                   <h1 className='font-semibold'>Choose Variants :</h1>
@@ -389,6 +391,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
             </div>
           </div>
         </div>
+        
         <div className='lg:w-[30%] w-full sticky top-24 h-full'>
           <div className='w-full'>
             <Card className='flex flex-col'>
@@ -398,11 +401,11 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                 <hr />
                 <div className='flex items-center gap-2'>
                   <div className='border rounded-md flex justify-between items-center gap-1'>
-                    <Button onClick={handleQtyMinus} variant={'ghost'} size={'icon'}>
+                    <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleQtyMinus} variant={'ghost'} size={'icon'}>
                       <MinusIcon />
                     </Button>
-                    <p className='font-medium'>{qty}</p>
-                    <Button onClick={handleQtyPlus} variant={'ghost'} size={'icon'}>
+                    <p className={`font-medium ${items.some(item => item.code_product === String(id)) ? 'text-muted-foreground': ''}`}>{qty}</p>
+                    <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleQtyPlus} variant={'ghost'} size={'icon'}>
                       <PlusIcon />
                     </Button>
                   </div>
@@ -433,7 +436,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
 
                     </div>
                   ) : (
-                    <Button onClick={handleViewNotes} variant={'outline'} className='flex text-sm items-center justify-start gap-2'>
+                    <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleViewNotes} variant={'outline'} className='flex text-sm items-center justify-start gap-2'>
                       <Pencil2Icon />
                       Add Notes
                     </Button>
@@ -441,7 +444,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                 )}
                 <div className='flex justify-between'>
                   <h1 className='text-gray-500 font-medium'>Subtotal</h1>
-                  <h1 className='font-medium'>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(calculateSubtotal(product.price)))}</h1>
+                  <h1 className='font-medium'>{formattedPrice.toIDR(calculateSubtotal(product.price))}</h1>
                 </div>
                 <div className='mt-5 w-full flex flex-col gap-3'>
                   <Button disabled={items.some(item => item.code_product === String(id))} variant={'outline'} onClick={handlePushItems}>Add to cart</Button>

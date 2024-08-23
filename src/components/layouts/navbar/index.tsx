@@ -30,6 +30,7 @@ import Lottie from "lottie-react";
 import { ProductDataType } from "@/types/productDataTypes";
 import { Badge } from "@/components/ui/badge";
 import { calculateSubtotal, calculateTransactionFee, calculateApplicationFee, calculateTax, calculateTotal } from "@/utils/calcutale";
+import formattedPrice from "@/utils/formattedPrice";
 
 
 const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>>, products: ProductDataType[], setProducts: Dispatch<SetStateAction<ProductDataType[]>> }) => {
@@ -259,7 +260,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
                                   <div className="flex flex-col h-full items-start justify-between">
                                     <p className="font-bold first-letter:uppercase">{item.name}</p>
                                     <p className="font-medium text-sm">Variant : <span className="font-bold capitalize">{item.variant}</span></p>
-                                    <p className="font-medium text-sm">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(item.price))}</p>
+                                    <p className="font-medium text-sm">{formattedPrice.toIDR(item.price)}</p>
                                     {item.notes && <p className="font-medium text-sm">Notes : <span className="capitalize font-normal text-gray-500 truncate overflow-hidden">{item.notes}</span></p>}
                                   </div>
                                 </div>
@@ -298,32 +299,33 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
                     <SheetDescription className="w-full flex flex-col gap-2 text-lg p-0">
                       <div className="flex w-full justify-between">
                         <h1 className="font-semibold text-primary text-xs">Subtotal :</h1>
-                        <p className="text-gray-500 text-xs">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(subtotal)}</p>
+                        <p className="text-gray-500 text-xs">{formattedPrice.toIDR(subtotal)}</p>
                       </div>
                       <hr />
                       <div className="flex w-full justify-between">
                         <h1 className="font-semibold text-primary text-xs">TAX :</h1>
-                        <p className="text-gray-500 text-xs text-right">({taxRate * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)} </p>
+                        <p className="text-gray-500 text-xs text-right">({taxRate * 100}%) {formattedPrice.toIDR(tax)} </p>
                       </div>
 
                       <div className="flex w-full justify-between">
                         <h1 className="font-semibold text-primary text-xs">Transaction fee :</h1>
-                        <p className="text-gray-500 text-xs text-right">({transactionValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transactionFee)} </p>
+                        <p className="text-gray-500 text-xs text-right">({transactionValue * 100}%) {formattedPrice.toIDR(transactionFee)} </p>
                       </div>
                       <div className="flex w-full justify-between">
                         <h1 className="font-semibold text-primary text-xs">Application fee :</h1>
-                        <p className="text-gray-500 text-xs text-right">({applicationValue * 100}%) {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(applicationFee)} </p>
+                        <p className="text-gray-500 text-xs text-right">({applicationValue * 100}%) {formattedPrice.toIDR(applicationFee)} </p>
                       </div>
                       <hr />
                       <div className="flex w-full justify-between">
                         <h1 className="font-semibold text-primary text-xs">TOTAL :</h1>
-                        <p className="text-primary font-bold text-sm">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}</p>
+                        <p className="text-primary font-bold text-sm">{formattedPrice.toIDR(total)}</p>
                       </div>
                       <div className="w-full flex flex-col gap-2 mt-5">
                         <Button size={'sm'}>Confirm</Button>
                         <Alerts btn="Delete all" desc="As a result, the cart will be empty. and you must add your items again." ok={() => {
                           setProducts([])
                           setItems([])
+                          location.reload()
                         }} />
                       </div>
                     </SheetDescription>

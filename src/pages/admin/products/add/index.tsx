@@ -2,29 +2,43 @@ import { FormEvent, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
 import { FolderPlusIcon, ImagePlusIcon, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import axios from 'axios';
+import {
+  Breadcrumb, BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
 
 const ReactEditor = dynamic(() => import('@/components/ui/reactEditor'), { ssr: false })
 
 const AddProductPage = () => {
-  const [productName, setProductName] = useState('');
-  const [shortDescription, setShortDescription] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [quantity, setQuantity] = useState(0);
-  const [variation, setVariation] = useState<string[]>([]);
-  const [variationValue, setVariationValue] = useState('')
-  const [image, setImage] = useState<string[]>([]);
+  const [productName, setProductName] = useState('')
+  const [shortDescription, setShortDescription] = useState('')
+  const [description, setDescription] = useState('')
+  const [spec, setSpesification] = useState('')
+  const [price, setPrice] = useState(0)
+  const [stock, setStock] = useState(0)
+  const [minOrder, setMinOrder] = useState(1)
+  const [variants, setVariants] = useState<string[]>([])
+  const [variantValue, setVariantValue] = useState('')
+  const [image, setImage] = useState<string[]>([])
   const [imageValue, setImageValue] = useState('')
+  const [information, setInformation] = useState('')
+  const [details, setDetails] = useState('')
   const [category, setCategory] = useState('website')
   const [variationInputView, setVariationInputView] = useState(false)
   const [imageInputView, setImageInputView] = useState(false)
   const variationInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
+  const [load, setLoad] = useState(false)
+
 
   const categoryView = [
     "Website",
@@ -45,11 +59,11 @@ const AddProductPage = () => {
     "(COIN) - Sha 256",
     "(TOKEN) - ERC 20, BSC 20, TRC 20",
   ]
-
+  //handleAddVariant menambahkan variant
   const handleAddVariation = (e: FormEvent) => {
     e.preventDefault()
-    setVariation((prev) => [...prev, variationValue])
-    setVariationValue('')
+    setVariants((prev) => [...prev, variantValue])
+    setVariantValue('')
     if (variationInputRef.current) {
       variationInputRef.current.value = ''
       variationInputRef.current.focus()
@@ -66,21 +80,76 @@ const AddProductPage = () => {
   }
 
   const handleDeleteVariants = (index: number) => {
-    const values = variation.filter((_, i) => i !== index)
-    setVariation(values)
+    const values = variants.filter((_, i) => i !== index)
+    setVariants(values)
   }
   const handleDeleteImage = (index: number) => {
-    const values = variation.filter((_, i) => i !== index)
+    const values = image.filter((_, i) => i !== index)
     setImage(values)
   }
 
-  const handleSave = () => {
-    // Handle save product logic here
-  };
+  const handleSave = async () => {
+    setLoad(true)
+    const body = {
+      name: productName,
+      category,
+      desc: description,
+      price,
+      stock,
+      variants,
+      image,
+      spec,
+      information,
+      sold: 0,
+      rate: 0,
+      minOrder,
+      reviews: [],
+      discusses: [],
+      details
+    }
+
+    try {
+      await axios.post('/api/product/post', body)
+      setProductName('')
+      setCategory('')
+      setDescription('')
+      setPrice(0)
+      setStock(0)
+      setVariants([])
+      setImage([])
+      setSpesification('')
+      setInformation('')
+      setLoad(false)
+    } catch (error) {
+      setLoad(false)
+      console.log(error)
+    }
+  }
 
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">Add Product</h1>
+    <div className="container mx-auto p-4 space-y-6">
+      <div className='space-y-2'>
+        <h1 className="text-4xl font-bold">Products</h1>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/products">Products</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="font-semibold">Add</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
       <div className="flex flex-col lg:flex-row justify-between gap-4 lg:gap-6">
         {/* Product Information Form */}
@@ -131,26 +200,65 @@ const AddProductPage = () => {
                 </div>
               </div>
               <div>
+                <Label htmlFor="spesification">Spesification<span className="text-red-500">*</span></Label>
+                <div className='w-full mt-2'>
+
+                  <ReactEditor
+                    value={spec}
+                    setValue={setSpesification}
+                    placeholder="Type your text here ..."
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="information">Information<span className="text-red-500">*</span></Label>
+                <div className='w-full mt-2'>
+                  <ReactEditor
+                    value={information}
+                    setValue={setInformation}
+                    placeholder="Type your text here ..."
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="information">Details<span className="text-red-500">*</span></Label>
+                <div className='w-full mt-2'>
+                  <ReactEditor
+                    value={details}
+                    setValue={setDetails}
+                    placeholder="Type your text here ..."
+                  />
+                </div>
+              </div>
+              <div>
                 <Label htmlFor="price">Price<span className="text-red-500">*</span></Label>
                 <Input
                   id="price"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) => setPrice(Number(e.target.value))}
                   placeholder="Base pricing"
                   required
                   className='mt-2'
                 />
               </div>
               <div>
-                <Label htmlFor="quantity">Quantity<span className="text-red-500">*</span></Label>
+                <Label htmlFor="stock">Stock<span className="text-red-500">*</span></Label>
                 <Input
-                  id="quantity"
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value))}
-                  min={1}
-                  step={1}
-                  placeholder="Quantity"
+                  id="stock"
+                  value={stock}
+                  onChange={(e) => setStock(Number(e.target.value))}
+                  placeholder="Stock"
+                  required
+                  className='mt-2'
+                />
+              </div>
+              <div>
+                <Label htmlFor="minOrder">Minimal Order <span className="text-red-500">*</span></Label>
+                <Input
+                  id="minOrder"
+                  value={minOrder}
+                  onChange={(e) => setMinOrder(Number(e.target.value))}
+                  placeholder="Minimal Order"
                   required
                   className='mt-2'
                 />
@@ -160,7 +268,7 @@ const AddProductPage = () => {
                 {variationInputView ? (
                   <div className='flex flex-col gap-2 w-full mt-2 mb-4'>
                     <ul className='inline-flex flex-wrap gap-5'>
-                      {variation.map((item, index) => (
+                      {variants.map((item, index) => (
                         <li key={index} className='relative cursor-default text-muted-foreground group text-sm'>
                           <Badge>{item}</Badge>
                           <button onClick={() => handleDeleteVariants(index)} className='p-0.5 absolute rounded-md -top-2 bg-destructive hidden group-hover:block -right-3'>
@@ -170,11 +278,11 @@ const AddProductPage = () => {
                       ))}
                     </ul>
                     <form onSubmit={handleAddVariation} className='space-y-2'>
-                      <Input required ref={variationInputRef} type='text' placeholder='Type a variation here...' onChange={(e) => setVariationValue(e.target.value)} />
+                      <Input required ref={variationInputRef} type='text' placeholder='Type a variation here...' onChange={(e) => setVariantValue(e.target.value)} />
                       <div className='flex items-center gap-2'>
                         <Button type='submit' size={'sm'} className='w-fit'>Add</Button>
                         <Button type='button' onClick={() => {
-                          setVariationValue('')
+                          setVariantValue('')
                           setVariationInputView(false)
                         }} size={'sm'} className='w-fit' variant={'destructive'}>Cancel</Button>
                       </div>
@@ -188,7 +296,7 @@ const AddProductPage = () => {
                 )}
               </div>
 
-              <Button className='w-full'>Save</Button>
+              <Button className='w-full' onClick={handleSave}>Save</Button>
             </div>
           </CardContent>
         </Card>
@@ -229,10 +337,6 @@ const AddProductPage = () => {
               </button>
             )}
           </CardContent>
-          {/* <CardFooter className="flex justify-between">
-            <Button variant="outline" className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white">Cancel</Button>
-            <Button onClick={handleSave} className="bg-black text-white">Save</Button>
-          </CardFooter> */}
         </Card>
       </div>
     </div>

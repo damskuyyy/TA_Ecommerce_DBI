@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import prisma from "@/utils/prisma";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { code_product, name, price, image, category, variants, details, spec, information, sold, rate, reviews, discusses, stock, minOrder, desc } = req.body
+  const { code_product, name, price, image, category, variants, details, spec, information, sold, rate, stock, minOrder, desc } = req.body
   if (req.method === 'POST') {
     try {
       await prisma.product.create({
@@ -21,9 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           sold,
           rate,
           stock,
-          minOrder,
-          discusses,
-          reviews
+          minOrder
         }
       })
       res.status(200).send('data created succesfully!')

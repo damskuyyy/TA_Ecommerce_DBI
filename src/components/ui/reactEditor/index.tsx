@@ -8,14 +8,15 @@ type SetValueFunction = (value: Content) => void;
 interface Props {
   value: string;
   setValue: SetValueFunction | Dispatch<SetStateAction<string>>;
-  placeholder?: string
+  placeholder?: string,
+  autoFoucus?: boolean
 }
 
-const ReactEditor: React.FC<Props> = ({ value, setValue, placeholder }) => {
+const ReactEditor: React.FC<Props> = ({ value, setValue, placeholder, autoFoucus = false }) => {
   const handleChange = (content: Content) => {
     if (typeof setValue === 'function') {
       if (typeof setValue === 'function') {
-        const contentString =  String(content);
+        const contentString = String(content);
         setValue(String(contentString));
       }
     }
@@ -29,7 +30,7 @@ const ReactEditor: React.FC<Props> = ({ value, setValue, placeholder }) => {
       className="w-full"
       output="html"
       placeholder={placeholder || "Type your description here..."}
-      autofocus={true}
+      autofocus={autoFoucus ? true : false}
       immediatelyRender={true}
       editable={true}
       injectCSS={true}

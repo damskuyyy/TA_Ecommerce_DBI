@@ -18,7 +18,7 @@ const Appshell = ({ children }: props) => {
   const { pathname } = useRouter();
   const path = ["/user/login", "/user/signup", "/404", "/admin/auth/login"]
   const pathProfile = "/user/profile"
-  const adminPath = ["/admin/dashboard", "/admin/product", "/admin/transaction", "/admin/discussion", "/admin/order", "/admin/addProduct", "/admin/editProduct", "/admin/viewProduct"]
+  const adminPath = ["/admin/dashboard", "/admin/products", "/admin/transaction", "/admin/discussion", "/admin/order", "/admin/products/add", "/admin/products/edit", "/admin/products/details/[id]"]
   const [items, setItems] = useState<ItemDataType[]>([])
   const [products, setProducts] = useState<ProductDataType[]>([])
 
@@ -74,7 +74,7 @@ const Appshell = ({ children }: props) => {
             </div>
             <div className="flex-col lg:w-[84%] w-full">
               <Appbar />
-              <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-0">
+              <main className="flex flex-1 flex-col">
                 {children}
               </main>
             </div>
