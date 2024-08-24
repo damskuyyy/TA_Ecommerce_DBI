@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { ProductDataType } from '@/types/productDataTypes';
-import { MinusIcon, Pencil2Icon, PlusIcon, StarIcon } from '@radix-ui/react-icons';
+import { MinusIcon, Pencil2Icon, PlusIcon, StarFilledIcon, StarIcon } from '@radix-ui/react-icons';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/router';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
@@ -15,11 +15,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Lottie from 'lottie-react';
 import notfoundData from '../../../../../public/animations/notfound.json';
 import { Textarea } from '@/components/ui/textarea';
-import { PenBoxIcon, Trash2Icon } from 'lucide-react';
+import { PenBoxIcon, Star, StarsIcon, Trash2Icon } from 'lucide-react';
 import { ItemDataType } from '@/types/itemsDataTypes';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import formattedPrice from '@/utils/formattedPrice';
+import relativeTime from '@/utils/relativeTime';
 const ModalCheckout = dynamic(() => import('@/components/ui/modals/checkout'), { ssr: false })
 const ModalAddReview = dynamic(() => import('@/components/ui/modals/addReview'), { ssr: false })
 
@@ -51,13 +52,12 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
   const [load, setLoad] = useState(false)
   const hasReviews = product?.reviews && product.reviews.length > 0
   const hasDiscuss = product?.discusses && product.discusses.length > 0
-  const { push } = useRouter()
   const [notesView, setNotesView] = useState(false)
   const [notes, setNotes] = useState('')
   const [notesDone, setNotesDone] = useState(false)
   const notesRef = useRef<HTMLTextAreaElement>(null)
   const { toast } = useToast()
-  
+  const [updated, setUpdated] = useState(false)
 
   const handleQtyPlus = () => {
     setQty(qty + 1)
@@ -116,7 +116,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
 
   useEffect(() => {
     getData()
-  }, [id])
+  }, [id, updated])
 
   useEffect(() => {
     if (product.variants) {
@@ -189,7 +189,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                       <Skeleton className='w-full h-2' />
                     </div>
                   ) : (
-                    <div className='text-sm text-gray-500 font-medium'dangerouslySetInnerHTML={{__html: product.desc}}/>
+                    <div className='text-sm text-gray-500 font-medium' dangerouslySetInnerHTML={{ __html: product.desc }} />
                   )}
                   <div className='flex justify-between flex-wrap w-fit gap-3 items-center'>
                     <div className='flex items-center gap-1'>
@@ -299,23 +299,23 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                   product.reviews?.map((item, index) => (
                     <Card key={index}>
                       <CardHeader>
-                        <div className='flex items-center gap-2'>
-                          <StarIcon color='orange' fill='#f59e0b' />
-                          <StarIcon color='orange' fill='#f59e0b' />
-                          <StarIcon color='orange' fill='#f59e0b' />
-                          <StarIcon color='orange' fill='#f59e0b' />
-                          <StarIcon color='orange' fill='#f59e0b' />
-                        </div>
-                        <div className='flex flex-col gap-1 w-full'>
+
+                        <div className='flex flex-col gap-1 w-full rounded-md bg-muted p-3'>
                           <div className='items-center flex gap-2'>
-                            <img src="https://yt3.googleusercontent.com/-CFTJHU7fEWb7BYEb6Jh9gm1EpetvVGQqtof0Rbh-VQRIznYYKJxCaqv_9HeBcmJmIsp2vOO9JU=s900-c-k-c0x00ffffff-no-rj" alt="" className='w-8 h-8 object-cover rounded-full' />
-                            <p className='font-semibold'>Sarah Vallent</p>
+                            <img src={item.image} alt={item.name} className='w-8 h-8 object-cover rounded-full' />
+                            <div className='space-y-0'>
+                              <p className='font-semibold'>{item.name}</p>
+                              <div className='flex items-center gap-2 text-muted-foreground'>
+                                <span className='text-xs '>{relativeTime.fromNow(item.createdAt)}</span>
+                                <span className='font-bold'>-</span>
+                                <span className='items-center text-xs flex gap-0'>{item.rate}<Star size={12}/></span>
+                              </div>
+                            </div>
                           </div>
-                          <p className='text-sm text-gray-500 font-medium'>Variant : Pro</p>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit ex quisquam ratione, dolores dolorem repellat mollitia in iure, accusamus enim voluptatum porro iusto soluta beatae, cum maiores ut earum explicabo a illo facere molestiae tenetur? Eos, et omnis? At voluptatibus impedit in odio sint quia perferendis cupiditate praesentium harum quam. Excepturi ut magni, officia sit voluptas obcaecati provident dolorem vero. Ad molestiae accusantium distinctio modi natus dolores. Nihil perferendis excepturi non molestiae ipsa impedit et ab, quam voluptate iste placeat ratione expedita molestias hic nulla assumenda saepe inventore sequi soluta possimus! Voluptatum molestias doloribus, ut a soluta est illum nam! Optio molestiae inventore dolorem obcaecati accusantium? Reiciendis sequi numquam laborum eaque sint! Fugiat pariatur iure aut modi soluta, porro deserunt quis rem saepe. Culpa, voluptas? Qui quas libero soluta quis corporis doloremque necessitatibus eos culpa consequuntur ab voluptatibus voluptatem quisquam dolores dolorum unde et, praesentium quod commodi molestiae minima itaque.</p>
+                        <div dangerouslySetInnerHTML={{ __html: String(item.context) }} />
                       </CardContent>
                     </Card>
                   ))
@@ -325,7 +325,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                       <Lottie animationData={notfoundData} />
                     </div>
                     <h1 className='text-gray-500 text-center'>Unfortunately, our product has no reviews. <br /> Click "Add review" button below to add review into our product 😊</h1>
-                    <ModalAddReview />
+                    <ModalAddReview updated={updated} setUpdated={setUpdated} />
                   </div>
                 )
               )}
@@ -391,7 +391,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
             </div>
           </div>
         </div>
-        
+
         <div className='lg:w-[30%] w-full sticky top-24 h-full'>
           <div className='w-full'>
             <Card className='flex flex-col'>
@@ -404,7 +404,7 @@ const Details = ({ items, setItems }: { items: ItemDataType[], setItems: Dispatc
                     <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleQtyMinus} variant={'ghost'} size={'icon'}>
                       <MinusIcon />
                     </Button>
-                    <p className={`font-medium ${items.some(item => item.code_product === String(id)) ? 'text-muted-foreground': ''}`}>{qty}</p>
+                    <p className={`font-medium ${items.some(item => item.code_product === String(id)) ? 'text-muted-foreground' : ''}`}>{qty}</p>
                     <Button disabled={items.some(item => item.code_product === String(id))} onClick={handleQtyPlus} variant={'ghost'} size={'icon'}>
                       <PlusIcon />
                     </Button>

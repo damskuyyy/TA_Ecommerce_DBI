@@ -33,7 +33,7 @@ const CardProduct = ({ data }: Props) => {
         </p>
         <Link href={productUrl}>
           <Button size="sm" className="font-medium" disabled={!data.name}>
-            Buy now!
+            Details
           </Button>
         </Link>
       </CardFooter>

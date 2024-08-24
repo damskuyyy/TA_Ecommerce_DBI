@@ -15,12 +15,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
+import { Textarea } from '@/components/ui/textarea';
 
 const ReactEditor = dynamic(() => import('@/components/ui/reactEditor'), { ssr: false })
 
 const AddProductPage = () => {
   const [productName, setProductName] = useState('')
-  const [shortDescription, setShortDescription] = useState('')
   const [description, setDescription] = useState('')
   const [spec, setSpesification] = useState('')
   const [price, setPrice] = useState(0)
@@ -103,8 +103,6 @@ const AddProductPage = () => {
       sold: 0,
       rate: 0,
       minOrder,
-      reviews: [],
-      discusses: [],
       details
     }
 
@@ -192,11 +190,7 @@ const AddProductPage = () => {
               <div>
                 <Label htmlFor="description">Description</Label>
                 <div className='w-full mt-2'>
-                  <ReactEditor
-                    value={description}
-                    setValue={setDescription}
-                    placeholder="Type your text here ..."
-                  />
+                  <Textarea placeholder='Enter your short descriptions here...' value={description} onChange={(e) => setDescription(e.target.value)} />
                 </div>
               </div>
               <div>
@@ -295,49 +289,50 @@ const AddProductPage = () => {
                   </button>
                 )}
               </div>
-
-              <Button className='w-full' onClick={handleSave}>Save</Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Product Image Upload */}
-        <Card className="w-full lg:w-1/3 shadow-lg h-fit sticky top-20">
-          <CardHeader>
-            <CardTitle>Product Image</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {imageInputView ? (
-              <div className='flex flex-col gap-2 w-full mt-2 mb-4'>
-                <ul className='inline-flex flex-wrap gap-5'>
-                  {image.map((item, index) => (
-                    <li key={index} className='relative cursor-default text-muted-foreground group text-sm'>
-                      <img src={item} alt={String(index)} className='w-16 h-16 object-cover' />
-                      <button onClick={() => handleDeleteImage(index)} className='p-0.5 absolute rounded-md -top-2 bg-destructive hidden group-hover:block -right-3'>
-                        <span className='text-white'><X size={14} /></span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <form onSubmit={handleAddImage} className='space-y-2'>
-                  <Input required ref={imageInputRef} type='text' placeholder='Input image link here...' onChange={(e) => setImageValue(e.target.value)} />
-                  <div className='flex items-center gap-2'>
-                    <Button type='submit' size={'sm'} className='w-fit'>Add</Button>
-                    <Button type='button' onClick={() => {
-                      setImageValue('')
-                      setImageInputView(false)
-                    }} size={'sm'} className='w-fit' variant={'destructive'}>Cancel</Button>
-                  </div>
-                </form>
-              </div>
-            ) : (
-              <button onClick={() => setImageInputView(true)} className='border mt-2 hover:border-primary transition-colors border-dashed w-full rounded-md h-24 flex justify-center flex-col gap-2 items-center'>
-                <ImagePlusIcon />
-                <p className='text-muted-foreground text-sm'>Add Images</p>
-              </button>
-            )}
-          </CardContent>
-        </Card>
+        <div className='w-full lg:w-1/3 shadow-lg h-fit sticky top-20 space-y-4'>
+          <Card className="">
+            <CardHeader>
+              <CardTitle>Product Image</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {imageInputView ? (
+                <div className='flex flex-col gap-2 w-full mt-2 mb-4'>
+                  <ul className='inline-flex flex-wrap gap-5'>
+                    {image.map((item, index) => (
+                      <li key={index} className='relative cursor-default text-muted-foreground group text-sm'>
+                        <img src={item} alt={String(index)} className='w-16 h-16 object-cover' />
+                        <button onClick={() => handleDeleteImage(index)} className='p-0.5 absolute rounded-md -top-2 bg-destructive hidden group-hover:block -right-3'>
+                          <span className='text-white'><X size={14} /></span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <form onSubmit={handleAddImage} className='space-y-2'>
+                    <Input required ref={imageInputRef} type='text' placeholder='Input image link here...' onChange={(e) => setImageValue(e.target.value)} />
+                    <div className='flex items-center gap-2'>
+                      <Button type='submit' size={'sm'} className='w-fit'>Add</Button>
+                      <Button type='button' onClick={() => {
+                        setImageValue('')
+                        setImageInputView(false)
+                      }} size={'sm'} className='w-fit' variant={'destructive'}>Cancel</Button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                <button onClick={() => setImageInputView(true)} className='border mt-2 hover:border-primary transition-colors border-dashed w-full rounded-md h-24 flex justify-center flex-col gap-2 items-center'>
+                  <ImagePlusIcon />
+                  <p className='text-muted-foreground text-sm'>Add Images</p>
+                </button>
+              )}
+            </CardContent>
+          </Card>
+          <Button className='w-full h-20' onClick={handleSave}>Save product</Button>
+        </div>
+
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ const ReactEditor: React.FC<Props> = ({ value, setValue, placeholder, autoFoucus
       value={value}
       onChange={handleChange}
       throttleDelay={2000}
-      className="w-full"
+      className="w-full shadow-lg"
       output="html"
       placeholder={placeholder || "Type your description here..."}
       autofocus={autoFoucus ? true : false}
@@ -35,7 +35,7 @@ const ReactEditor: React.FC<Props> = ({ value, setValue, placeholder, autoFoucus
       editable={true}
       injectCSS={true}
       shouldRerenderOnTransaction={false}
-      editorClassName="focus:outline-none"
+      editorClassName="focus:outline-none leading-[14px]"
     />
   );
 };

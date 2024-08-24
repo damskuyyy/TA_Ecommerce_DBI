@@ -5,8 +5,8 @@ import { Skeleton } from '../skeleton';
 const SkeletonGrid = ({ length }: { length: number }) => {
   return (
     <>
-      {Array.from({ length: length }, () => (
-        <Card className='flex flex-col justify-between' key={length}>
+      {Array.from({ length: length }, (v, i) => (
+        <Card className='flex flex-col justify-between' key={i}>
           <div>
             <CardHeader>
               <Skeleton className='w-full h-36'/>

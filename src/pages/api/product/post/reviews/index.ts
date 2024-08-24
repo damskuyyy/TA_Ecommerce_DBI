@@ -3,13 +3,15 @@ import { NextApiRequest, NextApiResponse } from "next"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { code_product } = req.query
-  const { context, name, image, rate } = req.body
+  const { context, rate, userId } = req.body
   if (req.method === 'POST') {
     try {
+      const user = await prisma.user.findFirst({where: {id: userId}})
+
       await prisma.review.create({
         data: {
-          name,
-          image,
+          name: String(user?.name),
+          image: String(user?.image),
           rate,
           context,
           code_product: String(code_product)

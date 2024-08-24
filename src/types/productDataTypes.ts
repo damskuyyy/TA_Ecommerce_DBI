@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { ReviewsDataTypes } from "./reviewDataTypes";
+import { DiscussionDataType } from "./discussionDataTypes";
 
 export interface ProductDataType {
   code_product?: string,
@@ -13,12 +15,12 @@ export interface ProductDataType {
   information?: string,
   sold?: number,
   rate?: number,
-  reviews?: any[],
-  discusses?: any[],
+  reviews?: ReviewsDataTypes[],
+  discusses?: DiscussionDataType[],
   stock?: number,
   minOrder?: number,
   // items
   variant?: string
   qty?: number,
-  notes?:string
+  notes?: string
 }
