@@ -27,24 +27,40 @@ import { TooltipContent } from '@radix-ui/react-tooltip';
 import Head from 'next/head';
 import { FolderPlusIcon } from 'lucide-react';
 import ModalZoomImage from '@/components/ui/modals/zoomImage';
-
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState<ProductDataType[]>([])
+  const [products, setProducts] = useState<ProductDataType[]>([]);
+  const [load, setLoad] = useState(true);
 
   const getProductsData = async () => {
     try {
-      const resp = await axios('/api/product/get/categories?name=website')
-      setProducts(resp.data)
-      console.log(products)
+      const resp = await axios('/api/product/get/categories?name=website');
+      setProducts(resp.data);
+      setLoad(false);
     } catch (error) {
-      console.log(error)
+      setLoad(false);
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
-    getProductsData()
-  }, [])
+    getProductsData();
+  }, []);
+
+  const renderSkeletonRows = (numRows: number) => {
+    return Array.from({ length: numRows }).map((_, index) => (
+      <TableRow key={index}>
+        <TableCell className="px-6 py-2 whitespace-nowrap"><Skeleton className='w-full h-6' /></TableCell>
+        <TableCell className="px-6 py-2 whitespace-nowrap"><Skeleton className='w-full h-6' /></TableCell>
+        <TableCell className="px-6 py-2 whitespace-nowrap"><Skeleton className='w-full h-6' /></TableCell>
+        <TableCell className="px-6 py-2 whitespace-nowrap"><Skeleton className='w-full h-6' /></TableCell>
+        <TableCell className="px-6 py-2 whitespace-nowrap"><Skeleton className='w-full h-6' /></TableCell>
+        <TableCell className="px-6 py-2 whitespace-nowrap"><Skeleton className='w-full h-6' /></TableCell>
+        <TableCell className="px-6 py-2 whitespace-nowrap"><Skeleton className='w-full h-6' /></TableCell>
+      </TableRow>
+    ));
+  };
 
   return (
     <>
@@ -79,7 +95,7 @@ const ProductsPage = () => {
           </Breadcrumb>
         </div>
         <ScrollArea className="lg:pb-0 pb-4">
-          <Table className="min-w-full divide-y divide-gray-200 ">
+          <Table className="min-w-full divide-y divide-gray-200">
             <TableCaption>A list of products</TableCaption>
             <TableHeader className="bg-gray-50">
               <TableRow>
@@ -93,27 +109,29 @@ const ProductsPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody className="bg-white divide-y divide-gray-200">
-              {products.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell className="px-6 py-2 whitespace-nowrap">{item.code_product}</TableCell>
-                  <TableCell className="px-6 py-2 whitespace-nowrap">{item.name}</TableCell>
-                  <TableCell className="px-6 py-2 whitespace-nowrap">{formattedPrice.toIDR(item.price)}</TableCell>
-                  <TableCell className="px-6 py-2 whitespace-nowrap flex items-center gap-2">
-                    {item.variants.map((item, index) => (
-                      <Badge className='capitalize' key={index}>{item}</Badge>
-                    ))}
-                  </TableCell>
-                  <TableCell className="px-6 py-2 whitespace-nowrap capitalize">{item.category}</TableCell>
-                  <TableCell className="px-6 flex items-center gap-2 py-2 whitespace-nowrap" title='Zoom'>
-                    <ModalZoomImage src={item.image[0]} alt={item.name} />
-                  </TableCell>
-                  <TableCell className="px-6 py-2 whitespace-nowrap">
-                    <Link href={`/admin/products/details/${item.code_product}`}>
-                      <Button variant={'secondary'} size={'sm'}>Details</Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {load ? renderSkeletonRows(5) : (
+                products.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="px-6 py-2 whitespace-nowrap">{item.code_product}</TableCell>
+                    <TableCell className="px-6 py-2 whitespace-nowrap">{item.name}</TableCell>
+                    <TableCell className="px-6 py-2 whitespace-nowrap">{formattedPrice.toIDR(item.price)}</TableCell>
+                    <TableCell className="px-6 py-2 whitespace-nowrap flex items-center gap-2">
+                      {item.variants.map((variant, Index) => (
+                        <Badge className='capitalize' key={Index}>{variant}</Badge>
+                      ))}
+                    </TableCell>
+                    <TableCell className="px-6 py-2 whitespace-nowrap capitalize">{item.category}</TableCell>
+                    <TableCell className="px-6 flex items-center gap-2 py-2 whitespace-nowrap" title='Zoom'>
+                      <ModalZoomImage src={item.image[0]} alt={item.name} />
+                    </TableCell>
+                    <TableCell className="px-6 py-2 whitespace-nowrap">
+                      <Link href={`/admin/products/details/${item.code_product}`}>
+                        <Button variant={'secondary'} size={'sm'}>Details</Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
           <ScrollBar orientation="horizontal" />
