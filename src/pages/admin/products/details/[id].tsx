@@ -27,6 +27,18 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
+type ProductDetails = {
+  code_product: string;
+  name: string;
+  price: number;
+  desc: string;
+  image: string;
+  sold: number;
+  rate: number;
+  review_count: number;
+  variants: string[];
+};
+
 const ProductDetailsPage = () => {
   const { id } = useRouter().query;
 
@@ -100,7 +112,7 @@ const ProductDetailsPage = () => {
                 )}
               </div>
             </div>
-
+          </div>
             <div className="w-2/3 pl-4">
               {isLoading ? (
                 <>
