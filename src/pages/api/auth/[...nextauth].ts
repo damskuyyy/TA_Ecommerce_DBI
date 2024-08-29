@@ -87,7 +87,7 @@ const authOptions: NextAuthOptions = {
         token.role = 'user'
       }
 
-      if(account?.provider === 'Admin' && user) {
+      if (account?.provider === 'Admin' && user) {
         token.id = user.id
         token.role = 'admin'
       }
@@ -98,6 +98,12 @@ const authOptions: NextAuthOptions = {
         if (existingUser) {
           token.id = existingUser.id
           token.role = 'user'
+          await prisma.user.update({
+            where: { id: existingUser.id }, data: {
+              type: 'google',
+              emailVerified: true,
+            }
+          })
         } else {
           const newUser = await prisma.user.create({
             data: {

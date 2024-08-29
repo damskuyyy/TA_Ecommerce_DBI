@@ -67,20 +67,11 @@ model Discusses {
   createdAt    DateTime @default(now())
 }
 
-model Customer {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  name   String?
-  email  String?
-  no     String?
-  orders Order[]
-}
 
-model Order {
+model Orders {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   date        DateTime
   total       Float
-  customer_id String   @db.ObjectId
-  customer    Customer @relation(fields: [customer_id], references: [id])
   product     String[]
   xendit_id   String?
 }

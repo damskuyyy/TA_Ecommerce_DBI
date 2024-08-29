@@ -17,7 +17,7 @@ interface props {
 const Appshell = ({ children }: props) => {
   const { pathname } = useRouter();
   const path = ["/user/login", "/user/signup", "/404", "/admin/auth/login"]
-  const pathProfile = "/user/profile"
+  const pathProfile = ["/user/profile", "/user/profile/checkout/[id]"]
   const adminPath = ["/admin/dashboard", "/admin/products", "/admin/transaction", "/admin/discussion", "/admin/order", "/admin/products/add", "/admin/products/edit", "/admin/products/details/[id]"]
   const [items, setItems] = useState<ItemDataType[]>([])
   const [products, setProducts] = useState<ProductDataType[]>([])
@@ -91,7 +91,7 @@ const Appshell = ({ children }: props) => {
               {children && cloneElement(children, { items, setItems, products, setProducts })}
             </div>
 
-            {pathname === pathProfile ? (
+            {pathProfile.includes(pathname) ? (
               ''
             ) : (
               <div className="w-full border-t">

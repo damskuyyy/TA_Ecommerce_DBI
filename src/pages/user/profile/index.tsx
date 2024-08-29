@@ -188,10 +188,6 @@ const ProfilePage = ({ items, setItems, products, setProducts }: { items: ItemDa
               <ShoppingBasketIcon size={20} />
               Recent Order
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <CogIcon size={20} />
-              Settings
-            </TabsTrigger>
           </TabsList>
           <Scrollbar orientation="horizontal" />
         </ScrollArea>
@@ -412,74 +408,79 @@ const ProfilePage = ({ items, setItems, products, setProducts }: { items: ItemDa
               </div>
             </TabsContent>
             <TabsContent value="security" className="lg:mt-8 md:mt-6 mt-5">
-              <div className="flex flex-col gap-3 w-full">
-                <div className="grid grid-cols-2 w-full mb-3 gap-10">
-                  <h1 className="text-xl pb-3 border-b font-semibold w-full">
-                    Password changes
-                  </h1>
-                  <h1 className="text-xl pb-3 border-b font-semibold w-full">
-                    Email verification
-                  </h1>
-                </div>
-                <div className="grid grid-cols-2 w-full gap-10">
-                  <div className="w-full">
-                    <Card className="">
-                      <CardContent className="pt-3">
-                        <form className="w-full flex flex-col gap-3 items-start">
-                          <Input placeholder="your new password here..." />
-                          <Input placeholder="confirm your new password here..." />
-                          <Button type="submit" size={"sm"}>
-                            Confirm
-                          </Button>
-                        </form>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  <div className="w-full">
-                    {user.emailVerified ? (
-                      <Card className="bg-primary">
-                        <CardContent className="flex flex-col gap-2 items-center pt-3">
-                          <Lottie
-                            animationData={emailVerified}
-                            className="w-1/5"
-                          />
-                          <h1 className="font-semibold text-primary-foreground">
-                            Your email has been verified!
-                          </h1>
-                        </CardContent>
-                      </Card>
-                    ) : (
+              <div className="grid lg:grid-cols-2 grid-cols-1 gap-10 place-items-start w-full">
+                <div className="w-full space-y-4">
+                  <div className="space-y-2">
+                    <h1 className="text-xl pb-3 border-b font-semibold w-full">
+                      Password changes
+                    </h1>
+                    <div className="w-full">
                       <Card className="">
                         <CardContent className="pt-3">
                           <form className="w-full flex flex-col gap-3 items-start">
-                            <Input placeholder="Type your email here..." />
+                            <Input placeholder="your new password here..." />
+                            <Input placeholder="confirm your new password here..." />
                             <Button type="submit" size={"sm"}>
                               Confirm
                             </Button>
                           </form>
                         </CardContent>
                       </Card>
-                    )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h1 className="text-xl pb-2 border-b font-semibold w-full">
+                      Email verification
+                    </h1>
+                    <div className="w-full">
+                      {user.emailVerified ? (
+                        <Card className="bg-primary">
+                          <CardContent className="flex flex-col gap-2 items-center pt-3">
+                            <Lottie
+                              animationData={emailVerified}
+                              className="w-1/5"
+                            />
+                            <h1 className="font-semibold text-primary-foreground">
+                              Your email has been verified!
+                            </h1>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <Card className="">
+                          <CardContent className="pt-3">
+                            <form className="w-full flex flex-col gap-3 items-start">
+                              <Input placeholder="Type your email here..." />
+                              <Button type="submit" size={"sm"}>
+                                Confirm
+                              </Button>
+                            </form>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 w-full mb-3 gap-10 mt-5">
-                  <h1 className="text-xl pb-3 border-b font-semibold w-full">
-                    Phone verification
-                  </h1>
-                </div>
-                <div className="grid grid-cols-2 w-full gap-10">
+                <div className="w-full space-y-2">
                   <div className="w-full">
-                    <Card className="">
-                      <CardContent className="pt-3">
-                        <form className="w-full flex flex-col gap-3 items-start">
-                          <Input placeholder="Type your phone here..." />
-                          <Button type="submit" size={"sm"}>
-                            Confirm
-                          </Button>
-                        </form>
-                      </CardContent>
-                    </Card>
+                    <h1 className="text-xl pb-3 border-b font-semibold w-full">
+                      Phone verification
+                    </h1>
                   </div>
+                  <div className="w-full gap-10">
+                    <div className="w-full">
+                      <Card className="">
+                        <CardContent className="pt-3">
+                          <form className="w-full flex flex-col gap-3 items-start">
+                            <Input placeholder="Type your phone here..." />
+                            <Button type="submit" size={"sm"}>
+                              Confirm
+                            </Button>
+                          </form>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </TabsContent>
@@ -489,14 +490,6 @@ const ProfilePage = ({ items, setItems, products, setProducts }: { items: ItemDa
             >
               <Card className="w-full pt-3">
                 <CardContent>orders</CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent
-              value="settings"
-              className="w-full lg:mt-8 md:mt-6 mt-5"
-            >
-              <Card className="w-full pt-3">
-                <CardContent>settings</CardContent>
               </Card>
             </TabsContent>
           </>

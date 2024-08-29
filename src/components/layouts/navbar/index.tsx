@@ -321,7 +321,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
                         <p className="text-primary font-bold text-sm">{formattedPrice.toIDR(total)}</p>
                       </div>
                       <div className="w-full flex flex-col gap-2 mt-5">
-                        <Button size={'sm'}>Confirm</Button>
+                        <Link className="w-full" href={`/user/profile/checkout/${userData.name?.replace(' ', '-').toLowerCase()}`} onClick={() => setSheetOpen(false)}><Button size={'sm'} className="w-full">Confirm</Button></Link>
                         <Alerts btn="Delete all" desc="As a result, the cart will be empty. and you must add your items again." ok={() => {
                           setProducts([])
                           setItems([])
