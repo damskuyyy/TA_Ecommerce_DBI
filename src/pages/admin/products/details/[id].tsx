@@ -47,34 +47,34 @@ const ProductDetailsPage = () => {
   return (
     <div className="w-full mx-auto p-4 space-y-6">
       <div className="space-y-2">
-          <h1 className="text-4xl font-bold">Products</h1>
+        <h1 className="text-4xl font-bold">Products</h1>
         <Breadcrumb>
           <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin/products">
-                    Products
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href={`/admin/products/details/${id}`}>
-                    Details
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="font-semibold">
-                    {id}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/products">
+                Products
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/admin/products/details/${id}`}>
+                Details
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="font-semibold">
+                {id}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
@@ -112,7 +112,7 @@ const ProductDetailsPage = () => {
                 )}
               </div>
             </div>
-          </div>
+
             <div className="w-2/3 pl-4">
               {isLoading ? (
                 <>
@@ -156,82 +156,83 @@ const ProductDetailsPage = () => {
                 </>
               )}
             </div>
+
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Details and Reviews */}
+      <div className="w-full lg:w-1/3 space-y-4">
+        {/* Item Detail */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Item Detail</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <>
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-full mt-2" />
+                <Skeleton className="h-4 w-2/3 mt-2" />
+              </>
+            ) : (
+              <>
+                <p className="text-gray-600">Details:</p>
+
+                <ul className="list-disc list-inside mt-2 text-gray-700">
+                  <li>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  </li>
+                  <li>
+                    Sed do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua.
+                  </li>
+                  <li>Information on usage and features.</li>
+                </ul>
+              </>
+            )}
           </CardContent>
         </Card>
 
-        {/* Additional Details and Reviews */}
-        <div className="w-full lg:w-1/3 space-y-4">
-          {/* Item Detail */}
-          <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle>Item Detail</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <>
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-full mt-2" />
-                  <Skeleton className="h-4 w-2/3 mt-2" />
-                </>
-              ) : (
-                <>
-                  <p className="text-gray-600">Details:</p>
-
-                  <ul className="list-disc list-inside mt-2 text-gray-700">
-                    <li>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </li>
-                    <li>
-                      Sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua.
-                    </li>
-                    <li>Information on usage and features.</li>
-                  </ul>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Top Review */}
-          <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle>Top Review</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <>
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <Skeleton className="h-4 w-1/2 mt-2" />
-                  <Skeleton className="h-4 w-1/3 mt-1" />
-                  <Skeleton className="h-4 w-full mt-2" />
-                </>
-              ) : (
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-                  <div>
-                    <h4 className="font-semibold">Jess Santiago</h4>
-                    <p className="text-gray-500 text-sm">
-                      UI Designer | UX designer course
-                    </p>
-                    <p className="text-yellow-500 flex items-center mt-1">
-                      <StarIcon className="w-4 h-4" /> 5.0
-                    </p>
-                    <p className="mt-2 text-gray-600">
-                      Nullam donec dolor justo est pharetra accusam eget neque.
-                      Et fusce maecenas sagittis enim.
-                    </p>
-                  </div>
+        {/* Top Review */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Top Review</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <>
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <Skeleton className="h-4 w-1/2 mt-2" />
+                <Skeleton className="h-4 w-1/3 mt-1" />
+                <Skeleton className="h-4 w-full mt-2" />
+              </>
+            ) : (
+              <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                <div>
+                  <h4 className="font-semibold">Jess Santiago</h4>
+                  <p className="text-gray-500 text-sm">
+                    UI Designer | UX designer course
+                  </p>
+                  <p className="text-yellow-500 flex items-center mt-1">
+                    <StarIcon className="w-4 h-4" /> 5.0
+                  </p>
+                  <p className="mt-2 text-gray-600">
+                    Nullam donec dolor justo est pharetra accusam eget neque.
+                    Et fusce maecenas sagittis enim.
+                  </p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Discussions */}
-      <Card className="shadow-lg mt-6">
+
+      < Card className="shadow-lg mt-6" >
         <CardHeader>
-            <CardTitle>Discussions</CardTitle>
+          <CardTitle>Discussions</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -262,7 +263,7 @@ const ProductDetailsPage = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 };
 
