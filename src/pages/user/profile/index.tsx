@@ -237,7 +237,7 @@ const ProfilePage = ({
               value="settings"
               className="flex items-center gap-2"
             >
-              <ShoppingBasketIcon size={20} />
+              <CogIcon size={20} />
               Setting
             </TabsTrigger>
           </TabsList>
