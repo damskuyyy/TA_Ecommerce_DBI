@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { StarIcon } from "lucide-react";
+import { LoaderCircle, StarIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Galery from "@/components/ui/galery";
@@ -55,7 +55,12 @@ const ProductDetailsPage = () => {
   }, [id]);
 
   if (!product) {
-    return <p>Loading...</p>;
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center gap-3">
+        <LoaderCircle size={32} className="animate-spin"/>
+        Loading data...
+      </div>
+    );
   }
 
   return (
@@ -93,7 +98,7 @@ const ProductDetailsPage = () => {
         <Card className="w-full lg:w-2/3 shadow-lg">
           <CardContent className="flex">
             <div className="w-1/2">
-              <Galery images={product.image[0]} />
+              <Galery image={product.image} />
             </div>
 
             <div className="w-2/3 pl-4">
