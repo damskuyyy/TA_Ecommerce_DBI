@@ -1,11 +1,17 @@
-import React from "react";
+import { ItemDataType } from "@/types/itemsDataTypes";
+import React, { Dispatch, SetStateAction } from "react";
 
-const Invoice: React.FC = () => {
+type props ={
+  items: ItemDataType[],
+  setItems: Dispatch<SetStateAction<ItemDataType[]>>
+}
+
+const Invoice = ({items, setItems}: props) => {
   return (
     <div className="p-8 bg-white shadow-lg max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <div className="relative w-full h-32">
-          <div className="absolute top-0 left-0 w-fit h-32 bg-black z-50 flex justify-center px-10 flex-col">
+          <div className="absolute top-0 left-0 w-fit h-32 bg-black z-40 flex justify-center px-10 flex-col">
             <h1 className="text-3xl font-bold text-white">DBIX</h1>
             <p className="text-white">PT. Digital Blockchain Indonesia</p>
           </div>
