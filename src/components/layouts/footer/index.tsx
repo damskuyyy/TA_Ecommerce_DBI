@@ -4,6 +4,7 @@ import InstagramIcon from "@/components/ui/icons/instagram";
 import LocationIcon from "@/components/ui/icons/location";
 import TeleponeIcon from "@/components/ui/icons/telepon";
 import YoutubeIcon from "@/components/ui/icons/youtube";
+import Link from "next/link";
 import React from "react";
 
 const Footer = () => {
@@ -18,27 +19,24 @@ const Footer = () => {
           </p>
         </div>
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Perusahaan</h3>
+          <h3 className="text-2xl font-semibold mb-4">Company</h3>
           <ul>
-            <li className="mb-2">
-              <a href="#" className="hover:underline">
-                Tentang Kami
-              </a>
-            </li>
-            <li className="mb-2">
-              <a href="#" className="hover:underline">
-                Tim Kami
-              </a>
-            </li>
-            <li className="mb-2">
-              <a href="#" className="hover:underline">
-                FAQ
-              </a>
-            </li>
+            <Link href={"/aboutus"}>
+              <li className="mb-2 hover:underline">About Us</li>
+            </Link>
+            <Link href={"/team"}>
+              <li className="mb-2 hover:underline">Our Team</li>
+            </Link>
+            <Link href={"/terms"}>
+              <li className="mb-2 hover:underline">Terms & Privacy</li>
+            </Link>
+            <Link href={"/sections/faq"}>
+              <li className="mb-2 hover:underline">FAQ</li>
+            </Link>
           </ul>
         </div>
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Kantor Kami</h3>
+          <h3 className="text-2xl font-semibold mb-4">Our Office</h3>
           <ul>
             <li className="mb-2 flex items-center">
               <span role="img" aria-label="email" className="mr-2">
