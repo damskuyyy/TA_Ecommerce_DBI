@@ -155,7 +155,7 @@ const ProfilePage = ({
   const incrementQty = (index: number) => {
     setProducts((prevProducts) =>
       prevProducts.map((item, i) =>
-        i === index ? { ...item, qty: (item.qty ?? 1) + 1 } : item
+        i === index ? { ...item, quantity: (item.quantity ?? 1) + 1 } : item
       )
     );
     setItems((prevItems) =>
@@ -169,9 +169,9 @@ const ProfilePage = ({
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts
         .map((item, i) =>
-          i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item
+          i === index ? { ...item, quantity: (item.quantity ?? 1) - 1 } : item
         )
-        .filter((item) => item.qty && item.qty > 0);
+        .filter((item) => item.quantity && item.quantity > 0);
 
       if (updatedProducts.length === 0) {
         setProducts([]);
@@ -474,13 +474,13 @@ const ProfilePage = ({
                                   <PlusIcon size={14} />
                                 </button>
                                 <p className="font-medium text-xs cursor-default">
-                                  {item.qty}
+                                  {item.quantity}
                                 </p>
                                 <button
                                   onClick={() => decrementQty(index)}
                                   className="p-1 px-2 rounded-md hover:bg-secondary"
                                 >
-                                  {item.qty && item.qty <= 1 ? (
+                                  {item.quantity && item.quantity <= 1 ? (
                                     <Trash2Icon size={14} />
                                   ) : (
                                     <MinusIcon size={14} />

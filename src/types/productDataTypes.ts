@@ -21,6 +21,6 @@ export interface ProductDataType {
   minOrder?: number,
   // items
   variant?: string
-  qty?: number,
+  quantity?: number,
   notes?: string
 }
