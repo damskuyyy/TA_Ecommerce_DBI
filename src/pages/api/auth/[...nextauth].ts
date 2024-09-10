@@ -114,7 +114,8 @@ const authOptions: NextAuthOptions = {
               type: 'google',
               image: user.image || '',
               items: [],
-              phone: user.phone || ''
+              phone: user.phone || '',
+              orderId: ''
             },
           })
           token.id = newUser.id
