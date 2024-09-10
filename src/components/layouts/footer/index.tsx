@@ -6,6 +6,7 @@ import TeleponeIcon from "@/components/ui/icons/telepon";
 import YoutubeIcon from "@/components/ui/icons/youtube";
 import Link from "next/link";
 import React from "react";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -14,8 +15,9 @@ const Footer = () => {
         <div>
           <h2 className="text-2xl font-bold mb-4">E-Shop DBIX</h2>
           <p>
-            Improve your gardening know-how with our expert-written knowledge
-            base.
+            PT. Digital Blockchain Indonesia adalah Perusahaan yang bergerak di
+            Bidang Software Development dan Aplication IOS Android Mobile
+            Berbasis blockchain
           </p>
         </div>
         <div>
@@ -42,19 +44,20 @@ const Footer = () => {
               <span role="img" aria-label="email" className="mr-2">
                 <EmailIcon />
               </span>
-              Daija6@gmail.com
+              digitalblockchainindonesia@gmail.com
             </li>
             <li className="mb-2 flex items-center">
               <span role="img" aria-label="location" className="mr-2">
                 <LocationIcon />
               </span>
-              New Hallie, 32574 Cummerata Vista
+              Jalan Sutawijaya No 89 Kelurahan Sumberrejo Kecamatan Banyuwangi
+              Kabupaten Banyuwangi 68419 Jawa Timur Indonesia
             </li>
             <li className="mb-2 flex items-center">
               <span role="img" aria-label="phone" className="mr-2">
                 <TeleponeIcon />
               </span>
-              317-757-5201
+              +6287863005800 | +6281336494664
             </li>
           </ul>
         </div>

@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
 import { useSession } from "next-auth/react";
+import ZoomImage from "@/components/ui/modals/zoomImage"
 import {
   CheckCircleIcon,
   CircleUserRound,
@@ -17,6 +18,7 @@ import {
   PlusIcon,
   ShoppingBasketIcon,
   Trash2Icon,
+  SquareArrowOutUpRightIcon,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
@@ -233,10 +235,7 @@ const ProfilePage = ({
               <ShoppingBasketIcon size={20} />
               Recent Order
             </TabsTrigger>
-            <TabsTrigger
-              value="settings"
-              className="flex items-center gap-2"
-            >
+            <TabsTrigger value="settings" className="flex items-center gap-2">
               <CogIcon size={20} />
               Setting
             </TabsTrigger>
@@ -691,6 +690,11 @@ const ProfilePage = ({
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Amount
                         </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          payment proof
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody className="bg-white divide-y divide-gray-200">
@@ -771,6 +775,19 @@ const ProfilePage = ({
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap">
                             ₹{order.amount.toFixed(2)}
+                          </TableCell>
+                          <TableCell>
+                            <ZoomImage
+                              src="https://www.doku.com/blog/wp-content/uploads/2023/02/produk-digital.jpeg"
+                              alt="Payment Proof"
+                            />
+                          </TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">
+                            <a href="/user/invoice">
+                              <button className="ml-2 text-gray-500 hover:text-gray-700">
+                                <SquareArrowOutUpRightIcon className="w-4 h-4" />
+                              </button>
+                            </a>
                           </TableCell>
                         </TableRow>
                       ))}
