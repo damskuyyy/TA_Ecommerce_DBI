@@ -6,7 +6,6 @@ import TeleponeIcon from "@/components/ui/icons/telepon";
 import YoutubeIcon from "@/components/ui/icons/youtube";
 import Link from "next/link";
 import React from "react";
-import Link from "next/link";
 
 const Footer = () => {
   return (
