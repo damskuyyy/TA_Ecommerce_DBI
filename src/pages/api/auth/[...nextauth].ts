@@ -115,7 +115,7 @@ const authOptions: NextAuthOptions = {
               image: user.image || '',
               items: [],
               phone: user.phone || '',
-              orderId: ''
+              orderId: [],
             },
           })
           token.id = newUser.id
