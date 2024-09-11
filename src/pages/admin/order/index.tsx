@@ -9,70 +9,71 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import OrderDataTypes from "@/types/orderDataTypes";
 
 const orders: OrderDataTypes[] = [
   {
-    id: "#25426",
-    date: "Nov 8th, 2023",
-    customer: "Kavin",
-    variant: "Base",
-    quantity: 1,
-    status: "Completed",
-    amount: 200,
-  },
-  {
-    id: "#25424",
-    date: "Nov 6th, 2023",
-    customer: "Nikhil",
-    variant: "Base",
-    quantity: 1,
-    status: "Processing",
-    amount: 200,
+    id: "#25423",
+    products: [],
+    status: [],
+    userId: "#12345",
+    xenditId: "#09876",
+    orderDate: new Date,
+    users: [],
   },
   {
     id: "#25423",
-    date: "Nov 5th, 2023",
-    customer: "Shivam",
-    variant: "Base",
-    quantity: 1,
-    status: "Rejected",
-    amount: 200,
+    products: [],
+    status: [],
+    userId: "#12345",
+    xenditId: "#09876",
+    orderDate: new Date,
+    users: [],
   },
   {
-    id: "#25422",
-    date: "Nov 4th, 2023",
-    customer: "Shadab",
-    variant: "Pro",
-    quantity: 1,
-    status: "Completed",
-    amount: 200,
+    id: "#25423",
+    products: [],
+    status: [],
+    userId: "#12345",
+    xenditId: "#09876",
+    orderDate: new Date,
+    users: [],
   },
   {
-    id: "#25421",
-    date: "Nov 2nd, 2023",
-    customer: "Yogesh",
-    variant: "Pro",
-    quantity: 1,
-    status: "Completed",
-    amount: 200,
+    id: "#25423",
+    products: [],
+    status: [],
+    userId: "#12345",
+    xenditId: "#09876",
+    orderDate: new Date,
+    users: [],
   },
   {
-    id: "#25420",
-    date: "Nov 2nd, 2023",
-    customer: "Yogesh",
-    variant: "Pro",
-    quantity: 1,
-    status: "Processing",
-    amount: 200,
+    id: "#25423",
+    products: [],
+    status: [],
+    userId: "#12345",
+    xenditId: "#09876",
+    orderDate: new Date,
+    users: [],
   },
   {
-    id: "#25419",
-    date: "Nov 2nd, 2023",
-    customer: "Yogesh",
-    variant: "Pro",
-    quantity: 1,
-    status: "Rejected",
-    amount: 200,
+    id: "#25423",
+    products: [],
+    status: [],
+    userId: "#12345",
+    xenditId: "#09876",
+    orderDate: new Date,
+    users: [],
+  },
+  {
+    id: "#25423",
+    products: [],
+    status: [],
+    userId: "#12345",
+    xenditId: "#09876",
+    orderDate: new Date,
+    users: [],
   },
 ];
 
@@ -130,60 +131,48 @@ const OrderTable: React.FC = () => {
             <TableHeader className="bg-gray-50">
               <TableRow>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Id
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Product
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order ID
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer Name
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Variant
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Quantity
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
+                  User Id
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Xendit Id
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order Date
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  User
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="bg-white divide-y divide-gray-200">
               {orders.map((order, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">Lorem Ipsum</TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">{order.id}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.date}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.products}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.status}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.userId}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.xenditId}</TableCell>
+                  {/* <TableCell className="px-6 py-4 whitespace-nowrap">{new Date(order.orderDate)}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.users}</TableCell> */}
                   <TableCell className="px-6 py-4 whitespace-nowrap">
-                    {order.customer}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">
-                    {order.variant}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">
-                    X{order.quantity}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">
-                    <span
+                    {/* <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Completed"
                           ? "bg-green-100 text-green-800"
                           : order.status === "Processing"
                             ? "bg-purple-100 text-purple-800"
                             : "bg-red-100 text-red-800"
                         }`}
-                    >
+                    > */}
                       {order.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">
-                    ₹{order.amount.toFixed(2)}
                   </TableCell>
                 </TableRow>
               ))}

@@ -1,9 +1,13 @@
+import { UserDataType } from "./userDataTypes";
+
 interface OrderDataTypes {
-    id: string;
-    date: string;
-    customer: string;
-    variant: string;
-    quantity: number;
-    status: "Completed" | "Processing" | "Rejected";
-    amount: number;
-  }
+  id: string;
+  products: [];
+  status: [];
+  userId: string;
+  xenditId: string;
+  orderDate: Date;
+  users: UserDataType[];
+}
+
+export default OrderDataTypes;
