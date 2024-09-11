@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
 import { useSession } from "next-auth/react";
-import ZoomImage from "@/components/ui/modals/zoomImage"
+import ZoomImage from "@/components/ui/modals/zoomImage";
 import {
   CheckCircleIcon,
   CircleUserRound,
@@ -667,127 +667,116 @@ const ProfilePage = ({
                     <TableHeader className="bg-gray-50">
                       <TableRow>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Product
+                          Id
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Order ID
-                        </TableHead>
-                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </TableHead>
-                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Customer Name
-                        </TableHead>
-                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Variant
-                        </TableHead>
-                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Quantity
+                          Products
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Status
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
+                          User Id
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          payment proof
+                          Xendit Id
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Order Date
                         </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Users
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          
+                        </TableHead>
+                        {/* <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Payment Proof
+                        </TableHead> */}
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody className="bg-white divide-y divide-gray-200">
                       {[
                         {
-                          id: "#25426",
-                          date: "Nov 8th, 2023",
-                          customer: "Kavin",
-                          variant: "Base",
-                          quantity: 1,
-                          status: "Delivered",
-                          amount: 200,
-                        },
-                        {
-                          id: "#25424",
-                          date: "Nov 6th, 2023",
-                          customer: "Nikhil",
-                          variant: "Base",
-                          quantity: 1,
-                          status: "Delivered",
-                          amount: 200,
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
                         },
                         {
                           id: "#25423",
-                          date: "Nov 5th, 2023",
-                          customer: "Shivam",
-                          variant: "Base",
-                          quantity: 1,
-                          status: "Canceled",
-                          amount: 200,
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
                         },
                         {
-                          id: "#25422",
-                          date: "Nov 4th, 2023",
-                          customer: "Shadab",
-                          variant: "Pro",
-                          quantity: 1,
-                          status: "Delivered",
-                          amount: 200,
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
                         },
                         {
-                          id: "#25421",
-                          date: "Nov 2nd, 2023",
-                          customer: "Yogesh",
-                          variant: "Pro",
-                          quantity: 1,
-                          status: "Delivered",
-                          amount: 200,
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
+                        },
+                        {
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
                         },
                       ].map((order, idx) => (
                         <TableRow key={idx}>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">{`Lorem Ipsum`}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.id}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.products}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.status}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.userId}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.xenditId}</TableCell>
+                          {/* <TableCell className="px-6 py-4 whitespace-nowrap"></TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap"></TableCell> */}
                           <TableCell className="px-6 py-4 whitespace-nowrap">
-                            {order.id}
-                          </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">
-                            {order.date}
-                          </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">
-                            {order.customer}
-                          </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">
-                            {order.variant}
-                          </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">
-                            X{order.quantity}
-                          </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                order.status === "Delivered"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
+                            {/* <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Completed"
+                                ? "bg-green-100 text-green-800"
+                                : order.status === "Processing"
+                                ? "bg-purple-100 text-purple-800"
+                                : "bg-red-100 text-red-800"
                               }`}
-                            >
-                              {order.status}
-                            </span>
+                            > */}
+                            {order.status}
                           </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">
-                            ₹{order.amount.toFixed(2)}
-                          </TableCell>
-                          <TableCell>
+                          {/* <TableCell>
                             <ZoomImage
                               src="https://www.doku.com/blog/wp-content/uploads/2023/02/produk-digital.jpeg"
                               alt="Payment Proof"
                             />
-                          </TableCell>
+                          </TableCell> */}
+                          <TableCell className="px-6 py-4 whitespace-nowrap"></TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap"></TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap">
-                            <a href="/user/invoice">
+                            <Link href="/user/invoice">
                               <button className="ml-2 text-gray-500 hover:text-gray-700">
                                 <SquareArrowOutUpRightIcon className="w-4 h-4" />
                               </button>
-                            </a>
+                            </Link>
                           </TableCell>
                         </TableRow>
                       ))}
