@@ -41,6 +41,7 @@ const ModalAddReview = dynamic(
   { ssr: false }
 );
 
+
 const Details = ({
   items,
   setItems,
@@ -81,6 +82,7 @@ const Details = ({
   const notesRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
   const [updated, setUpdated] = useState(false);
+  
 
   const handleQtyPlus = () => {
     setQty(qty + 1);
@@ -517,9 +519,7 @@ const Details = ({
                       Click "Add discussion" button below to add discussion into
                       our product 😊
                     </h1>
-                    <Button size={"sm"} className="mt-2">
-                      Add discussion
-                    </Button>
+                    <Button size={"sm"} className="mt-2">Add discussion</Button>
                   </div>
                 )}
               </div>
