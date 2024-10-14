@@ -10,11 +10,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Breadcrumb, BreadcrumbItem,
+  Breadcrumb,
+  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Head from "next/head";
@@ -22,9 +23,9 @@ import Head from "next/head";
 const Dashboard: React.FC = () => {
   return (
     <>
-    <Head>
-      <title>DBIX | Admin - dashboard</title>
-    </Head>
+      <Head>
+        <title>DBIX | Admin - dashboard</title>
+      </Head>
       <div className="lg:p-4 p-1 space-y-6">
         <div className="space-y-3">
           <h2 className="font-bold text-4xl">Dashboard</h2>
@@ -39,7 +40,9 @@ const Dashboard: React.FC = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage className="font-semibold">Dashboard</BreadcrumbPage>
+                <BreadcrumbPage className="font-semibold">
+                  Dashboard
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -80,49 +83,113 @@ const Dashboard: React.FC = () => {
               <TableCaption>A list of your recent invoices.</TableCaption>
               <TableHeader className="bg-gray-50">
                 <TableRow>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variant</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Id
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Product
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    User Id
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Xendit Id
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Order Date
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    User
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="bg-white divide-y divide-gray-200">
                 {[
-                  { id: '#25426', date: 'Nov 8th, 2023', customer: 'Kavin', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
-                  { id: '#25424', date: 'Nov 6th, 2023', customer: 'Nikhil', variant: 'Base', quantity: 1, status: 'Delivered', amount: 200 },
-                  { id: '#25423', date: 'Nov 5th, 2023', customer: 'Shivam', variant: 'Base', quantity: 1, status: 'Canceled', amount: 200 },
-                  { id: '#25422', date: 'Nov 4th, 2023', customer: 'Shadab', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
-                  { id: '#25421', date: 'Nov 2nd, 2023', customer: 'Yogesh', variant: 'Pro', quantity: 1, status: 'Delivered', amount: 200 },
+                  {
+                    id: "#25423",
+                    products: [],
+                    status: [],
+                    userId: "#12345",
+                    xenditId: "#09876",
+                    orderDate: new Date(),
+                    users: [],
+                  },
+                  {
+                    id: "#25423",
+                    products: [],
+                    status: [],
+                    userId: "#12345",
+                    xenditId: "#09876",
+                    orderDate: new Date(),
+                    users: [],
+                  },
+                  {
+                    id: "#25423",
+                    products: [],
+                    status: [],
+                    userId: "#12345",
+                    xenditId: "#09876",
+                    orderDate: new Date(),
+                    users: [],
+                  },
+                  {
+                    id: "#25423",
+                    products: [],
+                    status: [],
+                    userId: "#12345",
+                    xenditId: "#09876",
+                    orderDate: new Date(),
+                    users: [],
+                  },
+                  {
+                    id: "#25423",
+                    products: [],
+                    status: [],
+                    userId: "#12345",
+                    xenditId: "#09876",
+                    orderDate: new Date(),
+                    users: [],
+                  },
                 ].map((order, idx) => (
                   <TableRow key={idx}>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{`Lorem Ipsum`}</TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{order.id}</TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{order.date}</TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{order.customer}</TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{order.variant}</TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">X{order.quantity}</TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}
-                      >
-                        {order.status}
-                      </span>
+                      {order.id}
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">₹{order.amount.toFixed(2)}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                      {order.products}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                      {order.status}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                      {order.userId}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                      {order.xenditId}
+                    </TableCell>
+                    {/* <TableCell className="px-6 py-4 whitespace-nowrap">{new Date(order.orderDate)}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.users}</TableCell> */}
+                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                      {/* <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Completed"
+                          ? "bg-green-100 text-green-800"
+                          : order.status === "Processing"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                    > */}
+                      {order.status}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
-          <div className="overflow-x-auto shadow-md">
-
-          </div>
+          <div className="overflow-x-auto shadow-md"></div>
         </div>
       </div>
     </>

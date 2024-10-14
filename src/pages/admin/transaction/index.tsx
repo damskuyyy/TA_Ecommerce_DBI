@@ -68,37 +68,95 @@ const Transaction: React.FC = () => {
             <TableCaption>A list of your recent invoices.</TableCaption>
             <TableHeader className="bg-gray-50">
               <TableRow>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Xandit ID</TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customers ID</TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Id
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Product
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  User Id
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Xendit Id
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order Date
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  User
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="bg-white divide-y divide-gray-200">
-              {[
-                { XanditID: 200, id: '#25426', date: 'Nov 8th, 2023', type: 'Credit Card', total: 1, product: 'lorem ipsum', status: 'Completed' },
-                { XanditID: 200, id: '#25424', date: 'Nov 6th, 2023', type: 'Credit Card', total: 1, product: 'lorem ipsum', status: 'Completed' },
-                { XanditID: 200, id: '#25423', date: 'Nov 5th, 2023', type: 'Credit Card', total: 1, product: 'lorem ipsum', status: 'Processing' },
-                { XanditID: 200, id: '#25422', date: 'Nov 4th, 2023', type: 'Wallet', total: 1, product: 'lorem ipsum', status: 'Processing' },
-                { XanditID: 200, id: '#25421', date: 'Nov 2nd, 2023', type: 'Wallet', total: 1, product: 'lorem ipsum', status: 'Completed' },
+            {[
+                        {
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
+                        },
+                        {
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
+                        },
+                        {
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
+                        },
+                        {
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
+                        },
+                        {
+                          id: "#25423",
+                          products: [],
+                          status: [],
+                          userId: "#12345",
+                          xenditId: "#09876",
+                          orderDate: new Date(),
+                          users: [],
+                        },
               ].map((transaction, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.XanditID}</TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.id}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.date}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.type}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">X{transaction.total}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.product}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.products}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.status}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.userId}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{transaction.xenditId}</TableCell>
+                    {/* <TableCell className="px-6 py-4 whitespace-nowrap">{new Date(order.orderDate)}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.users}</TableCell> */}
                   <TableCell className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${transaction.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    {/* <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Completed"
+                          ? "bg-green-100 text-green-800"
+                          : order.status === "Processing"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-red-100 text-red-800"
                         }`}
-                    >
+                    > */}
                       {transaction.status}
-                    </span>
                   </TableCell>
 
                 </TableRow>

@@ -60,9 +60,9 @@ const Appbar = () => {
             >
               <LogsIcon className="h-5 w-5" />
               Order
-              <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+              {/* <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                 6
-              </Badge>
+              </Badge> */}
             </Link>
             <Link
               href="/admin/transaction"
@@ -109,8 +109,8 @@ const Appbar = () => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
+          {/* <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>Support</DropdownMenuItem> */}
           <DropdownMenuSeparator />
           <Alerts btn='Signout' desc='this can be changed!' ok={() => {
             signOut()
