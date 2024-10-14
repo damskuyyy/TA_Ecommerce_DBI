@@ -31,7 +31,7 @@ const Footer = () => {
             <Link href={"/terms"}>
               <li className="mb-2 hover:underline">Terms & Privacy</li>
             </Link>
-            <Link href={"/sections/faq"}>
+            <Link href={"/#faqs"}>
               <li className="mb-2 hover:underline">FAQ</li>
             </Link>
           </ul>
@@ -64,21 +64,21 @@ const Footer = () => {
           <h3 className="text-2xl font-semibold mb-4">Social</h3>
           <ul className="flex space-x-4">
             <li>
-              <a href="#" className="hover:underline">
+              <a href="https://www.facebook.com/" className="hover:underline">
                 <div className=" bg-white rounded-sm size-6">
                   <FacebookIcon />
                 </div>
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <a href="https://www.youtube.com/" className="hover:underline">
                 <div className="bg-white rounded-sm size-6">
                   <YoutubeIcon />
                 </div>
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <a href="https://www.instagram.com/" className="hover:underline">
                 <div className="bg-white rounded-sm size-6">
                   <InstagramIcon />
                 </div>
