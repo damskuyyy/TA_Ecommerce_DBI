@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useDropzone } from "react-dropzone";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../dialog';
 import { Button } from '../../button';
 import { ProductDataType } from '@/types/productDataTypes';
@@ -6,10 +7,87 @@ import axios from 'axios';
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { Image } from "lucide-react";
 import formattedPrice from '@/utils/formattedPrice';
 
+// Komponen Modal
+const PaymentProofModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [image, setImage] = useState<File | null>(null);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles && acceptedFiles[0]) {
+      setImage(acceptedFiles[0]);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+  });
+
+  const handleSubmit = async () => {
+    if (!image) {
+      alert("Please upload an image.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("paymentProof", image);
+    try {
+      const response = await axios.post("/api/upload-payment-proof", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (response.status === 200) {
+        alert("Payment proof uploaded successfully!");
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error uploading payment proof:", error);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+        <h2 className="text-xl font-semibold mb-4 text-center">Upload Payment Proof</h2>
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${
+            isDragActive ? "border-blue-500" : "border-gray-300"
+          }`}
+        >
+          <input {...getInputProps()} />
+          <div className="flex flex-col items-center">
+            <div className="mb-2">
+              <Image />
+            </div>
+            {image ? (
+              <p className="text-gray-500">{image.name}</p>
+            ) : (
+              <>
+                <p className="text-gray-500 mb-1">Attach File</p>
+                <p className="text-gray-400">or Drag & Drop</p>
+              </>
+            )}
+          </div>
+        </div>
+        <Button onClick={handleSubmit} className="w-full">
+          Submit
+        </Button>
+        <Button onClick={onClose} className="w-full mt-2" variant="secondary">
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) => {
+  const { id } = useRouter().query;
+  const [isModalOpen, setModalOpen] = useState(false);
   const { toast } = useToast()
   const fee = price && (price * 0.004)
   const tax = 0.05
@@ -43,8 +121,9 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
           })
 
           setTimeout(() => {
-            window.open(invoiceUrl)
-          }, 1000)
+            window.open(resp.data.data.invoiceUrl);
+            setModalOpen(true);
+          }, 500)
         } else {
           toast({
             description: "Creating invoice Failed!",
@@ -115,6 +194,8 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
               </div>
             </div>
           </div>
+
+          <PaymentProofModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
         </DialogDescription>
       </DialogContent>
     </Dialog>
