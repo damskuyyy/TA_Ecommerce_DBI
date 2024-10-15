@@ -541,7 +541,16 @@ const ProfilePage = ({
                             </p>
                           </div>
                           <div className="w-full flex flex-col gap-2 mt-5">
-                            <Button size={"sm"}>Confirm</Button>
+                            <Button
+                              onClick={() =>
+                                (window.location.href = `/user/profile/checkout/${user.name
+                                  ?.replace(" ", "-")
+                                  .toLowerCase()}`)
+                              }
+                            >
+                              Confirm
+                            </Button>
+
                             <Alerts
                               btn="Delete all"
                               desc="As a result, the cart will be empty. and you must add your items again."
@@ -687,9 +696,7 @@ const ProfilePage = ({
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Users
                         </TableHead>
-                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          
-                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></TableHead>
                         {/* <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Payment Proof
                         </TableHead> */}
@@ -745,11 +752,21 @@ const ProfilePage = ({
                         },
                       ].map((order, idx) => (
                         <TableRow key={idx}>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.id}</TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.products}</TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.status}</TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.userId}</TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap">{order.xenditId}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">
+                            {order.id}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">
+                            {order.products}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">
+                            {order.status}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">
+                            {order.userId}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap">
+                            {order.xenditId}
+                          </TableCell>
                           {/* <TableCell className="px-6 py-4 whitespace-nowrap"></TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap"></TableCell> */}
                           <TableCell className="px-6 py-4 whitespace-nowrap">

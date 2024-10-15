@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,7 +8,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import OrderDataTypes from "@/types/orderDataTypes";
 
 const orders: OrderDataTypes[] = [
@@ -18,7 +39,7 @@ const orders: OrderDataTypes[] = [
     status: [],
     userId: "#12345",
     xenditId: "#09876",
-    orderDate: new Date,
+    orderDate: new Date(),
     users: [],
   },
   {
@@ -27,7 +48,7 @@ const orders: OrderDataTypes[] = [
     status: [],
     userId: "#12345",
     xenditId: "#09876",
-    orderDate: new Date,
+    orderDate: new Date(),
     users: [],
   },
   {
@@ -36,7 +57,7 @@ const orders: OrderDataTypes[] = [
     status: [],
     userId: "#12345",
     xenditId: "#09876",
-    orderDate: new Date,
+    orderDate: new Date(),
     users: [],
   },
   {
@@ -45,7 +66,7 @@ const orders: OrderDataTypes[] = [
     status: [],
     userId: "#12345",
     xenditId: "#09876",
-    orderDate: new Date,
+    orderDate: new Date(),
     users: [],
   },
   {
@@ -54,7 +75,7 @@ const orders: OrderDataTypes[] = [
     status: [],
     userId: "#12345",
     xenditId: "#09876",
-    orderDate: new Date,
+    orderDate: new Date(),
     users: [],
   },
   {
@@ -63,7 +84,7 @@ const orders: OrderDataTypes[] = [
     status: [],
     userId: "#12345",
     xenditId: "#09876",
-    orderDate: new Date,
+    orderDate: new Date(),
     users: [],
   },
   {
@@ -72,15 +93,22 @@ const orders: OrderDataTypes[] = [
     status: [],
     userId: "#12345",
     xenditId: "#09876",
-    orderDate: new Date,
+    orderDate: new Date(),
     users: [],
   },
 ];
 
 const OrderTable: React.FC = () => {
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  const handleDateClick = () => {
+    setShowCalendar(!showCalendar);
+  };
+
   return (
     <div className="p-4 space-y-6">
-      <div className='space-y-2'>
+      <div className="space-y-2">
         <h1 className="text-4xl font-bold">Orders</h1>
         <Breadcrumb>
           <BreadcrumbList>
@@ -106,18 +134,40 @@ const OrderTable: React.FC = () => {
               Filter By
             </button>
           </div>
-          <div className="flex items-center space-x-2">
-            <button className="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg">
-              Date
-            </button>
-            <button className="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg">
-              Order Status
-            </button>
-          </div>
+          <Popover>
+            <PopoverTrigger>
+              <button
+                onClick={handleDateClick}
+                className="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg"
+              >
+                Date
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border"
+              />
+            </PopoverContent>
+          </Popover>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <button className="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg">
+                Order Status
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Delivered</DropdownMenuItem>
+              <DropdownMenuItem>Succes</DropdownMenuItem>
+              <DropdownMenuItem>Process</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <button className="text-red-500 flex items-center space-x-1">
           <span>Reset Filter</span>
-
         </button>
       </div>
 
@@ -156,11 +206,21 @@ const OrderTable: React.FC = () => {
             <TableBody className="bg-white divide-y divide-gray-200">
               {orders.map((order, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.id}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.products}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.status}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.userId}</TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap">{order.xenditId}</TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">
+                    {order.id}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">
+                    {order.products}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">
+                    {order.status}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">
+                    {order.userId}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap">
+                    {order.xenditId}
+                  </TableCell>
                   {/* <TableCell className="px-6 py-4 whitespace-nowrap">{new Date(order.orderDate)}</TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">{order.users}</TableCell> */}
                   <TableCell className="px-6 py-4 whitespace-nowrap">
@@ -172,7 +232,7 @@ const OrderTable: React.FC = () => {
                             : "bg-red-100 text-red-800"
                         }`}
                     > */}
-                      {order.status}
+                    {order.status}
                   </TableCell>
                 </TableRow>
               ))}

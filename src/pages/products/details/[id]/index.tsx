@@ -41,7 +41,6 @@ const ModalAddReview = dynamic(
   { ssr: false }
 );
 
-
 const Details = ({
   items,
   setItems,
@@ -80,9 +79,12 @@ const Details = ({
   const [notes, setNotes] = useState("");
   const [notesDone, setNotesDone] = useState(false);
   const notesRef = useRef<HTMLTextAreaElement>(null);
+  const [discussView, setDiscussView] = useState(false);
+  const [discuss, setDiscuss] = useState("");
+  const [discussDone, setDiscussDone] = useState(false);
+  const discussRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
   const [updated, setUpdated] = useState(false);
-  
 
   const handleQtyPlus = () => {
     setQty(qty + 1);
@@ -124,6 +126,10 @@ const Details = ({
       setNotesDone(true);
     }
   }, [notes]);
+
+  const handleViewDiscuss = () => {
+    setDiscussView(!discussView);
+  };
 
   const getData = async () => {
     setLoad(true);
@@ -482,35 +488,18 @@ const Details = ({
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <p>
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Velit ex quisquam ratione, dolores dolorem
-                          repellat mollitia in iure, accusamus enim voluptatum
-                          porro iusto soluta beatae, cum maiores ut earum
-                          explicabo a illo facere molestiae tenetur? Eos, et
-                          omnis? At voluptatibus impedit in odio sint quia
-                          perferendis cupiditate praesentium harum quam.
-                          Excepturi ut magni, officia sit voluptas obcaecati
-                          provident dolorem vero. Ad molestiae accusantium
-                          distinctio modi natus dolores. Nihil perferendis
-                          excepturi non molestiae ipsa impedit et ab, quam
-                          voluptate iste placeat ratione expedita molestias hic
-                          nulla assumenda saepe inventore sequi soluta possimus!
-                          Voluptatum molestias doloribus, ut a soluta est illum
-                          nam! Optio molestiae inventore dolorem obcaecati
-                          accusantium? Reiciendis sequi numquam laborum eaque
-                          sint! Fugiat pariatur iure aut modi soluta, porro
-                          deserunt quis rem saepe. Culpa, voluptas? Qui quas
-                          libero soluta quis corporis doloremque necessitatibus
-                          eos culpa consequuntur ab voluptatibus voluptatem
-                          quisquam dolores dolorum unde et, praesentium quod
-                          commodi molestiae minima itaque.
-                        </p>
+                        <p>lorem</p>
                       </CardContent>
                     </Card>
                   ))
                 ) : (
-                  <div className="flex flex-col gap-0 w-full items-center">
+                  discussView ? (
+                    <div className="space-y-3">
+                      <Textarea placeholder="write your discuss here..."></Textarea>
+                      <Button onClick={() => setDiscussView(false)}>Done</Button>
+                    </div>
+                  ): (
+                    <div className="flex flex-col gap-0 w-full items-center">
                     <div className="w-1/4">
                       <Lottie animationData={notfoundData} />
                     </div>
@@ -519,8 +508,9 @@ const Details = ({
                       Click "Add discussion" button below to add discussion into
                       our product 😊
                     </h1>
-                    <Button size={"sm"} className="mt-2">Add discussion</Button>
+                    <Button onClick={handleViewDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
                   </div>
+                  )
                 )}
               </div>
             </div>
