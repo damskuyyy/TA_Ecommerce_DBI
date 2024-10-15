@@ -98,7 +98,7 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
   const { push } = useRouter()
 
   const handleDebitCardPayment = async () => {
-    if (status === 'authenticated') {
+    if (status === "authenticated") {
       const body = {
         amount: total,
         description: `Payout for ${name} on the marketplace dbix.my.id`,
@@ -106,19 +106,19 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
           {
             name: name,
             quantity: 1,
-            price: price
-          }
-        ]
-      }
-      setLoad(true)
+            price: price,
+          },
+        ],
+      };
+      setLoad(true);
       try {
-        const resp = await axios.post('/api/payment/create-checkout', body)
+        const resp = await axios.post("/api/payment/create-checkout", body);
         if (resp.status === 200) {
-          const invoiceUrl = resp.data.data.invoiceUrl
-          setLoad(false)
+          const invoiceUrl = resp.data.data.invoiceUrl;
+          setLoad(false);
           toast({
             description: "Creating invoice success!",
-          })
+          });
 
           setTimeout(() => {
             window.open(resp.data.data.invoiceUrl);
@@ -127,70 +127,101 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
         } else {
           toast({
             description: "Creating invoice Failed!",
-            variant: 'destructive'
-          })
+            variant: "destructive",
+          });
         }
       } catch (error) {
-        console.log(error)
-        setLoad(false)
+        console.log(error);
+        setLoad(false);
         toast({
           description: "Error server!",
-          variant: 'destructive'
-        })
+          variant: "destructive",
+        });
       }
     } else {
       toast({
         title: "Opps!",
         description: "You must login to continue this transaction 😁😁",
-        variant: 'destructive'
-      })
+        variant: "destructive",
+      });
       setTimeout(() => {
-        push('/user/login')
+        push("/user/login");
       }, 1500);
     }
-  }
-
+  };
 
   return (
     <Dialog>
       <DialogTrigger>
-        <Button size={'default'} className='font-medium w-full'>Buy now!</Button> 
+        <Button size={"default"} className="font-medium w-full">
+          Buy now!
+        </Button>
       </DialogTrigger>
-      <DialogContent className='flex justify-between gap-5'>
-        <DialogHeader className='w-1/2'>
+      <DialogContent className="flex justify-between gap-5">
+        <DialogHeader className="w-1/2">
           <DialogTitle>
-            <img src={image[0]} alt={name} className='w-full h-[26rem] object-cover rounded-md' />
+            <img
+              src={image[0]}
+              alt={name}
+              className="w-full h-[26rem] object-cover rounded-md"
+            />
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription className='w-1/2 flex flex-col gap-5'>
-          <h1 className=''>Transaction confirmation</h1>
-          <div className='flex w-full flex-col gap-1'>
-            <h1 className='text-black font-bold text-xl first-letter:uppercase'>{name}</h1>
-            <p className='font-medium capitalize text-gray-500'>Variant : <span className='text-zinc-950 font-bold'>{variants[0]}</span></p>
+        <DialogDescription className="w-1/2 flex flex-col gap-5">
+          <h1 className="">Transaction confirmation</h1>
+          <div className="flex w-full flex-col gap-1">
+            <h1 className="text-black font-bold text-xl first-letter:uppercase">
+              {name}
+            </h1>
+            <p className="font-medium capitalize text-gray-500">
+              Variant :{" "}
+              <span className="text-zinc-950 font-bold">{variants[0]}</span>
+            </p>
           </div>
           <p>{desc}</p>
-          <div className='flex flex-col gap-5'>
-            <div className='pb-2 border-b w-full justify-between flex'>
-              <h1 className='text-sm'>Transaction fee :</h1>
-              <p className='text-sm'>{formattedPrice.toIDR(fee)}</p>
+          <div className="flex flex-col gap-5">
+            <div className="pb-2 border-b w-full justify-between flex">
+              <h1 className="text-sm">Transaction fee :</h1>
+              <p className="text-sm">{formattedPrice.toIDR(fee)}</p>
             </div>
-            <div className='pb-2 border-b w-full justify-between flex'>
-              <h1 className='text-sm'>TAX :</h1>
-              <p className='text-sm'>{tax * 100}% ({formattedPrice.toIDR(tax * price)})</p>
+            <div className="pb-2 border-b w-full justify-between flex">
+              <h1 className="text-sm">TAX :</h1>
+              <p className="text-sm">
+                {tax * 100}% ({formattedPrice.toIDR(tax * price)})
+              </p>
             </div>
-            <div className='pb-2 border-b w-full justify-between flex'>
-              <h1 className='text-sm'>Application fee :</h1>
-              <p className='text-sm'>{appFee * 100}% ({formattedPrice.toIDR(appFee * price)})</p>
+            <div className="pb-2 border-b w-full justify-between flex">
+              <h1 className="text-sm">Application fee :</h1>
+              <p className="text-sm">
+                {appFee * 100}% ({formattedPrice.toIDR(appFee * price)})
+              </p>
             </div>
-            <div className='pb-2 border-b w-full justify-between flex'>
-              <h1 className='text-xl font-bold text-black'>TOTAL :</h1>
-              <p className='text-sm text-black font-bold'>{formattedPrice.toIDR(total)}</p>
+            <div className="pb-2 border-b w-full justify-between flex">
+              <h1 className="text-xl font-bold text-black">TOTAL :</h1>
+              <p className="text-sm text-black font-bold">
+                {formattedPrice.toIDR(total)}
+              </p>
             </div>
-            <div className='flex flex-col gap-3 w-full'>
+            <div className="flex flex-col gap-3 w-full">
               <h1>Payment methods</h1>
-              <div className='flex items-center gap-3 justify-between w-full'>
-                <Button size={'sm'} className='w-full'>Crypto currency</Button>
-                <Button size={'sm'} className='w-full' onClick={handleDebitCardPayment}>{load ? 'Creating Invoice....' : 'Debit cards and other payments'}</Button>
+              <div className="flex items-center gap-3 justify-between w-full">
+                {/* Trigger Crypto Modal */}
+                <Button
+                  size={"sm"}
+                  className="w-full"
+                  onClick={() => setShowCryptoModal(true)}
+                >
+                  Crypto currency
+                </Button>
+                <Button
+                  size={"sm"}
+                  className="w-full"
+                  onClick={handleDebitCardPayment}
+                >
+                  {load
+                    ? "Creating Invoice...."
+                    : "Debit cards and other payments"}
+                </Button>
               </div>
             </div>
           </div>
@@ -198,6 +229,67 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
           <PaymentProofModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
         </DialogDescription>
       </DialogContent>
+
+      {/* Crypto Payment Modal */}
+      {showCryptoModal && (
+        <Dialog open={showCryptoModal} onOpenChange={setShowCryptoModal}>
+          <DialogContent className="w-[400px] h-[450px] bg-white text-gray-800 p-6 rounded-lg">
+            <DialogHeader>
+              <DialogTitle className="text-center text-lg font-bold">
+                Select a crypto wallet to proceed with payment
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className="flex flex-col gap-2 mt-6">
+              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
+                <img
+                  src="https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=035"
+                  alt="BTC"
+                  className="w-5 h-5"
+                />
+                BTC
+              </Button>
+              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
+                <img
+                  src="https://cryptologos.cc/logos/solana-sol-logo.png?v=035"
+                  alt="Solana"
+                  className="w-5 h-5"
+                />
+                Solana
+              </Button>
+              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
+                <img
+                  src="https://cryptologos.cc/logos/bnb-bnb-logo.png?v=035"
+                  alt="BNB"
+                  className="w-5 h-5"
+                />
+                BNB
+              </Button>
+              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
+                <img
+                  src="https://cryptologos.cc/logos/tether-usdt-logo.png?v=035"
+                  alt="USDT"
+                  className="w-5 h-5"
+                />
+                Tether USDT
+              </Button>
+              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
+                <img
+                  src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=035"
+                  alt="USDC"
+                  className="w-5 h-5"
+                />
+                USDC
+              </Button>
+            </DialogDescription>
+            <Button
+              className="mt-4 w-full bg-gray-700"
+              onClick={() => setShowCryptoModal(false)}
+            >
+              Close
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </Dialog>
   );
 };
