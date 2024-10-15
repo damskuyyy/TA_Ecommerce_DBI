@@ -1,8 +1,8 @@
+import React from "react";
 import CardStats from "@/components/ui/cardStats";
 import ListIcon from "@/components/ui/icons/list";
 import UserIcon from "@/components/ui/icons/user";
 import UsercircleIcon from "@/components/ui/icons/usercircle";
-import React from "react";
 
 const Stats = () => {
   return (
