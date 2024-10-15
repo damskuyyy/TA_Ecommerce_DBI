@@ -1,17 +1,30 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../dialog';
-import { Button } from '../../button';
-import { ProductDataType } from '@/types/productDataTypes';
-import axios from 'axios';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../dialog";
+import { Button } from "../../button";
+import { ProductDataType } from "@/types/productDataTypes";
+import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { Image } from "lucide-react";
-import formattedPrice from '@/utils/formattedPrice';
+import formattedPrice from "@/utils/formattedPrice";
 
 // Komponen Modal
-const PaymentProofModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const PaymentProofModal = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
   const [image, setImage] = useState<File | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -52,7 +65,9 @@ const PaymentProofModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-xl font-semibold mb-4 text-center">Upload Payment Proof</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          Upload Payment Proof
+        </h2>
         <div
           {...getRootProps()}
           className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${
@@ -85,17 +100,25 @@ const PaymentProofModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   );
 };
 
-const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) => {
+const ModalCheckout = ({
+  name,
+  desc,
+  image,
+  price,
+  variants,
+}: ProductDataType) => {
   const { id } = useRouter().query;
   const [isModalOpen, setModalOpen] = useState(false);
-  const { toast } = useToast()
-  const fee = price && (price * 0.004)
-  const tax = 0.05
-  const appFee = 0.002
-  const total = (price + (fee + price * tax + price * appFee))
-  const [load, setLoad] = useState(false)
-  const { status }: any = useSession()
-  const { push } = useRouter()
+  const [showCryptoModal, setShowCryptoModal] = useState<boolean>(false);
+
+  const { toast } = useToast();
+  const fee = price && price * 0.004;
+  const tax = 0.05;
+  const appFee = 0.002;
+  const total = price + (fee + price * tax + price * appFee);
+  const [load, setLoad] = useState(false);
+  const { status }: any = useSession();
+  const { push } = useRouter();
 
   const handleDebitCardPayment = async () => {
     if (status === "authenticated") {
@@ -123,7 +146,7 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
           setTimeout(() => {
             window.open(resp.data.data.invoiceUrl);
             setModalOpen(true);
-          }, 500)
+          }, 500);
         } else {
           toast({
             description: "Creating invoice Failed!",
@@ -226,7 +249,10 @@ const ModalCheckout = ({ name, desc, image, price, variants }: ProductDataType) 
             </div>
           </div>
 
-          <PaymentProofModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+          <PaymentProofModal
+            isOpen={isModalOpen}
+            onClose={() => setModalOpen(false)}
+          />
         </DialogDescription>
       </DialogContent>
 
