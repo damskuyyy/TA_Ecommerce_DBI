@@ -202,7 +202,7 @@ const ModalCheckout = ({
                   alt="USDT"
                   className="w-5 h-5"
                 />
-                USDT
+                Tether USDT
               </Button>
               <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
                 <img
