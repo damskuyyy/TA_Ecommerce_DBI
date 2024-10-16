@@ -72,7 +72,7 @@ const ProductsPage = () => {
           <div className="flex justify-between items-center">
             <h1 className="text-4xl font-bold">Products</h1>
             <Link href={"/admin/products/add"}>
-              <Button className="text-white flex items-center gap-2" size={'sm'}>
+              <Button className="text-white flex items-center gap-2 dark:bg-black" size={'sm'}>
                 <FolderPlusIcon size={16} />
                 Add
               </Button>
@@ -97,7 +97,7 @@ const ProductsPage = () => {
         <ScrollArea className="lg:pb-0 pb-4">
           <Table className="min-w-full divide-y divide-gray-200">
             <TableCaption>A list of products</TableCaption>
-            <TableHeader className="bg-gray-50">
+            <TableHeader className="bg-gray-50 dark:bg-gray-900">
               <TableRow>
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code product</TableHead>
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</TableHead>
@@ -108,7 +108,7 @@ const ProductsPage = () => {
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="bg-white divide-y divide-gray-200">
+            <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950">
               {load ? renderSkeletonRows(5) : (
                 products.map((item, index) => (
                   <TableRow key={index}>

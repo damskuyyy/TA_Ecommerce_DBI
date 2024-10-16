@@ -61,12 +61,12 @@ const Transaction: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white shadow rounded-lg p-4">
-        <h2 className="text-lg font-semibold text-gray-700">Recent Orders</h2>
+      <div className="bg-white shadow rounded-lg p-4 dark:bg-black">
+        <h2 className="text-lg font-semibold text-gray-700 dark:text-white">Recent Orders</h2>
         <div className="overflow-x-auto">
           <Table className="min-w-full divide-y divide-gray-200 mt-4">
             <TableCaption>A list of your recent invoices.</TableCaption>
-            <TableHeader className="bg-gray-50">
+            <TableHeader className="bg-gray-50 dark:bg-gray-900">
               <TableRow>
               <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Id
@@ -91,7 +91,7 @@ const Transaction: React.FC = () => {
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="bg-white divide-y divide-gray-200">
+            <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950">
             {[
                         {
                           id: "#25423",

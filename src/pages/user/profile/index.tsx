@@ -257,7 +257,6 @@ const ProfilePage = ({
               <div className="flex flex-col w-full gap-5">
                 <Card className="w-full">
                   <CardContent className="pt-3">
-                    <div className="flex-grow bg-white w-full flex flex-col gap-5 dark:bg-black">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 group">
                           <div className="relative">
@@ -270,7 +269,7 @@ const ProfilePage = ({
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h2 className="text-xl font-semibold capitalize">
+                              <h2 className="text-xl font-semibold capitalize dark:text-white">
                                 {user.name}
                               </h2>
                             </div>
@@ -281,7 +280,6 @@ const ProfilePage = ({
                       <h3 className="text-2xl font-bold mb-5">
                         Personal Information
                       </h3>
-                    </div>
                     <Table className="w-fit">
                       <TableBody>
                         <TableRow>

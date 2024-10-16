@@ -155,7 +155,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
 
 
   return (
-    <div className="w-full flex py-5 relative lg:px-0  px-6 justify-between  dark:bg-black">
+    <div className="w-full flex py-5 relative lg:px-0  px-6 justify-between">
       <div className="font-bold text-lg flex items-center gap-5">
         <div className="flex gap-4 lg:hidden">
           <button name="buttonnav" onClick={() => setView(!view)} className="lg:hidden block">
@@ -264,7 +264,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
               <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger className="relative" name="shoppingcartbutton">
                   {products.length > 0 && <Badge className="absolute -top-3 -right-3 p-1 py-0.5 bg-transparent font-bold text-zinc-950 dark:text-zinc-50">{products.length}</Badge>}
-                  <ShoppingCart color="white" className="" />
+                  <ShoppingCart className="dark:white" />
                 </SheetTrigger>
                 <SheetContent className={`flex flex-col gap-5 w-full items-start justify-between`}>
                   <div className="flex flex-col gap-5 w-full">
