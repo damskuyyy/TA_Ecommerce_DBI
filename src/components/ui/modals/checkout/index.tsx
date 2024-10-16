@@ -110,7 +110,6 @@ const ModalCheckout = ({
   const { id } = useRouter().query;
   const [isModalOpen, setModalOpen] = useState(false);
   const [showCryptoModal, setShowCryptoModal] = useState<boolean>(false);
-
   const { toast } = useToast();
   const fee = price && price * 0.004;
   const tax = 0.05;

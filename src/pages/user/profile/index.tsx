@@ -4,9 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import Head from "next/head";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Toggle } from "@/components/ui/toggle";
 import { useSession } from "next-auth/react";
-import ZoomImage from "@/components/ui/modals/zoomImage";
 import {
   CheckCircleIcon,
   CircleUserRound,
@@ -19,7 +17,15 @@ import {
   ShoppingBasketIcon,
   Trash2Icon,
   SquareArrowOutUpRightIcon,
+  MoonIcon,
+  Sun,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import noData from "../../../../public/animations/nodata.json";
@@ -234,10 +240,6 @@ const ProfilePage = ({
             >
               <ShoppingBasketIcon size={20} />
               Recent Order
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <CogIcon size={20} />
-              Setting
             </TabsTrigger>
           </TabsList>
           <Scrollbar orientation="horizontal" />
@@ -803,16 +805,6 @@ const ProfilePage = ({
                 </ScrollArea>
                 <div className="overflow-x-auto shadow-md"></div>
               </div>
-            </TabsContent>
-            <TabsContent
-              value="settings"
-              className="w-full lg:mt-8 md:mt-6 mt-5"
-            >
-              <Toggle aria-label="Toggle italic">
-                <Button type="button" size={"lg"}>
-                  Drak Mode
-                </Button>
-              </Toggle>
             </TabsContent>
           </>
         )}

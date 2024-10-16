@@ -62,7 +62,7 @@ const Appshell = ({ children }: props) => {
   }
 
   return (
-    <>
+    <div >
       <Toaster />
       {path.includes(pathname) ? (
         <div className="w-full">{children}</div>
@@ -101,7 +101,7 @@ const Appshell = ({ children }: props) => {
           </div>
         )
       )}
-    </>
+    </div>
   );
 };
 
