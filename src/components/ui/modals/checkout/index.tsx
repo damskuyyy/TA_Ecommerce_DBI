@@ -165,7 +165,7 @@ const ModalCheckout = ({
       {/* Crypto Payment Modal */}
       {showCryptoModal && (
         <Dialog open={showCryptoModal} onOpenChange={setShowCryptoModal}>
-          <DialogContent className="w-[400px] h-[450px] bg-white text-gray-800 p-6 rounded-lg">
+          <DialogContent className="w-[400px] h-[450px] bg-white text-gray-900 p-6 rounded-lg">
             <DialogHeader>
               <DialogTitle className="text-center text-lg font-bold">
                 Select a crypto wallet to proceed with payment
