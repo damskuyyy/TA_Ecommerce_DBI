@@ -171,47 +171,75 @@ const ModalCheckout = ({
                 Select a crypto wallet to proceed with payment
               </DialogTitle>
             </DialogHeader>
-            <DialogDescription className="flex flex-col gap-2 mt-6">
-              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
-                <img
-                  src="https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=035"
-                  alt="BTC"
-                  className="w-5 h-5"
-                />
-                BTC
-              </Button>
-              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
-                <img
-                  src="https://cryptologos.cc/logos/solana-sol-logo.png?v=035"
-                  alt="Solana"
-                  className="w-5 h-5"
-                />
-                Solana
-              </Button>
-              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
-                <img
-                  src="https://cryptologos.cc/logos/bnb-bnb-logo.png?v=035"
-                  alt="BNB"
-                  className="w-5 h-5"
-                />
-                BNB
-              </Button>
-              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
-                <img
-                  src="https://cryptologos.cc/logos/tether-usdt-logo.png?v=035"
-                  alt="USDT"
-                  className="w-5 h-5"
-                />
-                Tether USDT
-              </Button>
-              <Button className="bg-gray-800 text-white p-3 rounded-md flex justify-center items-center gap-2">
-                <img
-                  src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=035"
-                  alt="USDC"
-                  className="w-5 h-5"
-                />
-                USDC
-              </Button>
+            <DialogDescription className="mt-6">
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <img
+                    src="https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=035"
+                    alt="BTC"
+                    className="w-5 h-5"
+                  />
+                  BTC
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <img
+                    src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=035"
+                    alt="ETH"
+                    className="w-5 h-5"
+                  />
+                  Ethereum
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <img
+                    src="https://cryptologos.cc/logos/solana-sol-logo.png?v=035"
+                    alt="Solana"
+                    className="w-5 h-5"
+                  />
+                  Solana
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <img
+                    src="https://cryptologos.cc/logos/bnb-bnb-logo.png?v=035"
+                    alt="BNB"
+                    className="w-5 h-5"
+                  />
+                  BNB
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <img
+                    src="https://cryptologos.cc/logos/tether-usdt-logo.png?v=035"
+                    alt="USDT"
+                    className="w-5 h-5"
+                  />
+                  Tether USDT
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex justify-center items-center gap-2"
+                >
+                  <img
+                    src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=035"
+                    alt="USDC"
+                    className="w-5 h-5"
+                  />
+                  USDC
+                </Button>
+              </div>
             </DialogDescription>
             <Button
               className="mt-4 w-full bg-gray-700"
