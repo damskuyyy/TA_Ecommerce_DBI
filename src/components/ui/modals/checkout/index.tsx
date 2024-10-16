@@ -30,7 +30,7 @@ const ModalCheckout = ({
   const [load, setLoad] = useState(false);
   const { status }: any = useSession();
   const { push } = useRouter();
-  const [showCryptoModal, setShowCryptoModal] = useState(false); // Crypto modal state
+  const [showCryptoModal, setShowCryptoModal] = useState(false); 
 
   const handleDebitCardPayment = async () => {
     if (status === "authenticated") {
