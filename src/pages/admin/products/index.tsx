@@ -25,7 +25,7 @@ import formattedPrice from '@/utils/formattedPrice';
 import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TooltipContent } from '@radix-ui/react-tooltip';
 import Head from 'next/head';
-import { FolderPlusIcon } from 'lucide-react';
+import { Eye, FolderPlusIcon, PenBox, Trash } from 'lucide-react';
 import ModalZoomImage from '@/components/ui/modals/zoomImage';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -124,10 +124,14 @@ const ProductsPage = () => {
                     <TableCell className="px-6 flex items-center gap-2 py-2 whitespace-nowrap" title='Zoom'>
                       <ModalZoomImage src={item.image[0]} alt={item.name} />
                     </TableCell>
-                    <TableCell className="px-6 py-2 whitespace-nowrap">
-                      <Link href={`/admin/products/details/${item.code_product}`}>
-                        <Button variant={'secondary'} size={'sm'}>Details</Button>
-                      </Link>
+                    <TableCell className="px-6 py-2">
+                      <div className='flex items-center gap-2'>
+                        <Link href={`/admin/products/details/${item.code_product}`}>
+                          <Button variant={'secondary'} size={'sm'}><Eye /></Button>
+                        </Link>
+                        <Button variant={'secondary'} size={'sm'}><PenBox /></Button>
+                        <Button variant={'destructive'} size={'sm'}><Trash /></Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
