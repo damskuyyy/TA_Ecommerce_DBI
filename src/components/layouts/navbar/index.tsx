@@ -12,7 +12,7 @@ import ButtoNavIcon from "@/components/ui/icons/buttonnav";
 import { AccordionContent, AccordionItem, AccordionTrigger, Accordion } from "@/components/ui/accordion";
 import { signOut, useSession } from "next-auth/react";
 import { UserDataType } from "@/types/userDataTypes";
-import { LoaderCircleIcon, MinusIcon, PlusIcon, ShoppingCart, Trash2Icon } from "lucide-react";
+import { LoaderCircleIcon, MinusIcon, MoonIcon, PlusIcon, ShoppingCart, Sun, Trash2Icon } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -31,7 +31,7 @@ import { ProductDataType } from "@/types/productDataTypes";
 import { Badge } from "@/components/ui/badge";
 import { calculateSubtotal, calculateTransactionFee, calculateApplicationFee, calculateTax, calculateTotal } from "@/utils/calcutale";
 import formattedPrice from "@/utils/formattedPrice";
-
+import { useTheme } from "next-themes";
 
 const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataType[], setItems: Dispatch<SetStateAction<ItemDataType[]>>, products: ProductDataType[], setProducts: Dispatch<SetStateAction<ProductDataType[]>> }) => {
   const [view, setView] = useState(false)
@@ -51,6 +51,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
   })
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [dropdownOpen2, setDropdownOpen2] = useState(false)
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     if (view) {
@@ -240,10 +241,30 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
         ) : (
           status === 'authenticated' && session.user.role === 'user' ? (
             <div className="flex items-center gap-5">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <span className="sr-only">Toggle theme</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
+                    Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    Dark
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("system")}>
+                    System
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger className="relative" name="shoppingcartbutton">
-                  {products.length > 0 && <Badge className="absolute -top-3 -right-3 p-1 py-0.5 bg-transparent font-bold text-zinc-950">{products.length}</Badge>}
-                  <ShoppingCart color="#000000" className="" />
+                  {products.length > 0 && <Badge className="absolute -top-3 -right-3 p-1 py-0.5 bg-transparent font-bold text-zinc-950 dark:text-zinc-50">{products.length}</Badge>}
+                  <ShoppingCart className="dark:white" />
                 </SheetTrigger>
                 <SheetContent className={`flex flex-col gap-5 w-full items-start justify-between`}>
                   <div className="flex flex-col gap-5 w-full">
@@ -351,6 +372,26 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
                     <DropdownMenuItem>
                       <Link onClick={() => setDropdownOpen(false)} className="font-medium hover:opacity-80 w-full" href={'/user/profile#cart'}>Cart</Link>
                     </DropdownMenuItem>
+                    <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <span className="sr-only">Toggle theme</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
+                    Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    Dark
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("system")}>
+                    System
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
                     <div className="flex justify-center items-center p-2 py-1 w-full">
                       <Alerts ok={async () => {

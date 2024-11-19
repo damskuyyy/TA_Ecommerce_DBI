@@ -127,10 +127,10 @@ const OrderTable: React.FC = () => {
         </Breadcrumb>
       </div>
       {/* filter */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow mb-4">
+      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow mb-4 dark:bg-gray-900">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <button className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg">
+            <button className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg dark:bg-gray-950 dark:text-white">
               Filter By
             </button>
           </div>
@@ -138,23 +138,23 @@ const OrderTable: React.FC = () => {
             <PopoverTrigger>
               <button
                 onClick={handleDateClick}
-                className="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg"
+                className="bg-white text-gray-600 px-4 py-2 rounded-lg dark:bg-gray-950 dark:text-white"
               >
                 Date
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
+            <PopoverContent className="w-auto p-0 dark:bg-gray-950 dark:text-white">
               <Calendar
                 mode="single"
                 selected={date}
                 onSelect={setDate}
-                className="rounded-md border"
+                className="rounded-md"
               />
             </PopoverContent>
           </Popover>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <button className="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg">
+              <button className="bg-white text-gray-600 px-4 py-2 rounded-lg dark:bg-gray-950 dark:text-white">
                 Order Status
               </button>
             </DropdownMenuTrigger>
@@ -172,13 +172,13 @@ const OrderTable: React.FC = () => {
       </div>
 
       {/* table */}
-      <div className="bg-white shadow rounded-lg p-4">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">
+      <div className="bg-white shadow rounded-lg p-4 dark:bg-black">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4 dark:text-white">
           Recent Orders
         </h2>
         <div className="overflow-x-auto">
           <Table className="min-w-full divide-y divide-gray-200">
-            <TableHeader className="bg-gray-50">
+            <TableHeader className="bg-gray-50 dark:bg-gray-900">
               <TableRow>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Id
@@ -203,7 +203,7 @@ const OrderTable: React.FC = () => {
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="bg-white divide-y divide-gray-200">
+            <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950">
               {orders.map((order, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="px-6 py-4 whitespace-nowrap">

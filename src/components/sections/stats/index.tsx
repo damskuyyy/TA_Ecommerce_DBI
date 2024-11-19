@@ -6,7 +6,7 @@ import UsercircleIcon from "@/components/ui/icons/usercircle";
 
 const Stats = () => {
   return (
-    <div className="flex flex-col lg:flex-row md:flex-row gap-5 lg:gap-[50px] rounded-xl justify-center py-[35px] bg-black px-[30px] lg:px-[222px]">
+    <div className="flex flex-col lg:flex-row md:flex-row gap-5 lg:gap-[50px] rounded-xl justify-center py-[35px] bg-black px-[30px] lg:px-[222px] dark:bg-black dark:text-black">
       <CardStats icon={<UserIcon />} title="Klien" value={20} />
       <CardStats icon={<ListIcon />} title="Proyek Sukses" value={20} />
       <CardStats icon={<UsercircleIcon />} title="Tenaga Ahli" value={20} />

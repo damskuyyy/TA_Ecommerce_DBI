@@ -4,9 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import Head from "next/head";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Toggle } from "@/components/ui/toggle";
 import { useSession } from "next-auth/react";
-import ZoomImage from "@/components/ui/modals/zoomImage";
 import {
   CheckCircleIcon,
   CircleUserRound,
@@ -19,7 +17,15 @@ import {
   ShoppingBasketIcon,
   Trash2Icon,
   SquareArrowOutUpRightIcon,
+  MoonIcon,
+  Sun,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import noData from "../../../../public/animations/nodata.json";
@@ -235,10 +241,6 @@ const ProfilePage = ({
               <ShoppingBasketIcon size={20} />
               Recent Order
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <CogIcon size={20} />
-              Setting
-            </TabsTrigger>
           </TabsList>
           <Scrollbar orientation="horizontal" />
         </ScrollArea>
@@ -255,7 +257,6 @@ const ProfilePage = ({
               <div className="flex flex-col w-full gap-5">
                 <Card className="w-full">
                   <CardContent className="pt-3">
-                    <div className="flex-grow bg-white w-full flex flex-col gap-5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 group">
                           <div className="relative">
@@ -268,7 +269,7 @@ const ProfilePage = ({
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h2 className="text-xl font-semibold capitalize">
+                              <h2 className="text-xl font-semibold capitalize dark:text-white">
                                 {user.name}
                               </h2>
                             </div>
@@ -279,7 +280,6 @@ const ProfilePage = ({
                       <h3 className="text-2xl font-bold mb-5">
                         Personal Information
                       </h3>
-                    </div>
                     <Table className="w-fit">
                       <TableBody>
                         <TableRow>
@@ -666,14 +666,14 @@ const ProfilePage = ({
               value="recentOrder"
               className="w-full lg:mt-8 md:mt-6 mt-5"
             >
-              <div className="bg-white rounded-lg lg:p-2 p-1">
+              <div className="bg-white rounded-lg lg:p-2 p-1 dark:bg-black">
                 <h2 className="text-xl pb-3 border-b font-semibold w-full">
                   Recent Orders
                 </h2>
                 <ScrollArea className="lg:pb-0 pb-4">
-                  <Table className="min-w-full divide-y divide-gray-200 mt-4">
+                  <Table className="min-w-full divide-y divide-gray-200 mt-4 dark:divide-gray-800">
                     <TableCaption>A list of your recent invoices.</TableCaption>
-                    <TableHeader className="bg-gray-50">
+                    <TableHeader className="bg-gray-50 dark:bg-gray-900">
                       <TableRow>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Id
@@ -703,7 +703,7 @@ const ProfilePage = ({
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></TableHead>
                       </TableRow>
                     </TableHeader>
-                    <TableBody className="bg-white divide-y divide-gray-200">
+                    <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950 dark:divide-gray-700">
                       {[
                         {
                           id: "#25423",
@@ -803,16 +803,6 @@ const ProfilePage = ({
                 </ScrollArea>
                 <div className="overflow-x-auto shadow-md"></div>
               </div>
-            </TabsContent>
-            <TabsContent
-              value="settings"
-              className="w-full lg:mt-8 md:mt-6 mt-5"
-            >
-              <Toggle aria-label="Toggle italic">
-                <Button type="button" size={"lg"}>
-                  Drak Mode
-                </Button>
-              </Toggle>
             </TabsContent>
           </>
         )}

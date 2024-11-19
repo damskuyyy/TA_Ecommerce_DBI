@@ -62,7 +62,7 @@ const Appshell = ({ children }: props) => {
   }
 
   return (
-    <>
+    <div >
       <Toaster />
       {path.includes(pathname) ? (
         <div className="w-full">{children}</div>
@@ -81,7 +81,7 @@ const Appshell = ({ children }: props) => {
           </div>
         ) : (
           <div className="w-full flex flex-col lg:gap-8 gap-4">
-            <div className="w-full border-b shadow-lg sticky top-0 left-0 bg-white z-50">
+            <div className="w-full border-b shadow-lg sticky top-0 left-0 bg-background z-50">
               <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md sm:max-w-screen-sm mx-auto w-full xl:px-0 lg:px-3">
                 <Navbar items={items} setItems={setItems} products={products} setProducts={setProducts} />
               </div>
@@ -101,7 +101,7 @@ const Appshell = ({ children }: props) => {
           </div>
         )
       )}
-    </>
+    </div>
   );
 };
 
