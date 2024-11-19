@@ -129,7 +129,9 @@ const ProductsPage = () => {
                         <Link href={`/admin/products/details/${item.code_product}`}>
                           <Button variant={'secondary'} size={'sm'}><Eye /></Button>
                         </Link>
-                        <Button variant={'secondary'} size={'sm'}><PenBox /></Button>
+                        <Link href={`/admin/products/edit/${item.code_product}`}>
+                          <Button variant={'secondary'} size={'sm'}><PenBox /></Button>
+                        </Link>
                         <Button variant={'destructive'} size={'sm'}><Trash /></Button>
                       </div>
                     </TableCell>
