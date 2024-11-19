@@ -127,7 +127,7 @@ const AddProductPage = () => {
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className='space-y-2'>
-        <h1 className="text-4xl font-bold">Products</h1>
+        <h1 className="text-4xl font-bold">Add Products</h1>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
