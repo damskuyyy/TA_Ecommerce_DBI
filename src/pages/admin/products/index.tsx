@@ -35,7 +35,7 @@ const ProductsPage = () => {
 
   const getProductsData = async () => {
     try {
-      const resp = await axios('/api/product/get/categories?name=website');
+      const resp = await axios('/api/product/get/all');
       setProducts(resp.data);
       setLoad(false);
     } catch (error) {
@@ -47,6 +47,16 @@ const ProductsPage = () => {
   useEffect(() => {
     getProductsData();
   }, []);
+
+  const handleDelete = async (id:string) => {
+    try {
+      await axios.delete(`/api/product/delete/${id}`)
+      alert('delete success')
+    } catch (error) {
+      alert('error')
+      console.log(error)
+    }
+  }
 
   const renderSkeletonRows = (numRows: number) => {
     return Array.from({ length: numRows }).map((_, index) => (
@@ -132,7 +142,9 @@ const ProductsPage = () => {
                         <Link href={`/admin/products/edit/${item.code_product}`}>
                           <Button variant={'secondary'} size={'sm'}><PenBox /></Button>
                         </Link>
-                        <Button variant={'destructive'} size={'sm'}><Trash /></Button>
+                        <Button onClick={()=>{
+                          handleDelete(item.id)
+                        }} variant={'destructive'} size={'sm'}><Trash /></Button>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -1,4 +1,4 @@
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,11 +17,15 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Textarea } from '@/components/ui/textarea';
 
+import { useRouter } from 'next/router';
+import { ProductDataType } from '@/types/productDataTypes';
+
+
 const ReactEditor = dynamic(() => import('@/components/ui/reactEditor'), { ssr: false })
 
-const AddProductPage = () => {
+const EditProductPage = () => {
   const [productName, setProductName] = useState('')
-  const [description, setDescription] = useState('')
+  const [desc, setDesc] = useState('')
   const [spec, setSpesification] = useState('')
   const [price, setPrice] = useState(0)
   const [stock, setStock] = useState(0)
@@ -39,6 +43,8 @@ const AddProductPage = () => {
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [load, setLoad] = useState(false)
 
+  const router = useRouter();
+  const { id } = router.query;
 
   const categoryView = [
     "Website",
@@ -59,6 +65,48 @@ const AddProductPage = () => {
     "(COIN) - Sha 256",
     "(TOKEN) - ERC 20, BSC 20, TRC 20",
   ]
+
+  const getDetailsProducts = async () => {
+
+    try {
+      const data = await axios(`/api/product/get?code=${id}`)
+      const parsedData: ProductDataType = data.data
+      console.log(parsedData)
+      setProductName(parsedData.name)
+      setCategory(parsedData.category)
+      setDesc(parsedData.desc)
+      setSpesification(String(parsedData.spec))
+      setInformation(String(parsedData.information))
+      setDetails(String(parsedData.details))
+      setPrice(parsedData.price)
+      setStock(Number(parsedData.stock))
+      setMinOrder(Number(parsedData.minOrder))
+      setVariants(parsedData.variants)
+      setImage(parsedData.image)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getDetailsProducts()
+  }, [id])
+
+  useEffect(() => {
+    if (variants && image) {
+      if (variants.length > 0) {
+        setVariationInputView(true)
+      } 
+      if (image.length > 0) {
+        setImageInputView(true)
+      } 
+      if (variants.length > 0 && image.length > 0) {
+        setVariationInputView(true)
+        setImageInputView(true)
+      }
+    }
+  }, [variants && variants.length, image && image.length])
+
   //handleAddVariant menambahkan variant
   const handleAddVariation = (e: FormEvent) => {
     e.preventDefault()
@@ -69,6 +117,7 @@ const AddProductPage = () => {
       variationInputRef.current.focus()
     }
   }
+
   const handleAddImage = (e: FormEvent) => {
     e.preventDefault()
     setImage((prev) => [...prev, imageValue])
@@ -91,33 +140,24 @@ const AddProductPage = () => {
   const handleSave = async () => {
     setLoad(true)
     const body = {
+      code_product: id,
       name: productName,
-      category,
-      desc: description,
-      price,
-      stock,
-      variants,
+      price: price,
       image,
+      category,
+      variants,
+      details,
       spec,
       information,
-      sold: 0,
-      rate: 0,
-      minOrder,
-      details
+      stock: 10,
+      minOrder: 1,
+      desc,
     }
 
     try {
-      await axios.post('/api/product/post', body)
-      setProductName('')
-      setCategory('')
-      setDescription('')
-      setPrice(0)
-      setStock(0)
-      setVariants([])
-      setImage([])
-      setSpesification('')
-      setInformation('')
+      await axios.put(`/api/product/update/${id}`, body)
       setLoad(false)
+      location.href = '/admin/products'
     } catch (error) {
       setLoad(false)
       console.log(error)
@@ -171,7 +211,7 @@ const AddProductPage = () => {
               <div>
                 <Label htmlFor="productName">Category<span className="text-red-500">*</span></Label>
                 <div className='w-full mt-2'>
-                  <Select onValueChange={setCategory}>
+                  <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
@@ -190,7 +230,7 @@ const AddProductPage = () => {
               <div>
                 <Label htmlFor="description">Description</Label>
                 <div className='w-full mt-2'>
-                  <Textarea placeholder='Enter your short descriptions here...' value={description} onChange={(e) => setDescription(e.target.value)} />
+                  <Textarea placeholder='Enter your short descriptions here...' value={desc} onChange={(e) => setDesc(e.target.value)} />
                 </div>
               </div>
               <div>
@@ -262,7 +302,7 @@ const AddProductPage = () => {
                 {variationInputView ? (
                   <div className='flex flex-col gap-2 w-full mt-2 mb-4'>
                     <ul className='inline-flex flex-wrap gap-5'>
-                      {variants.map((item, index) => (
+                      {variants.length > 0 && variants.map((item, index) => (
                         <li key={index} className='relative cursor-default text-muted-foreground group text-sm'>
                           <Badge>{item}</Badge>
                           <button onClick={() => handleDeleteVariants(index)} className='p-0.5 absolute rounded-md -top-2 bg-destructive hidden group-hover:block -right-3'>
@@ -338,4 +378,4 @@ const AddProductPage = () => {
   );
 }
 
-export default AddProductPage;
+export default EditProductPage;
