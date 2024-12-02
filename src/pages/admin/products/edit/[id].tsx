@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
-import { FolderPlusIcon, ImagePlusIcon, X } from 'lucide-react';
+import { FolderPlusIcon, ImagePlusIcon, X, LoaderCircle} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import axios from 'axios';
 import {
@@ -16,7 +16,8 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { Textarea } from '@/components/ui/textarea';
-
+import { useToast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import { ProductDataType } from '@/types/productDataTypes';
 
@@ -42,6 +43,7 @@ const EditProductPage = () => {
   const variationInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [load, setLoad] = useState(false)
+  const { toast } = useToast()
 
   const router = useRouter();
   const { id } = router.query;
@@ -156,8 +158,18 @@ const EditProductPage = () => {
 
     try {
       await axios.put(`/api/product/update/${id}`, body)
-      setLoad(false)
-      location.href = '/admin/products'
+      toast({
+        className: cn(
+          'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
+        ),
+        title: 'Alerts!',
+        description: 'Save succeded!',
+        variant: 'default',
+      })
+      setTimeout(() => {
+        setLoad(false)
+        location.href = '/admin/products'
+      }, 1000)
     } catch (error) {
       setLoad(false)
       console.log(error)
@@ -165,6 +177,15 @@ const EditProductPage = () => {
   }
 
   return (
+    <>
+      {load ? (
+        <div className='w-full flex h-[85vh] justify-center items-center'>
+          <div className="flex items-center gap-3">
+            <h1 className='text-xl'>Loading</h1>
+            <LoaderCircle className='animate-spin' />
+          </div>
+        </div>
+      ) : (
     <div className="container mx-auto p-4 space-y-6">
       <div className='space-y-2'>
         <h1 className="text-4xl font-bold">Edit Products</h1>
@@ -375,6 +396,8 @@ const EditProductPage = () => {
 
       </div>
     </div>
+      )}
+      </>
   );
 }
 

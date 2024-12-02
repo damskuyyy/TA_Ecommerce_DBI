@@ -13,10 +13,10 @@ const Discussion = () => {
         </div>
         <div className="w-full h-fit ">
           <div className="flex flex-col gap-5">
-            <h1 className="text-2xl font-bold mb-4 lg:text-5xl">
+            <h1 className="text-2xl font-bold mb-5 lg:text-5xl">
               Turn your dreams into reality!
             </h1>
-            <p className="lg:text-lg mb-5 text-gray-600">
+            <p className="lg:text-lg mb-10 text-gray-600">
             Share your project ideas with us, and our team will be ready to discuss and help bring them to life.
             </p>
           </div>

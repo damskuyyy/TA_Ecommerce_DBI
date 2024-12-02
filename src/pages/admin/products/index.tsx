@@ -28,10 +28,13 @@ import Head from 'next/head';
 import { Eye, FolderPlusIcon, PenBox, Trash } from 'lucide-react';
 import ModalZoomImage from '@/components/ui/modals/zoomImage';
 import { Skeleton } from '@/components/ui/skeleton';
+import DeleteDialog from '@/components/ui/deleteModal';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState<ProductDataType[]>([]);
   const [load, setLoad] = useState(true);
+  const [modalDeleteView, setModalDeleteView] = useState(false)
+  const [updated, setUpdated] = useState(false)
 
   const getProductsData = async () => {
     try {
@@ -46,12 +49,15 @@ const ProductsPage = () => {
 
   useEffect(() => {
     getProductsData();
-  }, []);
+  }, [updated]);
 
-  const handleDelete = async (id:string) => {
+  const handleDelete = async (id: string) => {
+    setLoad(true)
     try {
       await axios.delete(`/api/product/delete/${id}`)
-      alert('delete success')
+      setLoad(false)
+      setModalDeleteView(false)
+      setUpdated(!updated)
     } catch (error) {
       alert('error')
       console.log(error)
@@ -136,15 +142,40 @@ const ProductsPage = () => {
                     </TableCell>
                     <TableCell className="px-6 py-2">
                       <div className='flex items-center gap-2'>
-                        <Link href={`/admin/products/details/${item.code_product}`}>
-                          <Button variant={'secondary'} size={'sm'}><Eye /></Button>
-                        </Link>
-                        <Link href={`/admin/products/edit/${item.code_product}`}>
-                          <Button variant={'secondary'} size={'sm'}><PenBox /></Button>
-                        </Link>
-                        <Button onClick={()=>{
-                          handleDelete(item.id)
-                        }} variant={'destructive'} size={'sm'}><Trash /></Button>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Link href={`/admin/products/details/${item.code_product}`}>
+                                <Button variant={'secondary'} size={'sm'}><Eye /></Button>
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent className='bg-foreground text-background p-3 rounded-md'>
+                              <p>Details</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Link href={`/admin/products/edit/${item.code_product}`}>
+                                <Button variant={'secondary'} size={'sm'}><PenBox /></Button>
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent className='bg-foreground text-background p-3 rounded-md'>
+                              <p>Update</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <DeleteDialog onDelete={() => handleDelete(item.id)} load={load} modalDeleteView={modalDeleteView} setModalDeleteView={setModalDeleteView} />
+                            </TooltipTrigger>
+                            <TooltipContent className='bg-foreground text-background p-3 rounded-md'>
+                              <p>Delete</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </TableCell>
                   </TableRow>
