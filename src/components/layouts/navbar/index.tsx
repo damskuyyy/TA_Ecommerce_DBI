@@ -372,7 +372,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
                     <DropdownMenuItem>
                       <Link onClick={() => setDropdownOpen(false)} className="font-medium hover:opacity-80 w-full" href={'/user/profile#cart'}>Cart</Link>
                     </DropdownMenuItem>
-                    <DropdownMenu>
+                    {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">
                     <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -391,7 +391,7 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
                     System
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
 
                     <div className="flex justify-center items-center p-2 py-1 w-full">
                       <Alerts ok={async () => {
