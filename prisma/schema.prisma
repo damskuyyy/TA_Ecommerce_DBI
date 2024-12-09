@@ -24,7 +24,6 @@ model User {
   image         String  @default("https://cactusthemes.com/blog/wp-content/uploads/2018/01/tt_avatar_small.jpg")
   type          String  @default("crendetials")
   orderId       String[]  @db.ObjectId @default([])
-  orders        Orders  @relation(fields: [orderId], references: [id])
 }
 
 model Product {
@@ -70,12 +69,15 @@ model Discusses {
 
 model Orders {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @default("") 
   products  Json[]   @default([]) // id qty
-  status    Json[]   @default([]) // payment order progress dueDate
+  status    String   @default("process") // payment order progress dueDate
   userId    String[] @db.ObjectId @default([])
   xenditId  String
   orderDate DateTime @default(now())
-  Users      User[]
+  paymentProof String @default("")
+  paymentMethods String @default("")
+  cust     Json[]   @default([]) 
 }
 
 model Admin {
