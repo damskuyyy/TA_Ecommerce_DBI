@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -31,80 +31,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import OrderDataTypes from "@/types/orderDataTypes";
-
-const orders: OrderDataTypes[] = [
-  {
-    id: "#25423",
-    products: [],
-    status: [],
-    userId: "#12345",
-    xenditId: "#09876",
-    orderDate: new Date(),
-    users: [],
-  },
-  {
-    id: "#25423",
-    products: [],
-    status: [],
-    userId: "#12345",
-    xenditId: "#09876",
-    orderDate: new Date(),
-    users: [],
-  },
-  {
-    id: "#25423",
-    products: [],
-    status: [],
-    userId: "#12345",
-    xenditId: "#09876",
-    orderDate: new Date(),
-    users: [],
-  },
-  {
-    id: "#25423",
-    products: [],
-    status: [],
-    userId: "#12345",
-    xenditId: "#09876",
-    orderDate: new Date(),
-    users: [],
-  },
-  {
-    id: "#25423",
-    products: [],
-    status: [],
-    userId: "#12345",
-    xenditId: "#09876",
-    orderDate: new Date(),
-    users: [],
-  },
-  {
-    id: "#25423",
-    products: [],
-    status: [],
-    userId: "#12345",
-    xenditId: "#09876",
-    orderDate: new Date(),
-    users: [],
-  },
-  {
-    id: "#25423",
-    products: [],
-    status: [],
-    userId: "#12345",
-    xenditId: "#09876",
-    orderDate: new Date(),
-    users: [],
-  },
-];
+import axios from "axios";
 
 const OrderTable: React.FC = () => {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
+  const [orders, setOrders] = useState<OrderDataTypes[]>([])
 
   const handleDateClick = () => {
     setShowCalendar(!showCalendar);
   };
+
+  const getOrderData = async () => {
+    try {
+      const resp = await axios('/api/order/get')
+      if (resp.status === 200) {
+        setOrders(resp.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getOrderData()
+  }, [])
 
   return (
     <div className="p-4 space-y-6">
@@ -193,47 +144,54 @@ const OrderTable: React.FC = () => {
                   User Id
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Xendit Id
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Order Date
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
+                  Payment Method
                 </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Payment Proof
+                </TableHead>
+
               </TableRow>
             </TableHeader>
             <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950">
-              {orders.map((order, idx) => (
+              {orders && orders.length > 0 && orders.map((order, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="px-6 py-4 whitespace-nowrap">
-                    {order.id}
+                    {order.orderId}
                   </TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">
-                    {order.products}
+                    {order.products[0].id}
                   </TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">
-                    {order.status}
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Completed"
+                        ? "bg-green-100 text-green-800"
+                        : order.status === "process"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-red-100 text-red-800"
+                        }`}
+                    >{order.status}</span>
+
                   </TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">
                     {order.userId}
                   </TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">
-                    {order.xenditId}
+                    {new Date(order.orderDate).toLocaleDateString()}
                   </TableCell>
+                  <TableCell className="px-6 capitalize py-4 whitespace-nowrap">
+                    {order.paymentMethods}
+                  </TableCell>
+                  <TableCell className="px-6 capitalize py-4 whitespace-nowrap">
+                    {order.paymentProof === '' ? '-' : (
+                      <img src={order.paymentProof} alt="" />
+                    )}</TableCell>
+
                   {/* <TableCell className="px-6 py-4 whitespace-nowrap">{new Date(order.orderDate)}</TableCell>
                   <TableCell className="px-6 py-4 whitespace-nowrap">{order.users}</TableCell> */}
-                  <TableCell className="px-6 py-4 whitespace-nowrap">
-                    {/* <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === "Completed"
-                          ? "bg-green-100 text-green-800"
-                          : order.status === "Processing"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                    > */}
-                    {order.status}
-                  </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>

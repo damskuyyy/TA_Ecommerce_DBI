@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, SetStateAction, Dispatch } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Dialog,
@@ -16,20 +16,32 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Image } from "lucide-react";
 import formattedPrice from "@/utils/formattedPrice";
+import generateInvoiceId from "@/utils/generateInvoiceId";
 
 // Komponen Modal
 const PaymentProofModal = ({
   isOpen,
   onClose,
+  image,
+  setImage,
+  handlePostOrder
 }: {
   isOpen: boolean;
   onClose: () => void;
+  image: File[],
+  setImage: Dispatch<SetStateAction<File[]>>,
+  handlePostOrder:  () => void
 }) => {
-  const [image, setImage] = useState<File | null>(null);
-
+  
+  
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles && acceptedFiles[0]) {
-      setImage(acceptedFiles[0]);
+      // Validasi tipe file
+      if (!acceptedFiles[0].type.startsWith('image/')) {
+        alert('Please upload an image file.');
+        return;
+      }
+      setImage(acceptedFiles);
     }
   }, []);
 
@@ -38,27 +50,7 @@ const PaymentProofModal = ({
     maxFiles: 1,
   });
 
-  const handleSubmit = async () => {
-    if (!image) {
-      alert("Please upload an image.");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("paymentProof", image);
-    try {
-      const response = await axios.post("/api/upload-payment-proof", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      if (response.status === 200) {
-        alert("Payment proof uploaded successfully!");
-        onClose();
-      }
-    } catch (error) {
-      console.error("Error uploading payment proof:", error);
-    }
-  };
+  
 
   if (!isOpen) return null;
 
@@ -78,8 +70,8 @@ const PaymentProofModal = ({
             <div className="mb-2">
               <Image />
             </div>
-            {image ? (
-              <p className="text-gray-500">{image.name}</p>
+            {image.length > 0 ? (
+              <p className="text-gray-500">{image[0].name}</p>
             ) : (
               <>
                 <p className="text-gray-500 mb-1">Attach File</p>
@@ -88,7 +80,10 @@ const PaymentProofModal = ({
             )}
           </div>
         </div>
-        <Button onClick={handleSubmit} className="w-full">
+        <Button onClick={() =>{
+          handlePostOrder()
+          onClose()
+        }} className="w-full">
           Submit
         </Button>
         <Button onClick={onClose} className="w-full mt-2" variant="secondary">
@@ -109,19 +104,20 @@ const ModalCheckout = ({
   const appFee = 0.002;
   const total = data.price + (fee + data.price * tax + data.price * appFee);
   const [load, setLoad] = useState(false);
-  const { status }: any = useSession();
+  const { data: session, status } : any = useSession();
   const { push } = useRouter();
   const [showCryptoModal, setShowCryptoModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [image, setImage] = useState<File[]>([]);
 
   const handleDebitCardPayment = async () => {
     if (status === "authenticated") {
-      const body = {
+      const bodyXendit = {
         amount: total,
-        description: `Payout for ${name} on the marketplace dbix.my.id`,
+        description: `Payout for ${data.name} on the marketplace dbix.my.id`,
         items: [
           {
-            name: name,
+            name: data.name,
             quantity: 1,
             price: data.price,
           },
@@ -129,13 +125,14 @@ const ModalCheckout = ({
       };
       setLoad(true);
       try {
-        const resp = await axios.post("/api/payment/create-checkout", body);
+        const resp = await axios.post("/api/payment/create-checkout", bodyXendit);
         if (resp.status === 200) {
-          const invoiceUrl = resp.data.data.invoiceUrl;
           setLoad(false);
           toast({
             description: "Creating invoice success!",
-          });
+          })
+
+          
 
           setTimeout(() => {
             window.open(resp.data.data.invoiceUrl);
@@ -166,6 +163,44 @@ const ModalCheckout = ({
       }, 1500);
     }
   };
+
+
+  const handlePostOrder = async () => {
+    const convertFileToBase64 = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+    };  
+    if (image && image[0]) {
+      try {
+        // Konversi file menjadi Base64
+        const base64Image = await convertFileToBase64(image[0]);
+  
+        const bodyOrder = {
+          orderId: `CARD-${generateInvoiceId()}`,
+          products: [{ id: data.code_product, qty: 1 }],
+          userId: [String(session?.user.id)],
+          paymentProof: base64Image, // Kirim Base64 image
+          paymentMethods: paymentMethod,
+        };
+  
+        await axios.post('/api/order/post', bodyOrder);
+  
+        alert('Order berhasil dikirim!');
+      } catch (error) {
+        console.error(error);
+        alert('Terjadi kesalahan saat mengirim order.');
+      }
+    } else {
+      alert('Please provide an image!');
+    }
+  };
+  
+
+  
 
   return (
     <Dialog>
@@ -252,6 +287,9 @@ const ModalCheckout = ({
           <PaymentProofModal
             isOpen={isModalOpen}
             onClose={() => setModalOpen(false)}
+            image={image}
+            setImage={setImage}
+            handlePostOrder={handlePostOrder}
           />
         </DialogDescription>
       </DialogContent>

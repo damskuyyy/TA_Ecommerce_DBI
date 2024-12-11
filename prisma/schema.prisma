@@ -73,11 +73,9 @@ model Orders {
   products  Json[]   @default([]) // id qty
   status    String   @default("process") // payment order progress dueDate
   userId    String[] @db.ObjectId @default([])
-  xenditId  String
   orderDate DateTime @default(now())
   paymentProof String @default("")
   paymentMethods String @default("")
-  cust     Json[]   @default([]) 
 }
 
 model Admin {

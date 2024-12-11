@@ -1,13 +1,16 @@
 import { UserDataType } from "./userDataTypes";
 
 interface OrderDataTypes {
-  id: string;
-  products: [];
-  status: [];
-  userId: string;
-  xenditId: string;
-  orderDate: Date;
-  users: UserDataType[];
+  orderId: string,
+  products: [{
+    id: string,
+    qty: number
+  }],
+  status: string,
+  userId: string,
+  orderDate: Date
+  paymentProof: string,
+  paymentMethods: string
 }
 
 export default OrderDataTypes;
