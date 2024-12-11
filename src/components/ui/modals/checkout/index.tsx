@@ -70,9 +70,8 @@ const PaymentProofModal = ({
         </h2>
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${
-            isDragActive ? "border-blue-500" : "border-gray-300"
-          }`}
+          className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${isDragActive ? "border-blue-500" : "border-gray-300"
+            }`}
         >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center">
@@ -101,23 +100,19 @@ const PaymentProofModal = ({
 };
 
 const ModalCheckout = ({
-  name,
-  desc,
-  image,
-  price,
-  variants,
-}: ProductDataType) => {
-  const { id } = useRouter().query;
+  data
+}: { data: ProductDataType }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const { toast } = useToast();
-  const fee = price && price * 0.004;
+  const fee = data.price && data.price * 0.004;
   const tax = 0.05;
   const appFee = 0.002;
-  const total = price + (fee + price * tax + price * appFee);
+  const total = data.price + (fee + data.price * tax + data.price * appFee);
   const [load, setLoad] = useState(false);
   const { status }: any = useSession();
   const { push } = useRouter();
-  const [showCryptoModal, setShowCryptoModal] = useState(false); 
+  const [showCryptoModal, setShowCryptoModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   const handleDebitCardPayment = async () => {
     if (status === "authenticated") {
@@ -128,7 +123,7 @@ const ModalCheckout = ({
           {
             name: name,
             quantity: 1,
-            price: price,
+            price: data.price,
           },
         ],
       };
@@ -183,8 +178,8 @@ const ModalCheckout = ({
         <DialogHeader className="w-1/2">
           <DialogTitle>
             <img
-              src={image[0]}
-              alt={name}
+              src={data.image[0]}
+              alt={data.name}
               className="w-full h-[26rem] object-cover rounded-md"
             />
           </DialogTitle>
@@ -193,14 +188,14 @@ const ModalCheckout = ({
           <h1 className="">Transaction confirmation</h1>
           <div className="flex w-full flex-col gap-1">
             <h1 className="text-black font-bold text-xl first-letter:uppercase">
-              {name}
+              {data.name}
             </h1>
             <p className="font-medium capitalize text-gray-500">
               Variant :{" "}
-              <span className="text-zinc-950 font-bold">{variants[0]}</span>
+              <span className="text-zinc-950 font-bold">{data.variants[0]}</span>
             </p>
           </div>
-          <p>{desc}</p>
+          <p>{data.desc}</p>
           <div className="flex flex-col gap-5">
             <div className="pb-2 border-b w-full justify-between flex">
               <h1 className="text-sm">Transaction fee :</h1>
@@ -209,13 +204,13 @@ const ModalCheckout = ({
             <div className="pb-2 border-b w-full justify-between flex">
               <h1 className="text-sm">TAX :</h1>
               <p className="text-sm">
-                {tax * 100}% ({formattedPrice.toIDR(tax * price)})
+                {tax * 100}% ({formattedPrice.toIDR(tax * data.price)})
               </p>
             </div>
             <div className="pb-2 border-b w-full justify-between flex">
               <h1 className="text-sm">Application fee :</h1>
               <p className="text-sm">
-                {appFee * 100}% ({formattedPrice.toIDR(appFee * price)})
+                {appFee * 100}% ({formattedPrice.toIDR(appFee * data.price)})
               </p>
             </div>
             <div className="pb-2 border-b w-full justify-between flex">
@@ -231,14 +226,20 @@ const ModalCheckout = ({
                 <Button
                   size={"sm"}
                   className="w-full"
-                  onClick={() => setShowCryptoModal(true)}
+                  onClick={() => {
+                    setShowCryptoModal(true)
+                    setPaymentMethod('wallet')
+                  }}
                 >
                   Crypto currency
                 </Button>
                 <Button
                   size={"sm"}
                   className="w-full"
-                  onClick={handleDebitCardPayment}
+                  onClick={() =>{
+                    handleDebitCardPayment()
+                    setPaymentMethod('card')
+                  }}
                 >
                   {load
                     ? "Creating Invoice...."

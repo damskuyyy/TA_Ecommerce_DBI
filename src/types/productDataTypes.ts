@@ -3,7 +3,7 @@ import { ReviewsDataTypes } from "./reviewDataTypes";
 import { DiscussionDataType } from "./discussionDataTypes";
 
 export interface ProductDataType {
-  id: string,
+  id?: string,
   code_product?: string,
   name: string,
   desc: string,

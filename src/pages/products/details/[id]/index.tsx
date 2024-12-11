@@ -1,18 +1,7 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, } from "@/components/ui/card";
 import { ProductDataType } from "@/types/productDataTypes";
-import {
-  MinusIcon,
-  Pencil2Icon,
-  PlusIcon,
-  StarFilledIcon,
-  StarIcon,
-} from "@radix-ui/react-icons";
+import { MinusIcon, Pencil2Icon, PlusIcon, StarFilledIcon, StarIcon, } from "@radix-ui/react-icons";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -33,64 +22,47 @@ import { cn } from "@/lib/utils";
 import formattedPrice from "@/utils/formattedPrice";
 import relativeTime from "@/utils/relativeTime";
 
-const ModalCheckout = dynamic(() => import("@/components/ui/modals/checkout"), {
+const ModalCheckout = dynamic(() => import("@/components/ui/modals/checkout"), { //mengimpor dua komponen secra dinamis
   ssr: false,
 });
 const ModalAddReview = dynamic(
   () => import("@/components/ui/modals/addReview"),
-  { ssr: false }
+  { ssr: false } //opsi ssr = komponen hanya dimuat disisi klien, mencegah potensi masalah saat ssr
 );
 
-const Details = ({
-  items,
-  setItems,
+const Details = ({ //komponen menerima 2 properti
+  items, // array yang menyimpan daftar item dalam keranjang
+  setItems, // fungsi untuk memperbarui daftar item dalam keranjang
 }: {
   items: ItemDataType[];
-  setItems: Dispatch<SetStateAction<ItemDataType[]>>;
+  setItems: Dispatch<SetStateAction<ItemDataType[]>>; //menggunakan tipe data TypeScript
 }) => {
-  const { id } = useRouter().query;
-  const { data: session, status }: any = useSession();
-  const [product, setProduct] = useState<ProductDataType>({
-    code_product: "",
-    name: "",
-    price: 0,
-    image: [],
-    category: "",
-    variants: [""],
-    details: "",
-    spec: "",
-    information: "",
-    sold: 0,
-    rate: 0,
-    reviews: [],
-    discusses: [],
-    stock: 0,
-    minOrder: 0,
-    desc: "",
-  });
-  const [variant, setVariant] = useState("");
-  const [qty, setQty] = useState(1);
-  const [isReply, setIsReply] = useState(false);
-  const replyRefs = useRef<HTMLFormElement>(null);
-  const [load, setLoad] = useState(false);
-  const hasReviews = product?.reviews && product.reviews.length > 0;
-  const hasDiscuss = product?.discusses && product.discusses.length > 0;
-  const [notesView, setNotesView] = useState(false);
-  const [notes, setNotes] = useState("");
-  const [notesDone, setNotesDone] = useState(false);
-  const notesRef = useRef<HTMLTextAreaElement>(null);
-  const [discussView, setDiscussView] = useState(false);
+  const { id } = useRouter().query; //deklarasi state, mengambil parameter id dari url menggunakan userouter untuk menentukan produk yg sedang dilihat
+  const { data: session, status }: any = useSession(); //mengambil data sesi pengguna (login)
+  const [product, setProduct] = useState<ProductDataType>({} as ProductDataType); //menyimpan data produk dari api
+  const [variant, setVariant] = useState(""); //menyimpan varian produk yang dipilih
+  const [qty, setQty] = useState(1); //mengelola jumlah produk yg ingin ditambahkan ke keranjang, default 1
+  const [isReply, setIsReply] = useState(false); //status untuk menampilkan/menghilangkan balasan
+  const replyRefs = useRef<HTMLFormElement>(null); //referensi dom untuk elemen form balasan
+  const [load, setLoad] = useState(false); //loading data
+  const hasReviews = product?.reviews && product.reviews.length > 0; 
+  const hasDiscuss = product?.discusses && product.discusses.length > 0; 
+  const [notesView, setNotesView] = useState(false); //status untuk buka/tutup modal catatan
+  const [notes, setNotes] = useState(""); //menyimpan catatan yg ditambahkan pengguna
+  const [notesDone, setNotesDone] = useState(false); //menandai apakah catatan telah diisi
+  const notesRef = useRef<HTMLTextAreaElement>(null); //referensi dom untuk elemen teks area catetan
+  const [discussView, setDiscussView] = useState(false); //mirip dengan catatan tapi untuk diskusi
   const [discuss, setDiscuss] = useState("");
   const [discussDone, setDiscussDone] = useState(false);
   const discussRef = useRef<HTMLTextAreaElement>(null);
-  const { toast } = useToast();
-  const [updated, setUpdated] = useState(false);
+  const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
+  const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
 
   const handleQtyPlus = () => {
-    setQty(qty + 1);
+    setQty(qty + 1); //meningkatkan atau mengurangi jumlah produk
   };
   const handleQtyMinus = () => {
-    setQty(qty - 1);
+    setQty(qty - 1); //memastikan kuantitas tidak kurang dari 1
     if (qty <= 1) {
       setQty(1);
     }
@@ -102,21 +74,21 @@ const Details = ({
       if (replyRefs.current) {
         replyRefs.current.scrollIntoView();
       }
-    }, 10);
+    }, 10); //buka/tutup form balsan
   };
 
   const handleViewNotes = () => {
-    setNotesView(true);
+    setNotesView(true); //membuka modal catatan
   };
   const handleCloseNotes = () => {
-    setNotesView(false);
+    setNotesView(false); //menutup modal
   };
   const handleDoneNotes = () => {
     setNotesView(false);
     if (notesRef.current) {
       setNotes(notesRef.current.value);
       notesRef.current.value = notes;
-    }
+    } //menyimpan catatan yang ditulis
   };
 
   useEffect(() => {
@@ -125,19 +97,20 @@ const Details = ({
     } else {
       setNotesDone(true);
     }
-  }, [notes]);
+  }, [notes]); //memastikan status notesdone diperbarui berdasarkan isi catetan
 
   const handleViewDiscuss = () => {
     setDiscussView(!discussView);
-  };
+  }; //buka/tutup tampilan diskusi
 
   const getData = async () => {
     setLoad(true);
     if (id) {
       try {
-        const resp = await axios(`/api/product/get?code=${String(id)}`);
+        const resp = await axios(`/api/product/get?code=${String(id)}`); //menggunakan axios untuk mengambil data produk berdasarkan id 
         setProduct(resp.data);
-        setLoad(false);
+        console.log(resp)
+        setLoad(false); //status setload digunakan untuk menandai data yang sedang diambil
       } catch (error) {
         setLoad(false);
         console.log(error);
@@ -147,16 +120,16 @@ const Details = ({
 
   useEffect(() => {
     getData();
-  }, [id, updated]);
+  }, [id, updated]); //memanggil fungsi getdata setiap kali id atau updated berubah
 
   useEffect(() => {
     if (product.variants) {
       setVariant(product?.variants?.[0]);
     }
-  }, [product.variants]);
+  }, [product.variants]); //menyimpan varian pertama produk saat data produk sudah diambil
 
   const calculateSubtotal = (price: number) => {
-    return price * qty;
+    return price * qty; //menghitung subtotal harga berdasarkan harga per unit dikalikan jumlah produk
   };
 
   const handlePushItems = () => {
@@ -172,7 +145,7 @@ const Details = ({
             description:
               "You have added into cart 😒! If you wanna update quantity, please update it on cart icon in the top right😁",
             variant: "destructive",
-          });
+          }); //jika produk sdh berada di keranjang, akan ditampilkan notifikasi menggunkan toast ini
           return prevItems;
         } else {
           toast({
@@ -180,7 +153,7 @@ const Details = ({
             description:
               'The product has been added in your cart. Click "Cart icon" on top right to view your recent cart 😊',
             variant: "default",
-          });
+          }); // menmabhakan produk ke keranjang jika pengguna sudah login
           return [
             ...prevItems,
             { code_product: String(id), qty, variant, notes },
@@ -196,9 +169,9 @@ const Details = ({
         variant: "destructive",
         description:
           "You're not logged in 😑. Please login first to product into cart!",
-      });
+      }); //jika belum login, pengguna dieri peringatan untuk login menggunakan toast ini
     }
-  };
+  }; 
 
   return (
     <>
@@ -212,7 +185,7 @@ const Details = ({
               <div className="w-full grid lg:grid-cols-2 grid-cols-1 gap-8">
                 <div className="w-full">
                   <div className="w-full sticky top-24">
-                    <Gallery image={product.image} />
+                    <Gallery image={product.image && product.image} />
                   </div>
                 </div>
                 <div className="w-full flex flex-col gap-3">
@@ -498,18 +471,18 @@ const Details = ({
                       <Textarea placeholder="write your discuss here..."></Textarea>
                       <Button onClick={() => setDiscussView(false)}>Done</Button>
                     </div>
-                  ): (
+                  ) : (
                     <div className="flex flex-col gap-0 w-full items-center">
-                    <div className="w-1/4">
-                      <Lottie animationData={notfoundData} />
+                      <div className="w-1/4">
+                        <Lottie animationData={notfoundData} />
+                      </div>
+                      <h1 className="text-gray-500 text-center">
+                        Unfortunately, our product has no discussions. <br />{" "}
+                        Click "Add discussion" button below to add discussion into
+                        our product 😊
+                      </h1>
+                      <Button onClick={handleViewDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
                     </div>
-                    <h1 className="text-gray-500 text-center">
-                      Unfortunately, our product has no discussions. <br />{" "}
-                      Click "Add discussion" button below to add discussion into
-                      our product 😊
-                    </h1>
-                    <Button onClick={handleViewDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
-                  </div>
                   )
                 )}
               </div>
@@ -543,11 +516,10 @@ const Details = ({
                         <MinusIcon />
                       </Button>
                       <p
-                        className={`font-medium ${
-                          items.some((item) => item.code_product === String(id))
-                            ? "text-muted-foreground"
-                            : ""
-                        }`}
+                        className={`font-medium ${items.some((item) => item.code_product === String(id))
+                          ? "text-muted-foreground"
+                          : ""
+                          }`}
                       >
                         {qty}
                       </p>
@@ -565,11 +537,10 @@ const Details = ({
                     <p className="font-medium capitalize flex items-center gap-1 justify-center ">
                       remaining stock :{" "}
                       <span
-                        className={`${
-                          product.stock && product.stock >= 99
-                            ? "underline"
-                            : ""
-                        }`}
+                        className={`${product.stock && product.stock >= 99
+                          ? "underline"
+                          : ""
+                          }`}
                       >
                         {product.stock && product?.stock >= 99
                           ? "Unlimited"
@@ -656,22 +627,13 @@ const Details = ({
                     >
                       Add to cart
                     </Button>
-                    <ModalCheckout
-                      name={product.name}
-                      price={calculateSubtotal(product.price)}
-                      image={product.image}
-                      variants={[variant]}
-                      spec={""}
-                      information={""}
-                      sold={0}
-                      rate={0}
-                      reviews={[]}
-                      discusses={[]}
-                      stock={0}
-                      minOrder={0}
-                      desc={product.desc}
-                      category={""}
-                    />
+                    {load ? (
+                      ''
+                    ) : (
+                      <ModalCheckout
+                        data={product}
+                      />
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter></CardFooter>
