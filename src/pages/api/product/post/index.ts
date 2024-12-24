@@ -21,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           sold,
           rate,
           stock,
-          minOrder
+          minOrder,
         }
       })
       res.status(200).send('data created succesfully!')

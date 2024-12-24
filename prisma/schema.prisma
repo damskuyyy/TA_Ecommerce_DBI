@@ -31,6 +31,7 @@ model Product {
   code_product String      @unique
   name         String?
   price        Float
+  desc         String
   image        String[]
   category     String
   variants     String[]
@@ -43,7 +44,6 @@ model Product {
   discusses    Discusses[]
   stock        Int
   minOrder     Int
-  desc         String
 }
 
 model Review {
