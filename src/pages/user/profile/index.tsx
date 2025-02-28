@@ -17,15 +17,7 @@ import {
   ShoppingBasketIcon,
   Trash2Icon,
   SquareArrowOutUpRightIcon,
-  MoonIcon,
-  Sun,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import noData from "../../../../public/animations/nodata.json";
@@ -221,7 +213,7 @@ const ProfilePage = ({
   return (
     <>
       <Head>
-        <title>DBIX | User - {String(user.name)}</title>
+        <title>DBI | User - {String(user.name)}</title>
       </Head>
       <Tabs className="max-w-screen-lg mx-auto pb-8" defaultValue="myProfile">
         <ScrollArea className="w-full max-w-screen-xl lg:pb-0 pb-4 h-fit">

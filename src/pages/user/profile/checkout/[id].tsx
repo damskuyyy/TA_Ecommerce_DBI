@@ -140,11 +140,11 @@ const CheckoutPage = ({ products }: { products: ProductDataType[] }) => {
   return (
     <>
       <Head>
-        <title>DBIX | user - checkout</title>
+        <title>DBI | user - checkout</title>
       </Head>
       <div className="w-full space-y-8 pb-16">
         <div className="space-y-2">
-          <h1 className="text-4xl font-semibold">DBIX Checkout</h1>
+          <h1 className="text-4xl font-semibold">DBI Checkout</h1>
           <p className="">Checkout for {String(id).replace("-", " ")}</p>
         </div>
         <ScrollArea>

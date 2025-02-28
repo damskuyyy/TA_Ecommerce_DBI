@@ -161,7 +161,7 @@ const AddProductPage = () => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+                  <BreadcrumbLink href="/admin">DBI</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>

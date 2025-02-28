@@ -81,7 +81,7 @@ const ProductsPage = () => {
   return (
     <>
       <Head>
-        <title>DBIX | Admin - products</title>
+        <title>DBI | Admin - products</title>
       </Head>
       <div className="w-full lg:p-4 p-1 space-y-6">
         <div className='space-y-2'>
@@ -97,7 +97,7 @@ const ProductsPage = () => {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+                <BreadcrumbLink href="/admin">DBI</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>

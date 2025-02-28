@@ -76,7 +76,7 @@ const AdminLoginPage = () => {
   return (
     <>
       <Head>
-        <title>DBIX | admin-authentication</title>
+        <title>DBI | admin-authentication</title>
       </Head>
       <div className="w-full flex h-screen justify-center items-center flex-col gap-5 lg:px-0 px-6">
         <Card className="mx-auto max-w-lg w-full p-5 flex-col gap-5 flex">

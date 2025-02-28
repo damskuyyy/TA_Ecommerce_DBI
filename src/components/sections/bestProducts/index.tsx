@@ -50,7 +50,6 @@ const BestProducts = () => {
     getData()
   }, [category])
 
-
   return (
     <div className="w-full flex flex-col gap-8 lg:mt-5" id="products">
       <div className="flex flex-col gap-3 items-center">

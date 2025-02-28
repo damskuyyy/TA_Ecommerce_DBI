@@ -93,7 +93,7 @@ export default function LoginForm() {
   return (
     <>
       <Head>
-        <title>DBIX | Login</title>
+        <title>DBI | Login</title>
       </Head>
       <div className="w-full flex h-screen justify-center items-center flex-col gap-5 lg:px-0 px-6">
         <Card className="mx-auto max-w-lg w-full p-5 flex-col gap-5 flex">

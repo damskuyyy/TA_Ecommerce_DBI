@@ -35,7 +35,7 @@ const Appbar = () => {
               onClick={() => setSheetView(false)}
             >
               <Package2 className="h-6 w-6" />
-              <span className="">E-Shop DBIX</span>
+              <span className="">E-Shop DBI</span>
             </Link>
             <Link
               href="/admin/dashboard"

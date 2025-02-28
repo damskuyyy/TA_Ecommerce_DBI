@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, } from "@/components/ui/card";
 import { ProductDataType } from "@/types/productDataTypes";
-import { MinusIcon, Pencil2Icon, PlusIcon, StarFilledIcon, StarIcon, } from "@radix-ui/react-icons";
+import { MinusIcon, Pencil2Icon, PlusIcon, StarIcon, } from "@radix-ui/react-icons";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -12,15 +12,12 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
-import Lottie from "lottie-react";
-import notfoundData from "../../../../../public/animations/notfound.json";
 import { Textarea } from "@/components/ui/textarea";
-import { PenBoxIcon, Star, StarsIcon, Trash2Icon } from "lucide-react";
+import { Link, PenBoxIcon, Star, StarsIcon, Trash2Icon } from "lucide-react";
 import { ItemDataType } from "@/types/itemsDataTypes";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import formattedPrice from "@/utils/formattedPrice";
-import relativeTime from "@/utils/relativeTime";
 
 const ModalCheckout = dynamic(() => import("@/components/ui/modals/checkout"), { //mengimpor dua komponen secra dinamis
   ssr: false,
@@ -176,7 +173,7 @@ const Details = ({ //komponen menerima 2 properti
   return (
     <>
       <Head>
-        <title>DBIX - Item Details</title>
+        <title>DBI - Item Details</title>
       </Head>
       {product && (
         <div className="flex w-full justify-between lg:flex-row flex-col gap-10">
@@ -339,7 +336,16 @@ const Details = ({ //komponen menerima 2 properti
                   </Tabs>
                 </div>
               </div>
+              
               <div className="flex flex-col gap-5 w-full">
+                <h1 className="text-4xl font-semibold">Discussion</h1>
+                <hr />
+                <Button onClick={handleViewDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
+              </div>
+            </div>
+          </div>
+
+{/* <div className="flex flex-col gap-5 w-full">
                 <h1 className="text-4xl font-semibold">Reviews</h1>
                 <hr />
                 {load ? (
@@ -411,84 +417,7 @@ const Details = ({ //komponen menerima 2 properti
                     <ModalAddReview updated={updated} setUpdated={setUpdated} />
                   </div>
                 )}
-              </div>
-              <div className="flex flex-col gap-5 w-full">
-                <h1 className="text-4xl font-semibold">Discussion</h1>
-                <hr />
-                {load ? (
-                  <Card>
-                    <CardHeader>
-                      <div className="flex flex-col gap-1 w-full">
-                        <div className="items-center flex gap-2">
-                          <Skeleton className="w-5 h-5 rounded-full" />
-                          <Skeleton className=" w-1/3 h-2" />
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-3">
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                    </CardContent>
-                  </Card>
-                ) : hasDiscuss && !load ? (
-                  product.reviews?.map((item, index) => (
-                    <Card key={index}>
-                      <CardHeader>
-                        <div className="flex items-center gap-2">
-                          <StarIcon color="orange" fill="#f59e0b" />
-                          <StarIcon color="orange" fill="#f59e0b" />
-                          <StarIcon color="orange" fill="#f59e0b" />
-                          <StarIcon color="orange" fill="#f59e0b" />
-                          <StarIcon color="orange" fill="#f59e0b" />
-                        </div>
-                        <div className="flex flex-col gap-1 w-full">
-                          <div className="items-center flex gap-2">
-                            <img
-                              src="https://yt3.googleusercontent.com/-CFTJHU7fEWb7BYEb6Jh9gm1EpetvVGQqtof0Rbh-VQRIznYYKJxCaqv_9HeBcmJmIsp2vOO9JU=s900-c-k-c0x00ffffff-no-rj"
-                              alt=""
-                              className="w-8 h-8 object-cover rounded-full"
-                            />
-                            <p className="font-semibold">Sarah Vallent</p>
-                          </div>
-                          <p className="text-sm text-gray-500 font-medium">
-                            Variant : Pro
-                          </p>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p>lorem</p>
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  discussView ? (
-                    <div className="space-y-3">
-                      <Textarea placeholder="write your discuss here..."></Textarea>
-                      <Button onClick={() => setDiscussView(false)}>Done</Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-0 w-full items-center">
-                      <div className="w-1/4">
-                        <Lottie animationData={notfoundData} />
-                      </div>
-                      <h1 className="text-gray-500 text-center">
-                        Unfortunately, our product has no discussions. <br />{" "}
-                        Click "Add discussion" button below to add discussion into
-                        our product 😊
-                      </h1>
-                      <Button onClick={handleViewDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-          </div>
-
+              </div> */}
           <div className="lg:w-[30%] w-full sticky top-24 h-full">
             <div className="w-full">
               <Card className="flex flex-col">

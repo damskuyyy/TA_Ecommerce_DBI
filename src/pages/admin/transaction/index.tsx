@@ -19,7 +19,7 @@ const Transaction: React.FC = () => {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
+              <BreadcrumbLink href="/admin">DBI</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -69,25 +69,19 @@ const Transaction: React.FC = () => {
             <TableHeader className="bg-gray-50 dark:bg-gray-900">
               <TableRow>
               <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Id
+                  Order Id
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Product
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   User Id
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Xendit Id
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Order Date
                 </TableHead>
                 <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
+                  Total
                 </TableHead>
               </TableRow>
             </TableHeader>

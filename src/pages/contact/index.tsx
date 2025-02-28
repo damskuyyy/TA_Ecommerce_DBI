@@ -1,6 +1,3 @@
-import EmailIcon from "@/components/ui/icons/email";
-import LocationIcon from "@/components/ui/icons/location";
-import TeleponeIcon from "@/components/ui/icons/telepon";
 import React from "react";
 
 const Contact = () => {

@@ -10,7 +10,7 @@ const Hero = () => {
       <div className="lg:w-1/2 w-full flex justify-start items-center">
         <div className="flex flex-col gap-6 py-10">
           <h1 className="text-6xl font-semibold lg:text-left text-center lg:py-4">
-            E-Shop DBIX
+            E-Shop DBI
           </h1>
           <p className="lg:text-left text-center leading-normal text-gray-500 ">
             PT. Digital Blockchain Indonesia focuses on developing state-of-the-art mobile applications for iOS and Android 
