@@ -96,8 +96,8 @@ const Details = ({ //komponen menerima 2 properti
     }
   }, [notes]); //memastikan status notesdone diperbarui berdasarkan isi catetan
 
-  const handleViewDiscuss = () => {
-    setDiscussView(!discussView);
+  const handleAddDiscuss = () => {
+    // router
   }; //buka/tutup tampilan diskusi
 
   const getData = async () => {
@@ -340,7 +340,7 @@ const Details = ({ //komponen menerima 2 properti
               <div className="flex flex-col gap-5 w-full">
                 <h1 className="text-4xl font-semibold">Discussion</h1>
                 <hr />
-                <Button onClick={handleViewDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
+                <Button onClick={handleAddDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
               </div>
             </div>
           </div>

@@ -1,77 +1,93 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Upload } from "lucide-react";
-import React, { useState } from "react";
+import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/utils/prisma";
 
-const messages = [
-    { sender: "user", text: "Lorem ipsum dolor sit amet consectetur. Quisque a mauris neque" },
-    { sender: "user", text: "Lorem ipsum dolor sit amet consectetur. Quisque a mauris neque commodo convallis nisi suspendisse pellentesque." },
-    { sender: "admin", text: "Semper nisi orci integer rhoncus purus massa interdum sed. Magna dui purus neque tempus dolor. Turpis quis maecenas" },
-    { sender: "admin", text: "Semper nisi orci integer rhoncus purus massa interdum." },
-];
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
-export default function Discuss() {
-    const [chat, setChat] = useState(""); // State management
+  try {
+    const { id } = req.query;
 
-    const sendMessage = () => { // State chat
-        if (chat.trim() !== "") {
-            console.log("Message Sent:", chat);
-            setChat("");
-        }
-    };
+    if (id) {
+      // Jika ada `id`, ambil 1 diskusi berdasarkan ID
+      if (typeof id !== "string") {
+        return res.status(400).json({ error: "Invalid discussion ID" });
+      }
 
-    return (
-        <main className="flex-1 flex flex-col bg-gray-200 p-2 gap-1">
-            {/* Header */}
-            <Card className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <p className="font-semibold">Nama Produk</p>
-                        <p className="text-sm text-gray-500">Variant</p>
-                    </div>
-                </div>
-            </Card>
+      const discussion = await prisma.discuss.findFirst({
+        where: { id },
+        include: {
+          product: { select: { id: true, name: true, variants: true } },
+          user: { select: { id: true, name: true, email: true } },
+          admin: { select: { id: true, username: true } },
+          messages: {
+            orderBy: { createdAt: "desc" }, // Urutkan pesan dari terbaru ke terlama
+            select: {
+              id: true,
+              content: true,
+              createdAt: true,
+              user: { select: { name: true } },
+              admin: { select: { username: true } },
+            },
+          },
+        },
+      });
 
-            {/* Chat Messages */}
-            <ScrollArea className="flex-1 overflow-y-auto p-2">
-                {messages.map((msg, index) => (
-                    <div key={index} className={`flex ${msg.sender === "admin" ? "justify-end" : "justify-start"} mb-2`}>
-                        <div className={`max-w-md px-4 py-2 rounded-lg ${msg.sender === "admin" ? "bg-gray-900 text-white rounded-br-none" : "bg-white text-gray-900 rounded-bl-none"}`}>
-                            {msg.text}
-                        </div>
-                    </div>
-                ))}
-            </ScrollArea>
+      if (!discussion) {
+        return res.status(404).json({ error: "Discussion not found" });
+      }
 
-            {/* Input Chat */}
-            <div className="flex items-center bg-transparent">
-                <div className="h-14 flex gap-2 rounded-full flex-1 items-center bg-white px-6">
-                    <Input
-                        type="text"
-                        placeholder="Tulis Pesan"
-                        className="flex-1 p-2 border-none focus:ring-0 focus:outline-none rounded-full shadow-none"
-                        value={chat}
-                        onChange={(e) => setChat(e.target.value)}
-                    />
-                    <Input id="uploadfile" type="file" className="hidden" />
+      // Format pesan agar sender menjadi satu field
+      const formattedDiscussion = {
+        ...discussion,
+        messages: discussion.messages.map((msg) => ({
+          id: msg.id,
+          content: msg.content,
+          createdAt: msg.createdAt,
+          sender: msg.user ? msg.user.name : msg.admin?.username || "Unknown",
+        })),
+      };
 
-                    {/* Label untuk Upload */}
-                    <Label htmlFor="uploadfile">
-                        <Upload className="h-5 w-5 cursor-pointer" />
-                    </Label>
-                </div>
-                <Button className="ml-2 p-2 bg-gray-900 text-white rounded-full" onClick={sendMessage}>
-                    <Send className="h-5 w-5" />
-                </Button>
-            </div>
-        </main>
-    );
+      return res.status(200).json(formattedDiscussion);
+    } else {
+      // Jika tidak ada `id`, ambil semua diskusi
+      const discussions = await prisma.discuss.findMany({
+        include: {
+          product: { select: { id: true, name: true, variants: true } },
+          user: { select: { id: true, name: true, email: true } },
+          admin: { select: { id: true, username: true } },
+          messages: {
+            orderBy: { createdAt: "desc" }, // Urutkan pesan dari terbaru ke terlama
+            select: {
+              id: true,
+              content: true,
+              createdAt: true,
+              user: { select: { name: true } },
+              admin: { select: { username: true } },
+            },
+          },
+        },
+      });
+
+      // Format semua diskusi agar sender menjadi satu field
+      const formattedDiscussions = discussions.map((discussion) => ({
+        ...discussion,
+        messages: discussion.messages.map((msg) => ({
+          id: msg.id,
+          content: msg.content,
+          createdAt: msg.createdAt,
+          sender: msg.user ? msg.user.name : msg.admin?.username || "Unknown",
+        })),
+      }));
+
+      return res.status(200).json(formattedDiscussions);
+    }
+  } catch (error) {
+    console.error("Error fetching discussions:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 }

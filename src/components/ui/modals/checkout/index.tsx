@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, SetStateAction, Dispatch } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  SetStateAction,
+  Dispatch,
+} from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Dialog,
@@ -24,21 +30,19 @@ const PaymentProofModal = ({
   onClose,
   image,
   setImage,
-  handlePostOrder
+  handlePostOrder,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  image: File[],
-  setImage: Dispatch<SetStateAction<File[]>>,
-  handlePostOrder:  () => void
+  image: File[];
+  setImage: Dispatch<SetStateAction<File[]>>;
+  handlePostOrder: () => void;
 }) => {
-  
-  
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles && acceptedFiles[0]) {
       // Validasi tipe file
-      if (!acceptedFiles[0].type.startsWith('image/')) {
-        alert('Please upload an image file.');
+      if (!acceptedFiles[0].type.startsWith("image/")) {
+        alert("Please upload an image file.");
         return;
       }
       setImage(acceptedFiles);
@@ -50,8 +54,6 @@ const PaymentProofModal = ({
     maxFiles: 1,
   });
 
-  
-
   if (!isOpen) return null;
 
   return (
@@ -62,8 +64,9 @@ const PaymentProofModal = ({
         </h2>
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${isDragActive ? "border-blue-500" : "border-gray-300"
-            }`}
+          className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${
+            isDragActive ? "border-blue-500" : "border-gray-300"
+          }`}
         >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center">
@@ -80,10 +83,13 @@ const PaymentProofModal = ({
             )}
           </div>
         </div>
-        <Button onClick={() =>{
-          handlePostOrder()
-          onClose()
-        }} className="w-full">
+        <Button
+          onClick={() => {
+            handlePostOrder();
+            onClose();
+          }}
+          className="w-full"
+        >
           Submit
         </Button>
         <Button onClick={onClose} className="w-full mt-2" variant="secondary">
@@ -94,9 +100,7 @@ const PaymentProofModal = ({
   );
 };
 
-const ModalCheckout = ({
-  data
-}: { data: ProductDataType }) => {
+const ModalCheckout = ({ data }: { data: ProductDataType }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const { toast } = useToast();
   const fee = data.price && data.price * 0.004;
@@ -104,7 +108,7 @@ const ModalCheckout = ({
   const appFee = 0.002;
   const total = data.price + (fee + data.price * tax + data.price * appFee);
   const [load, setLoad] = useState(false);
-  const { data: session, status } : any = useSession();
+  const { data: session, status }: any = useSession();
   const { push } = useRouter();
   const [showCryptoModal, setShowCryptoModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -125,14 +129,15 @@ const ModalCheckout = ({
       };
       setLoad(true);
       try {
-        const resp = await axios.post("/api/payment/create-checkout", bodyXendit);
+        const resp = await axios.post(
+          "/api/payment/create-checkout",
+          bodyXendit
+        );
         if (resp.status === 200) {
           setLoad(false);
           toast({
             description: "Creating invoice success!",
-          })
-
-          
+          });
 
           setTimeout(() => {
             window.open(resp.data.data.invoiceUrl);
@@ -164,7 +169,6 @@ const ModalCheckout = ({
     }
   };
 
-
   const handlePostOrder = async () => {
     const convertFileToBase64 = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {
@@ -173,12 +177,12 @@ const ModalCheckout = ({
         reader.onerror = (error) => reject(error);
         reader.readAsDataURL(file);
       });
-    };  
+    };
     if (image && image[0]) {
       try {
         // Konversi file menjadi Base64
         const base64Image = await convertFileToBase64(image[0]);
-  
+
         const bodyOrder = {
           orderId: `CARD-${generateInvoiceId()}`,
           products: [{ id: data.code_product, qty: 1 }],
@@ -186,21 +190,18 @@ const ModalCheckout = ({
           paymentProof: base64Image, // Kirim Base64 image
           paymentMethods: paymentMethod,
         };
-  
-        await axios.post('/api/order/post', bodyOrder);
-  
-        alert('Order berhasil dikirim!');
+
+        await axios.post("/api/order/post", bodyOrder);
+
+        alert("Order berhasil dikirim!");
       } catch (error) {
         console.error(error);
-        alert('Terjadi kesalahan saat mengirim order.');
+        alert("Terjadi kesalahan saat mengirim order.");
       }
     } else {
-      alert('Please provide an image!');
+      alert("Please provide an image!");
     }
   };
-  
-
-  
 
   return (
     <Dialog>
@@ -213,7 +214,7 @@ const ModalCheckout = ({
         <DialogHeader className="w-1/2">
           <DialogTitle>
             <img
-              src={data.image[0]}
+              src={data.image.length > 0 ? data.image[0] : ""}
               alt={data.name}
               className="w-full h-[26rem] object-cover rounded-md"
             />
@@ -227,7 +228,9 @@ const ModalCheckout = ({
             </h1>
             <p className="font-medium capitalize text-gray-500">
               Variant :{" "}
-              <span className="text-zinc-950 font-bold">{data.variants[0]}</span>
+              <span className="text-zinc-950 font-bold">
+                {data.variants.length > 0 ? data.variants[0] : ""}
+              </span>
             </p>
           </div>
           <p>{data.desc}</p>
@@ -262,8 +265,8 @@ const ModalCheckout = ({
                   size={"sm"}
                   className="w-full"
                   onClick={() => {
-                    setShowCryptoModal(true)
-                    setPaymentMethod('wallet')
+                    setShowCryptoModal(true);
+                    setPaymentMethod("wallet");
                   }}
                 >
                   Crypto currency
@@ -271,9 +274,9 @@ const ModalCheckout = ({
                 <Button
                   size={"sm"}
                   className="w-full"
-                  onClick={() =>{
-                    handleDebitCardPayment()
-                    setPaymentMethod('card')
+                  onClick={() => {
+                    handleDebitCardPayment();
+                    setPaymentMethod("card");
                   }}
                 >
                   {load
