@@ -213,11 +213,15 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
       <DialogContent className="flex justify-between gap-5">
         <DialogHeader className="w-1/2">
           <DialogTitle>
-            <img
-              src={data.image.length > 0 ? data.image[0] : ""}
-              alt={data.name}
-              className="w-full h-[26rem] object-cover rounded-md"
-            />
+            {data ? (
+              <img
+                src={data?.image ? data.image[0] : ""}
+                alt={data?.name}
+                className="w-full h-[26rem] object-cover rounded-md"
+              />
+            ) : (
+              <p>loading...</p>
+            )}
           </DialogTitle>
         </DialogHeader>
         <DialogDescription className="w-1/2 flex flex-col gap-5">
@@ -229,7 +233,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
             <p className="font-medium capitalize text-gray-500">
               Variant :{" "}
               <span className="text-zinc-950 font-bold">
-                {data.variants.length > 0 ? data.variants[0] : ""}
+                {data.variants ? data.variants[0] : ""}
               </span>
             </p>
           </div>

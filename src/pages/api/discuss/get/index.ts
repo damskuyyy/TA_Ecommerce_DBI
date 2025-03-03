@@ -10,19 +10,28 @@ export default async function handler(
   }
 
   try {
+    const { userId, productId } = req.query;
+
+    // Buat filter dinamis berdasarkan query yang tersedia
+    const filter: any = {};
+    if (userId) filter.userId = userId;
+    if (productId) filter.productId = productId;
+
     const discussions = await prisma.discuss.findMany({
+      where: filter, // Terapkan filter
       include: {
-        product: { select: { id: true, name: true, variants: true } },
+        product: {
+          select: { id: true, name: true, variants: true, image: true },
+        },
         user: { select: { id: true, name: true, email: true } },
         admin: { select: { id: true, username: true } },
         messages: {
-          orderBy: { createdAt: "desc" }, // Urutkan pesan dari terbaru ke terlama
-          take: 1,
+          // orderBy: { createdAt: "desc" }, // Urutkan pesan dari terbaru ke terlama
           select: {
             id: true,
             content: true,
             createdAt: true,
-            user: { select: { name: true } },
+            user: { select: { id: true } },
             admin: { select: { username: true } },
           },
         },

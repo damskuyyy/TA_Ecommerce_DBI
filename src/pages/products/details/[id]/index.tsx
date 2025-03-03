@@ -1,7 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { ProductDataType } from "@/types/productDataTypes";
-import { MinusIcon, Pencil2Icon, PlusIcon, StarIcon, } from "@radix-ui/react-icons";
+import {
+  MinusIcon,
+  Pencil2Icon,
+  PlusIcon,
+  StarIcon,
+} from "@radix-ui/react-icons";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -18,8 +28,10 @@ import { ItemDataType } from "@/types/itemsDataTypes";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import formattedPrice from "@/utils/formattedPrice";
+import { useProductStore } from "@/store/product";
 
-const ModalCheckout = dynamic(() => import("@/components/ui/modals/checkout"), { //mengimpor dua komponen secra dinamis
+const ModalCheckout = dynamic(() => import("@/components/ui/modals/checkout"), {
+  //mengimpor dua komponen secra dinamis
   ssr: false,
 });
 const ModalAddReview = dynamic(
@@ -27,7 +39,8 @@ const ModalAddReview = dynamic(
   { ssr: false } //opsi ssr = komponen hanya dimuat disisi klien, mencegah potensi masalah saat ssr
 );
 
-const Details = ({ //komponen menerima 2 properti
+const Details = ({
+  //komponen menerima 2 properti
   items, // array yang menyimpan daftar item dalam keranjang
   setItems, // fungsi untuk memperbarui daftar item dalam keranjang
 }: {
@@ -36,14 +49,16 @@ const Details = ({ //komponen menerima 2 properti
 }) => {
   const { id } = useRouter().query; //deklarasi state, mengambil parameter id dari url menggunakan userouter untuk menentukan produk yg sedang dilihat
   const { data: session, status }: any = useSession(); //mengambil data sesi pengguna (login)
-  const [product, setProduct] = useState<ProductDataType>({} as ProductDataType); //menyimpan data produk dari api
+  const [product, setProduct] = useState<ProductDataType>(
+    {} as ProductDataType
+  ); //menyimpan data produk dari api
   const [variant, setVariant] = useState(""); //menyimpan varian produk yang dipilih
   const [qty, setQty] = useState(1); //mengelola jumlah produk yg ingin ditambahkan ke keranjang, default 1
   const [isReply, setIsReply] = useState(false); //status untuk menampilkan/menghilangkan balasan
   const replyRefs = useRef<HTMLFormElement>(null); //referensi dom untuk elemen form balasan
   const [load, setLoad] = useState(false); //loading data
-  const hasReviews = product?.reviews && product.reviews.length > 0; 
-  const hasDiscuss = product?.discusses && product.discusses.length > 0; 
+  const hasReviews = product?.reviews && product.reviews.length > 0;
+  const hasDiscuss = product?.discusses && product.discusses.length > 0;
   const [notesView, setNotesView] = useState(false); //status untuk buka/tutup modal catatan
   const [notes, setNotes] = useState(""); //menyimpan catatan yg ditambahkan pengguna
   const [notesDone, setNotesDone] = useState(false); //menandai apakah catatan telah diisi
@@ -54,6 +69,9 @@ const Details = ({ //komponen menerima 2 properti
   const discussRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
   const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
+
+  const router = useRouter();
+  const { updateProduct } = useProductStore();
 
   const handleQtyPlus = () => {
     setQty(qty + 1); //meningkatkan atau mengurangi jumlah produk
@@ -97,16 +115,17 @@ const Details = ({ //komponen menerima 2 properti
   }, [notes]); //memastikan status notesdone diperbarui berdasarkan isi catetan
 
   const handleAddDiscuss = () => {
-    // router
+    const updatedProduct = { ...product, variant: variant };
+    updateProduct(updatedProduct);
+    router.push("/discuss");
   }; //buka/tutup tampilan diskusi
 
   const getData = async () => {
     setLoad(true);
     if (id) {
       try {
-        const resp = await axios(`/api/product/get?code=${String(id)}`); //menggunakan axios untuk mengambil data produk berdasarkan id 
+        const resp = await axios(`/api/product/get?code=${String(id)}`); //menggunakan axios untuk mengambil data produk berdasarkan id
         setProduct(resp.data);
-        console.log(resp)
         setLoad(false); //status setload digunakan untuk menandai data yang sedang diambil
       } catch (error) {
         setLoad(false);
@@ -168,7 +187,7 @@ const Details = ({ //komponen menerima 2 properti
           "You're not logged in 😑. Please login first to product into cart!",
       }); //jika belum login, pengguna dieri peringatan untuk login menggunakan toast ini
     }
-  }; 
+  };
 
   return (
     <>
@@ -336,88 +355,17 @@ const Details = ({ //komponen menerima 2 properti
                   </Tabs>
                 </div>
               </div>
-              
+
               <div className="flex flex-col gap-5 w-full">
                 <h1 className="text-4xl font-semibold">Discussion</h1>
                 <hr />
-                <Button onClick={handleAddDiscuss} size={"sm"} className="mt-2">Add discussion</Button>
+                <Button onClick={handleAddDiscuss} size={"sm"} className="mt-2">
+                  Add discussion
+                </Button>
               </div>
             </div>
           </div>
 
-{/* <div className="flex flex-col gap-5 w-full">
-                <h1 className="text-4xl font-semibold">Reviews</h1>
-                <hr />
-                {load ? (
-                  <Card>
-                    <CardHeader>
-                      <div className="flex flex-col gap-1 w-full">
-                        <div className="items-center flex gap-2">
-                          <Skeleton className="w-5 h-5 rounded-full" />
-                          <Skeleton className=" w-1/3 h-2" />
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-3">
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                      <Skeleton className=" w-full h-2" />
-                    </CardContent>
-                  </Card>
-                ) : hasReviews && !load ? (
-                  product.reviews?.map((item, index) => (
-                    <Card key={index}>
-                      <CardHeader>
-                        <div className="flex flex-col gap-1 w-full rounded-md bg-muted p-3">
-                          <div className="items-center flex gap-2">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-8 h-8 object-cover rounded-full"
-                            />
-                            <div className="space-y-0">
-                              <p className="font-semibold">{item.name}</p>
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <span className="text-xs ">
-                                  {relativeTime.fromNow(item.createdAt)}
-                                </span>
-                                <span className="font-bold">-</span>
-                                <span className="items-center text-xs flex gap-0">
-                                  {item.rate}
-                                  <Star size={12} />
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: String(item.context),
-                          }}
-                        />
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  <div className="flex flex-col gap-0 w-full items-center">
-                    <div className="w-1/4">
-                      <Lottie animationData={notfoundData} />
-                    </div>
-                    <h1 className="text-gray-500 text-center">
-                      Unfortunately, our product has no reviews. <br /> Click
-                      "Add review" button below to add review into our product
-                      😊
-                    </h1>
-                    <ModalAddReview updated={updated} setUpdated={setUpdated} />
-                  </div>
-                )}
-              </div> */}
           <div className="lg:w-[30%] w-full sticky top-24 h-full">
             <div className="w-full">
               <Card className="flex flex-col">
@@ -445,10 +393,11 @@ const Details = ({ //komponen menerima 2 properti
                         <MinusIcon />
                       </Button>
                       <p
-                        className={`font-medium ${items.some((item) => item.code_product === String(id))
-                          ? "text-muted-foreground"
-                          : ""
-                          }`}
+                        className={`font-medium ${
+                          items.some((item) => item.code_product === String(id))
+                            ? "text-muted-foreground"
+                            : ""
+                        }`}
                       >
                         {qty}
                       </p>
@@ -466,10 +415,11 @@ const Details = ({ //komponen menerima 2 properti
                     <p className="font-medium capitalize flex items-center gap-1 justify-center ">
                       remaining stock :{" "}
                       <span
-                        className={`${product.stock && product.stock >= 99
-                          ? "underline"
-                          : ""
-                          }`}
+                        className={`${
+                          product.stock && product.stock >= 99
+                            ? "underline"
+                            : ""
+                        }`}
                       >
                         {product.stock && product?.stock >= 99
                           ? "Unlimited"
@@ -556,13 +506,7 @@ const Details = ({ //komponen menerima 2 properti
                     >
                       Add to cart
                     </Button>
-                    {load ? (
-                      ''
-                    ) : (
-                      <ModalCheckout
-                        data={product}
-                      />
-                    )}
+                    {load ? "" : <ModalCheckout data={product} />}
                   </div>
                 </CardContent>
                 <CardFooter></CardFooter>
