@@ -30,6 +30,7 @@ export default async function handler(
           select: {
             id: true,
             content: true,
+            image: true,
             createdAt: true,
             user: { select: { id: true } },
             admin: { select: { username: true } },

@@ -19,9 +19,9 @@ export default async function handler(
   }
 
   try {
-    const { discussionId, adminId, content } = req.body;
+    const { discussionId, adminId, content, image } = req.body;
 
-    if (!discussionId || !adminId || !content.trim()) {
+    if (!discussionId || !adminId || (!content && !image)) {
       return res.status(400).json({ error: "Missing or invalid fields" });
     }
 
@@ -46,7 +46,8 @@ export default async function handler(
     // 💬 Tambahkan balasan admin ke dalam diskusi
     const newMessage = await prisma.message.create({
       data: {
-        content,
+        content: content || null,
+        image: image || null,
         admin: { connect: { id: adminId } },
         discuss: { connect: { id: discussionId } },
       },

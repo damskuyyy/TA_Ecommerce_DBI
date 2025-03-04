@@ -38,6 +38,7 @@ export default function handler(
         console.log(`User disconnected: ${socket.id}`);
       });
     });
+
   }
 
   res.end();
