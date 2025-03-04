@@ -10,7 +10,9 @@ import { useSession } from "next-auth/react";
 import { useProductStore } from "@/store/product";
 import io from "socket.io-client";
 
-const socket = io({ path: "/api/socket" });
+const socket = io("https://7191-103-124-138-188.ngrok-free.app/", {
+  path: "/api/socket",
+});
 
 interface User {
   id: string;
@@ -116,10 +118,15 @@ export default function Discuss() {
         return;
       }
 
+      const newMessage = {
+        ...response.data.messages[response.data.messages.length - 1],
+        user: { id: session.user.id, name: session.user.name },
+      };
+
       // ✅ Tunggu 500ms agar "Mengirim..." terlihat sebelum fetch data
       setTimeout(() => {
         fetchDiscussion(); // Refresh diskusi setelah pesan berhasil dikirim
-        socket.emit("chatMessage", response.data.messages);
+        socket.emit("chatMessage", newMessage);
       }, 500);
     } catch (error) {
       console.error("Gagal mengirim pesan:", error);

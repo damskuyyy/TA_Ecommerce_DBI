@@ -8,7 +8,9 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import io from "socket.io-client";
 
-const socket = io({ path: "/api/socket" });
+const socket = io("https://7191-103-124-138-188.ngrok-free.app/", {
+  path: "/api/socket",
+});
 
 interface User {
   id: string;
@@ -64,12 +66,24 @@ export default function Discussion() {
   }, []);
 
   useEffect(() => {
+    if (selectedDiscussion) {
+      const updatedDiscussion = discussion.find(
+        (d) => d.id === selectedDiscussion.id
+      );
+      if (updatedDiscussion) {
+        setSelectedDiscussion(updatedDiscussion);
+      }
+    }
+  }, [discussion]);
+
+  useEffect(() => {
     const handleNewMessage = (newMessage: Message) => {
       setSelectedDiscussion((prev) => {
         if (!prev || prev.id !== newMessage.discussionId) return prev;
         if (prev.messages.some((msg) => msg.id === newMessage.id)) return prev;
         return { ...prev, messages: [...prev.messages, newMessage] };
       });
+      fetchDiscussion();
     };
 
     socket.on("chatMessage", handleNewMessage);
