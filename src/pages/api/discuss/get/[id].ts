@@ -40,6 +40,7 @@ export default async function handler(
               createdAt: true,
               user: { select: { name: true } },
               admin: { select: { username: true } },
+              image: true,
             },
             orderBy: { createdAt: "asc" },
           },
@@ -60,6 +61,7 @@ export default async function handler(
             select: {
               id: true,
               content: true,
+              image: true,
               createdAt: true,
               user: { select: { name: true } },
               admin: { select: { username: true } },
@@ -80,6 +82,7 @@ export default async function handler(
       messages: discussion.messages.map((msg) => ({
         id: msg.id,
         content: msg.content,
+        image: msg.image,
         createdAt: msg.createdAt,
         sender: msg.user ? msg.user.name : msg.admin?.username || "Admin",
       })),

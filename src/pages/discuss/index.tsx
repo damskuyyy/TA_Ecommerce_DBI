@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
+import { Send, Upload } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useProductStore } from "@/store/product";
 import io from "socket.io-client";
+import UploadImageDiscuss from "../../components/ui/modals/uploadImageDiscuss/index";
 
 const socket = io("https://7191-103-124-138-188.ngrok-free.app/", {
   path: "/api/socket",
@@ -21,8 +22,9 @@ interface User {
 
 interface Message {
   id: string;
-  content: string;
+  content: string | undefined;
   user: User;
+  image: string | undefined;
   createdAt: string;
   status?: "pending" | "sent" | "failed";
 }
@@ -41,6 +43,8 @@ export default function Discuss() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [message, setMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [image, setImage] = useState<File[]>([]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,18 +85,30 @@ export default function Discuss() {
   }, []);
 
   const sendMessage = async () => {
-    if (!message.trim() || !selectedProduct || !session?.user?.id) return;
+    if (
+      (!message.trim() && image.length === 0) ||
+      !selectedProduct ||
+      !session?.user?.id
+    )
+      return;
 
     const tempId = `temp-${Date.now()}`;
+    let base64Image: string | null = null;
+
+    if (image.length > 0) {
+      base64Image = await convertFileToBase64(image[0]);
+    }
+
     const tempMessage: Message = {
       id: tempId,
-      content: message,
+      content: message || (base64Image ? "[Gambar]" : undefined),
+      image: base64Image || undefined,
       user: { id: session.user.id, name: session.user.name || "Anda" },
       createdAt: new Date().toISOString(),
       status: "pending",
     };
 
-    // ✅ Tambahkan pesan sementara agar langsung muncul di UI
+    // ✅ Tambahkan pesan sementara ke UI agar tidak menunggu API
     setSelectedDiscussion((prev) => {
       if (!prev) {
         return {
@@ -105,12 +121,14 @@ export default function Discuss() {
     });
 
     setMessage(""); // Kosongkan input setelah mengirim
+    setImage([]); // Kosongkan gambar setelah mengirim
 
     try {
       const response = await axios.post("/api/discuss/post/user", {
         userId: session.user.id,
         productId: selectedProduct.id,
-        content: message,
+        content: message.trim() ? message : null,
+        image: base64Image ? base64Image : null,
       });
 
       if (!response.data) {
@@ -123,7 +141,7 @@ export default function Discuss() {
         user: { id: session.user.id, name: session.user.name },
       };
 
-      // ✅ Tunggu 500ms agar "Mengirim..." terlihat sebelum fetch data
+      // ✅ Tunggu 500ms agar "Mengirim..." terlihat sebelum refresh data
       setTimeout(() => {
         fetchDiscussion(); // Refresh diskusi setelah pesan berhasil dikirim
         socket.emit("chatMessage", newMessage);
@@ -142,6 +160,22 @@ export default function Discuss() {
         };
       });
     }
+  };
+
+  const handleUploadImage = async () => {
+    if (image.length > 0) {
+      setIsModalOpen(false);
+      sendMessage();
+    }
+  };
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
   };
 
   return (
@@ -172,30 +206,39 @@ export default function Discuss() {
 
       <ScrollArea className="flex-1 overflow-y-auto p-2">
         {selectedDiscussion?.messages?.length ? (
-          selectedDiscussion.messages
-            .filter((msg) => msg.content)
-            .map((msg) => {
-              const isUserMessage = msg?.user?.id === session?.user?.id;
+          selectedDiscussion.messages.map((msg) => {
+            const isUserMessage = msg?.user?.id === session?.user?.id;
 
-              return (
+            return (
+              <div
+                key={msg.id}
+                className={`flex ${
+                  isUserMessage ? "justify-end" : "justify-start"
+                } mb-2`}
+              >
                 <div
-                  key={msg.id}
-                  className={`flex ${
-                    isUserMessage ? "justify-end" : "justify-start"
-                  } mb-2`}
+                  className={`max-w-md px-4 py-2 rounded-lg ${
+                    isUserMessage
+                      ? "bg-gray-900 text-white rounded-br-none"
+                      : "bg-white text-gray-900 rounded-bl-none"
+                  }`}
                 >
-                  <div
-                    className={`max-w-md px-4 py-2 rounded-lg ${
-                      isUserMessage
-                        ? "bg-gray-900 text-white rounded-br-none"
-                        : "bg-white text-gray-900 rounded-bl-none"
-                    }`}
-                  >
-                    {msg.status === "pending" ? "Mengirim..." : msg.content}
-                  </div>
+                  {msg.image ? (
+                    <img
+                      src={msg.image}
+                      alt="Gambar"
+                      className="rounded-lg max-w-xs"
+                    />
+                  ) : (
+                    msg.content
+                  )}
+                  {msg.status === "pending" && (
+                    <p className="text-sm text-gray-400">Mengirim...</p>
+                  )}
                 </div>
-              );
-            })
+              </div>
+            );
+          })
         ) : (
           <p className="text-center text-gray-500">Belum ada pesan.</p>
         )}
@@ -213,6 +256,16 @@ export default function Discuss() {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           />
+          <Button
+            size={"sm"}
+            variant={"ghost"}
+            className="bg-transparent"
+            onClick={() => {
+              setIsModalOpen(true);
+            }}
+          >
+            <Upload />
+          </Button>
         </div>
         <Button
           className="ml-2 p-3 bg-gray-900 text-white rounded-full"
@@ -221,6 +274,14 @@ export default function Discuss() {
           <Send className="h-5 w-5" />
         </Button>
       </div>
+
+      <UploadImageDiscuss
+        handleUploadImage={handleUploadImage}
+        image={image}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        setImage={setImage}
+      />
     </main>
   );
 }

@@ -74,11 +74,12 @@ model Discuss {
 
 model Message {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  content    String
+  content    String?
   discuss    Discuss @relation(fields: [discussId], references: [id])
   discussId  String
   user       User?    @relation(fields: [userId], references: [id])
   userId     String?
+  image      String?
   admin      Admin?   @relation(fields: [adminId], references: [id])
   adminId    String?
   createdAt  DateTime @default(now())

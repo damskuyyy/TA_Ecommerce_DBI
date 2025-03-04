@@ -10,10 +10,17 @@ export default async function handler(
   }
 
   try {
-    const { productId, userId, content } = req.body;
+    const { productId, userId, content, image } = req.body;
 
-    if (!productId || !userId || !content) {
+    // ✅ **Validasi: Pastikan hanya salah satu dari content atau imageUrl yang dikirim**
+    if (!productId || !userId || (!content && !image)) {
       return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    if (content && image) {
+      return res.status(400).json({
+        error: "Only one of content or imageUrl can be provided per message",
+      });
     }
 
     // 🔍 **Cek apakah diskusi sudah ada untuk produk & pengguna ini**
@@ -30,7 +37,8 @@ export default async function handler(
           user: { connect: { id: userId } },
           messages: {
             create: {
-              content,
+              content: content || null,
+              image: image || null,
               user: { connect: { id: userId } },
             },
           },
@@ -41,7 +49,8 @@ export default async function handler(
       // 💬 **Jika diskusi sudah ada, tambahkan pesan baru**
       const newMessage = await prisma.message.create({
         data: {
-          content,
+          content: content || null,
+          image: image || null,
           user: { connect: { id: userId } },
           discuss: { connect: { id: discussion.id } },
         },
