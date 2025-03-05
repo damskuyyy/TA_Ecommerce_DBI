@@ -26,7 +26,6 @@ export default async function handler(
         user: { select: { id: true, name: true, email: true } },
         admin: { select: { id: true, username: true } },
         messages: {
-          // orderBy: { createdAt: "desc" }, // Urutkan pesan dari terbaru ke terlama
           select: {
             id: true,
             content: true,

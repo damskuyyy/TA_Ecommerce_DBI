@@ -11,7 +11,7 @@ import { useProductStore } from "@/store/product";
 import io from "socket.io-client";
 import UploadImageDiscuss from "../../components/ui/modals/uploadImageDiscuss/index";
 
-const socket = io("https://7191-103-124-138-188.ngrok-free.app/", {
+const socket = io({
   path: "/api/socket",
 });
 
@@ -179,7 +179,7 @@ export default function Discuss() {
   };
 
   return (
-    <main className="flex-1 flex flex-col bg-gray-200 p-2 gap-1">
+    <main className="flex-1 flex h-screen flex-col bg-gray-200 p-2 gap-1">
       {selectedProduct ? (
         <Card className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -204,11 +204,12 @@ export default function Discuss() {
         <p>Loading...</p>
       )}
 
-      <ScrollArea className="flex-1 overflow-y-auto p-2">
-        {selectedDiscussion?.messages?.length ? (
+      <ScrollArea className="flex-1 overflow-y-auto p-2 scroll">
+        {loading ? (
+          <p className="text-center text-gray-500">Loading...</p>
+        ) : selectedDiscussion?.messages?.length ? (
           selectedDiscussion.messages.map((msg) => {
             const isUserMessage = msg?.user?.id === session?.user?.id;
-
             return (
               <div
                 key={msg.id}
@@ -251,7 +252,7 @@ export default function Discuss() {
           <Input
             type="text"
             placeholder="Tulis Pesan..."
-            className="flex-1 border-none focus:ring-0 rounded-full text-gray-900"
+            className="flex-1 border-none focus-visible:ring-0 focus:ring-0 focus:outline-none focus:stroke-none rounded-full text-gray-900 shadow-none"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}

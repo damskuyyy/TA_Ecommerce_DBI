@@ -3,13 +3,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Upload } from "lucide-react";
+import { EllipsisVertical, Send, Upload } from "lucide-react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import io from "socket.io-client";
 import UploadImageDiscuss from "@/components/ui/modals/uploadImageDiscuss";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-const socket = io("https://7191-103-124-138-188.ngrok-free.app/", {
+const socket = io({
   path: "/api/socket",
 });
 
@@ -45,10 +52,10 @@ export default function Discussion() {
   const [discussion, setDiscussion] = useState<Discussion[]>([]);
   const [selectedDiscussion, setSelectedDiscussion] =
     useState<Discussion | null>(null);
-  const [sendingMessages, setSendingMessages] = useState<string[]>([]); // Track sending messages by ID
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [image, setImage] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -56,11 +63,14 @@ export default function Discussion() {
   }, [selectedDiscussion?.messages]);
 
   const fetchDiscussion = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(`/api/discuss/get`);
       setDiscussion(response.data);
     } catch (error) {
       console.error("Gagal mengambil diskusi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,6 +104,15 @@ export default function Discussion() {
     return () => socket.off("chatMessage", handleNewMessage);
   }, []);
 
+  const handleDeleteDiscussion = async (id: string) => {
+    try {
+      const resp = await axios.delete(`/api/discuss/delete/${id}`);
+      console.log("Berhasil menghapus diskusi: ", resp.data);
+    } catch (e) {
+      console.log("Gagal menghapus diskusi: ", e);
+    }
+  };
+
   const sendMessage = async () => {
     if (
       (!message.trim() && image.length === 0) ||
@@ -117,8 +136,6 @@ export default function Discussion() {
       createdAt: new Date().toISOString(),
       status: "pending",
     };
-
-    setSendingMessages((prev) => [...prev, tempId]); // Add the message ID to the sending list
 
     setSelectedDiscussion((prev) =>
       prev ? { ...prev, messages: [...prev.messages, tempMessage] } : prev
@@ -168,8 +185,6 @@ export default function Discussion() {
             }
           : prev
       );
-    } finally {
-      setSendingMessages((prev) => prev.filter((id) => id !== tempId)); // Remove message from sending list
     }
   };
 
@@ -194,30 +209,81 @@ export default function Discussion() {
       <h1 className="text-4xl font-bold">Discussions</h1>
       <div className="flex-1 flex border rounded-lg overflow-hidden">
         <aside className="w-1/4 bg-white p-4 border-r">
-          <ScrollArea className="space-y-2">
-            {discussion.map((d) => (
-              <div
-                key={d.id}
-                onClick={() => setSelectedDiscussion(d)}
-                className="p-2 rounded-lg cursor-pointer hover:bg-gray-200"
-              >
-                <p className="font-medium">{d.user.name}</p>
-                <p className="text-sm text-gray-500">
-                  {d.messages[d.messages.length - 1]?.content ||
-                    "Belum ada pesan"}
-                </p>
-              </div>
-            ))}
+          <ScrollArea className="space-y-2 overflow-y-auto ">
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : discussion.length > 0 ? (
+              discussion.map((d) => (
+                <div
+                  key={d.id}
+                  onClick={() => setSelectedDiscussion(d)}
+                  className={`p-2 ${
+                    selectedDiscussion?.id === d.id
+                      ? "bg-gray-900 text-white hover:bg-gray-900"
+                      : "text-gray-900"
+                  } rounded-lg cursor-pointer flex gap-2 items-center hover:bg-gray-200 mb-2`}
+                >
+                  <Avatar>
+                    <AvatarImage src={d.product.image[0]} />
+                    <AvatarFallback>{d.user.name}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="font-medium">{d.user.name}</p>
+                    <p className="text-sm">
+                      {d.messages[d.messages.length - 1]?.content
+                        ? d.messages[d.messages.length - 1]?.content
+                        : d.messages[d.messages.length - 1]?.image
+                        ? "Image"
+                        : "Belum ada pesan"}
+                    </p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost">
+                        <EllipsisVertical />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="py-2 px-1 bg-white w-40 text-gray-900 shadow-md"
+                    >
+                      <DropdownMenuItem
+                        onSelect={() => console.log("Delete clicked")}
+                      >
+                        <Button
+                          onClick={() => handleDeleteDiscussion(d.id)}
+                          variant={"ghost"}
+                          className="w-full hover:border-none hover:outline-none hover:ring-0"
+                        >
+                          Delete
+                        </Button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ))
+            ) : (
+              <p>Tidak ada pesan</p>
+            )}
           </ScrollArea>
         </aside>
 
         <main className="flex-1 flex flex-col bg-gray-200 p-2">
           {selectedDiscussion ? (
             <>
-              <Card className="p-4 flex items-center">
-                <p className="font-semibold">
-                  {selectedDiscussion.product.name}
-                </p>
+              <Card className="p-4 flex gap-2 items-center">
+                <Avatar>
+                  <AvatarImage src={selectedDiscussion?.product.image[0]} />
+                  <AvatarFallback>
+                    {selectedDiscussion.product.name}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold">
+                    {selectedDiscussion?.product.name}
+                  </p>
+                  <p>{selectedDiscussion?.product.variants}</p>
+                </div>
               </Card>
               <ScrollArea className="flex-1 overflow-y-auto p-2">
                 {selectedDiscussion.messages.map((msg) => (
@@ -238,6 +304,7 @@ export default function Discussion() {
                         <img
                           src={msg.image}
                           alt="Gambar"
+                          loading="lazy"
                           className="rounded-lg max-w-xs"
                         />
                       ) : (
@@ -246,7 +313,6 @@ export default function Discussion() {
                       {msg.status === "pending" && (
                         <p className="text-sm text-gray-400">Mengirim...</p>
                       )}
-                      {sendingMessages.includes(msg.id) && "Mengirim..."}
                     </div>
                   </div>
                 ))}
@@ -257,7 +323,7 @@ export default function Discussion() {
                   <Input
                     type="text"
                     placeholder="Tulis Pesan..."
-                    className="flex-1 border-none focus:ring-0 rounded-full text-gray-900"
+                    className="flex-1 border-none focus-visible:ring-0 focus:ring-0 focus:outline-none focus:stroke-none rounded-full text-gray-900 shadow-none"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
