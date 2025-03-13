@@ -26,6 +26,7 @@ model User {
   orderId       String[]  @db.ObjectId @default([])
   message       Message[]
   discuss       Discuss[]
+  contractDigital ContractDigital[]
 }
 
 model Product {
@@ -46,6 +47,7 @@ model Product {
   minOrder     Int
   desc         String
   discuss      Discuss[]
+  contractDigital ContractDigital[]
 }
 
 model Review {
@@ -96,6 +98,32 @@ model Orders {
   paymentProof String @default("")
   paymentMethods String @default("")
 }
+
+
+model ContractDigital {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  price      Float
+  pdfUrl     String?
+  status     ContractStatus @default(PENDING)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId]) 
+  @@index([productId]) 
+  @@index([status])
+}
+
+enum ContractStatus {
+  PENDING 
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
 
 model Admin {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
