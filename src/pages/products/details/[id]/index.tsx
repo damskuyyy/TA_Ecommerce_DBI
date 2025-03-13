@@ -23,7 +23,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Link, PenBoxIcon, Star, StarsIcon, Trash2Icon } from "lucide-react";
+import { PenBoxIcon,  Trash2Icon } from "lucide-react";
 import { ItemDataType } from "@/types/itemsDataTypes";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
