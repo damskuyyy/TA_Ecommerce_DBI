@@ -9,7 +9,7 @@ export default function ContractForm() {
 
     try {
       const response = await axios.post(
-        "/api/contract/post",
+        "/api/contract/createPDF",
         {
           userId: "Zitutt ngentutan",
           productId: "674403a5174ecfa6e493c5d5",
