@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { ProductDataType } from "@/types/productDataTypes";
@@ -19,9 +19,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { StarIcon } from "@radix-ui/react-icons";
+import SignaturePad from "@/components/ui/signature-pad";
 
 const Contractdigital = () => {
-
   const { id } = useRouter().query; //deklarasi state, mengambil parameter id dari url menggunakan userouter untuk menentukan produk yg sedang dilihat
   const { data: session, status }: any = useSession(); //mengambil data sesi pengguna (login)
   const [product, setProduct] = useState<ProductDataType>(
@@ -31,9 +31,45 @@ const Contractdigital = () => {
   const [load, setLoad] = useState(false); //loading data
   const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
   const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
+  const [signature, setSignature] = useState<string | null>(null);
 
   const router = useRouter();
   const { updateProduct } = useProductStore();
+
+  const handleSignatureSave = (data: string) => {
+    setSignature(data); // Simpan base64 tanda tangan
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        "/api/contract/createPDF",
+        {
+          userId: "Zitutt ngentutan",
+          productId: "674403a5174ecfa6e493c5d5",
+          signature: signature,
+        },
+        {
+          responseType: "arraybuffer", // Pastikan response dikembalikan sebagai binary
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("✅ PDF berhasil dibuat");
+
+        // Buat blob dari response dan buka PDF
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+      } else {
+        console.error("❌ Gagal membuat kontrak");
+        alert("Gagal membuat kontrak");
+      }
+    } catch (error) {
+      console.error("❌ Error generating contract:", error);
+      alert("Terjadi kesalahan saat membuat kontrak.");
+    }
+  };
 
   const getData = async () => {
     setLoad(true);
@@ -105,8 +141,7 @@ const Contractdigital = () => {
                         <p className="text-sm font-medium">{product.rate}</p>
                       </div>
                       <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                      <div className="flex items-center gap-1">
-                      </div>
+                      <div className="flex items-center gap-1"></div>
                     </div>
                   </div>
                   {load ? (
@@ -240,18 +275,21 @@ const Contractdigital = () => {
               <Input type="date" placeholder="End Date" />
               <Textarea placeholder="Scope of Work" className="col-span-2" />
             </div>
-            <h2 className="text-xl font-bold my-4">E-signature</h2>
-            <Textarea placeholder="Draw your signature here" className="h-32" />
-            <Button className="mt-2 bg-gray-200 text-gray-900">Clear and Draw Again</Button>
+            <SignaturePad onSave={handleSignatureSave} />
             <div className="flex items-center gap-2 mt-4">
               <Checkbox />
               <span>Setuju</span>
             </div>
-            <Button className="mt-4 w-full bg-black text-white">Create Contract</Button>
+            <Button
+              className="mt-4 w-full bg-black text-white"
+              onClick={handleSubmit}
+            >
+              Create Contract
+            </Button>
           </div>
         </div>
       )}
     </>
   );
-}
+};
 export default Contractdigital;
