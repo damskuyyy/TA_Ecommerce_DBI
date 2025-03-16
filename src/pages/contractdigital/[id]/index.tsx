@@ -185,7 +185,6 @@ const Contractdigital = () => {
                         ))
                       )}
                     </div>
-                    <div></div>
                   </div>
                   <hr />
                   <Tabs

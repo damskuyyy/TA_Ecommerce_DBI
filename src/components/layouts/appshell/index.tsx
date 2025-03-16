@@ -8,7 +8,6 @@ import Sidebar from "../sidebar";
 import Appbar from "../appbar";
 import { ProductDataType } from "@/types/productDataTypes";
 import axios from "axios";
-import { getToken } from "next-auth/jwt";
 
 interface props {
   children: ReactElement;
@@ -18,7 +17,7 @@ const Appshell = ({ children }: props) => {
   const { pathname } = useRouter();
   const path = ["/user/login", "/user/signup", "/404", "/admin/auth/login"]
   const pathProfile = ["/user/profile", "/user/profile/checkout/[id]"]
-  const adminPath = ["/admin/dashboard", "/admin/products", "/admin/transaction", "/admin/discussion", "/admin/order", "/admin/products/add", "/admin/products/edit/[id]", "/admin/products/details/[id]"]
+  const adminPath = ["/admin/dashboard", "/admin/products", "/admin/transaction", "/admin/discussion", "/admin/contract","/admin/order", "/admin/products/add", "/admin/products/edit/[id]", "/admin/products/details/[id]"]
   const [items, setItems] = useState<ItemDataType[]>([])
   const [products, setProducts] = useState<ProductDataType[]>([])
 

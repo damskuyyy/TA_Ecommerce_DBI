@@ -1,5 +1,4 @@
 import Alerts from '@/components/ui/alerts';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -60,9 +59,6 @@ const Appbar = () => {
             >
               <LogsIcon className="h-5 w-5" />
               Order
-              {/* <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                6
-              </Badge> */}
             </Link>
             <Link
               href="/admin/transaction"
@@ -79,6 +75,14 @@ const Appbar = () => {
             >
               <Users className="h-5 w-5" />
               Disscussion
+            </Link>
+            <Link
+              href="/admin/contract"
+              className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/contract' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              onClick={() => setSheetView(false)}
+            >
+              <Users className="h-5 w-5" />
+              Contract 
             </Link>
           </nav>
         </SheetContent>
@@ -108,10 +112,6 @@ const Appbar = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {/* <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem> */}
-          <DropdownMenuSeparator />
           <Alerts btn='Signout' desc='this can be changed!' ok={() => {
             signOut()
           }} />

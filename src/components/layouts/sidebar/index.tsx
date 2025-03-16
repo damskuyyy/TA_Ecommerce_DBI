@@ -1,9 +1,8 @@
 import Link from "next/link";
 import {
-  ArrowLeftRightIcon, FoldersIcon,
+  ArrowLeftRightIcon, BookCheckIcon, FoldersIcon,
   Home, LogsIcon, Package2, Users
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/router";
 
 const Sidebar = () => {
@@ -55,6 +54,13 @@ const Sidebar = () => {
             >
               <Users className="h-4 w-4" />
               Disscusion
+            </Link>
+            <Link
+              href="/admin/contract"
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/contract' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
+            >
+              <BookCheckIcon className="h-4 w-4" />
+              Contract
             </Link>
           </nav>
         </div>
