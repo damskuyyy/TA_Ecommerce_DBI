@@ -63,10 +63,11 @@ export default async function handler(
       });
 
       // Simpan metadata ke database Prisma
-      const savedPdf = await prisma.pdfDocument.create({
+      const savedPdf = await prisma.contractDigital.create({
         data: {
           userId,
           productId,
+          price: 1000,
           filename: req.file.originalname,
         },
       });
