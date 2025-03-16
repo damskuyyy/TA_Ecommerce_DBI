@@ -23,7 +23,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { PenBoxIcon,  Trash2Icon } from "lucide-react";
+import { PenBoxIcon, Trash2Icon } from "lucide-react";
 import { ItemDataType } from "@/types/itemsDataTypes";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
@@ -119,6 +119,10 @@ const Details = ({
     updateProduct(updatedProduct);
     router.push("/discuss");
   }; //buka/tutup tampilan diskusi
+
+  const handleCreateContract = () => {
+    router.push(`/contractdigital/${id}`);
+  };
 
   const getData = async () => {
     setLoad(true);
@@ -506,7 +510,10 @@ const Details = ({
                     >
                       Add to cart
                     </Button>
-                    {load ? "" : <ModalCheckout data={product} />}
+                    <Button onClick={handleCreateContract}>
+                      Create Contract
+                    </Button>
+                    {/* {load ? "" : <ModalCheckout data={product} />} */}
                   </div>
                 </CardContent>
                 <CardFooter></CardFooter>

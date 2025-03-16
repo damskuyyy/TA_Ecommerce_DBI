@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           product: { connect: { id: productId } },
           user: { connect: { id: userId } },
           price,
-          pdfUrl: pdfUrl,
+          filename: pdfUrl,
         },
       });
       res.status(200).send("created contract succesfully!");

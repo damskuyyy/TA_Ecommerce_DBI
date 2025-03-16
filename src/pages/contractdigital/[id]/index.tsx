@@ -20,9 +20,17 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { StarIcon } from "@radix-ui/react-icons";
 import SignaturePad from "@/components/ui/signature-pad";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 const Contractdigital = () => {
-  const { id } = useRouter().query; //deklarasi state, mengambil parameter id dari url menggunakan userouter untuk menentukan produk yg sedang dilihat
+  const { id } = useRouter().query;
   const { data: session, status }: any = useSession(); //mengambil data sesi pengguna (login)
   const [product, setProduct] = useState<ProductDataType>(
     {} as ProductDataType
@@ -31,44 +39,63 @@ const Contractdigital = () => {
   const [load, setLoad] = useState(false); //loading data
   const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
   const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
-  const [signature, setSignature] = useState<string | null>(null);
 
   const router = useRouter();
-  const { updateProduct } = useProductStore();
+  const { selectedProduct } = useProductStore();
 
-  const handleSignatureSave = (data: string) => {
-    setSignature(data); // Simpan base64 tanda tangan
-  };
+  const form = useForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      address: "",
+      contractName: "",
+      cost: "",
+      contractEmail: "",
+      contractPhone: "",
+      startDate: "",
+      endDate: "",
+      scopeOfWork: "",
+      agreement: false,
+      signature: "",
+    },
+    mode: "onChange",
+  });
 
-  const handleSubmit = async () => {
+  const agreement = form.watch("agreement");
+
+  const onSubmit = async (data: any) => {
+    if (
+      !Object.values(data).every((value) => value !== "" && value !== false)
+    ) {
+      toast({ title: "Error", description: "All fields are required!" });
+      return;
+    }
+
     try {
-      // Generate PDF
       const response = await axios.post(
         "/api/contract/createPDF",
         {
-          userId: "asdasdas",
-          productId: "asdasd",
-          signature,
+          userId: session.user?.id,
+          productId: id,
+          ...data,
         },
         { responseType: "arraybuffer" }
       );
 
       if (response.status === 200) {
         console.log("✅ PDF berhasil dibuat");
-
-        // Simpan PDF ke Blob
         const pdfBlob = new Blob([response.data], { type: "application/pdf" });
-
-        // Buat FormData untuk upload
         const formData = new FormData();
-        formData.append("userId", "asdasd");
-        formData.append("productId", "asasas");
+        formData.append("userId", session.user?.id);
+        formData.append("productId", String(id));
+        formData.append("price", data.cost)
         formData.append(
           "pdfFile",
           new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
         );
 
-        // Upload PDF ke GridFS
         await axios.post("/api/contract/post/pdf", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
@@ -270,35 +297,126 @@ const Contractdigital = () => {
             </div>
           </div>
           <div className="w-full bg-white p-6 shadow rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Personal Info</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <Input placeholder="First Name" />
-              <Input placeholder="Last Name" />
-              <Input placeholder="Email" />
-              <Input placeholder="Phone Number" />
-              <Input placeholder="Address" className="col-span-2" />
-            </div>
-            <h2 className="text-xl font-bold my-4">Contract Info</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <Input placeholder="Contract Name" />
-              <Input placeholder="Cost" />
-              <Input placeholder="Email" />
-              <Input placeholder="Phone Number" />
-              <Input type="date" placeholder="Start Date" />
-              <Input type="date" placeholder="End Date" />
-              <Textarea placeholder="Scope of Work" className="col-span-2" />
-            </div>
-            <SignaturePad onSave={handleSignatureSave} />
-            <div className="flex items-center gap-2 mt-4">
-              <Checkbox />
-              <span>Setuju</span>
-            </div>
-            <Button
-              className="mt-4 w-full bg-black text-white"
-              onClick={handleSubmit}
-            >
-              Create Contract
-            </Button>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { name: "firstName", label: "First Name" },
+                    { name: "lastName", label: "Last Name" },
+                    { name: "email", label: "Email", type: "email" },
+                    { name: "phoneNumber", label: "Phone Number", type: "tel" },
+                    {
+                      name: "address",
+                      label: "Address",
+                      className: "col-span-2",
+                    },
+                  ].map(({ name, label, type, className }) => (
+                    <FormField
+                      key={name}
+                      control={form.control}
+                      name={name}
+                      render={({ field }) => (
+                        <FormItem className={className}>
+                          <FormLabel>{label}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={label}
+                              type={type}
+                              {...field}
+                              required
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+
+                <h2 className="text-xl font-bold my-4">Contract Info</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { name: "contractName", label: "Contract Name" },
+                    { name: "cost", label: "Cost", type: "number" },
+                    { name: "contractEmail", label: "Email", type: "email" },
+                    {
+                      name: "contractPhone",
+                      label: "Phone Number",
+                      type: "tel",
+                    },
+                    { name: "startDate", label: "Start Date", type: "date" },
+                    { name: "endDate", label: "End Date", type: "date" },
+                  ].map(({ name, label, type }) => (
+                    <FormField
+                      key={name}
+                      control={form.control}
+                      name={name}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{label}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={label}
+                              type={type}
+                              {...field}
+                              required
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                  <FormField
+                    control={form.control}
+                    name="scopeOfWork"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2">
+                        <FormLabel>Scope of Work</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Scope of Work"
+                            {...field}
+                            required
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <SignaturePad
+                  onSave={(signature) => form.setValue("signature", signature)}
+                />
+                <div className="flex items-center gap-2 mt-4">
+                  <FormField
+                    control={form.control}
+                    name="agreement"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            required
+                          />
+                        </FormControl>
+                        <span>Setuju</span>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="mt-4 w-full bg-black text-white"
+                  disabled={!agreement}
+                >
+                  Create Contract
+                </Button>
+              </form>
+            </Form>
           </div>
         </div>
       )}

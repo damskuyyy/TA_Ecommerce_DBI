@@ -10,17 +10,45 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     // Ambil data dari request
-    const { userId, productId, signature } = req.body; // Tambahkan signature
-    if (!userId || !productId || !signature) {
-      return res
-        .status(400)
-        .json({ error: "userId, productId, and signature are required" });
+    const {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      address,
+      contractName,
+      cost,
+      contractEmail,
+      contractPhone,
+      startDate,
+      endDate,
+      scopeOfWork,
+      signature,
+    } = req.body;
+
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phoneNumber ||
+      !address ||
+      !contractName ||
+      !cost ||
+      !contractEmail ||
+      !contractPhone ||
+      !startDate ||
+      !endDate ||
+      !scopeOfWork ||
+      !signature
+    ) {
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-    console.log("🔹 Received Data:", { userId, productId });
+    console.log("🔹 Received Data:", req.body);
 
     // Path ke template PDF
     const pdfPath = path.join(process.cwd(), "public", "contract-template.pdf");
+
     if (!fs.existsSync(pdfPath)) {
       return res.status(404).json({ error: "Template PDF not found" });
     }
@@ -30,21 +58,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const pdfDoc = await PDFDocument.load(templateBuffer);
     const form = pdfDoc.getForm();
 
-    // Isi field teks dalam PDF
-    form.getTextField("userIdField").setText(userId);
-    form.getTextField("productIdField").setText(productId);
+    // Isi field teks dalam PDF (sesuai dengan field dalam template)
+    form.getTextField("firstName").setText(firstName);
+    form.getTextField("lastName").setText(lastName);
+    form.getTextField("email").setText(email);
+    form.getTextField("phoneNumber").setText(phoneNumber);
+    form.getTextField("address").setText(address);
+    form.getTextField("contractName").setText(contractName);
+    form.getTextField("cost").setText(cost);
+    form.getTextField("contractEmail").setText(contractEmail);
+    form.getTextField("contractPhone").setText(contractPhone);
+    form.getTextField("startDate").setText(startDate);
+    form.getTextField("endDate").setText(endDate);
+    form.getTextField("scopeOfWork").setText(scopeOfWork);
 
     // Konversi tanda tangan dari base64 ke Uint8Array
     const signatureData = signature.replace(/^data:image\/png;base64,/, ""); // Hapus prefix base64
     const signatureBytes = Buffer.from(signatureData, "base64");
     const signatureImage = await pdfDoc.embedPng(signatureBytes);
 
-    // Tentukan ukuran dan posisi tanda tangan
+    // Tambahkan tanda tangan di posisi yang benar
     const page = pdfDoc.getPages()[0]; // Halaman pertama
     const { width, height } = page.getSize();
     page.drawImage(signatureImage, {
-      x: width - 220, // Posisi X dari kanan
-      y: 100, // Posisi Y dari bawah
+      x: width - 220, // Posisi dari kanan
+      y: 100, // Posisi dari bawah
       width: 200,
       height: 100,
     });
