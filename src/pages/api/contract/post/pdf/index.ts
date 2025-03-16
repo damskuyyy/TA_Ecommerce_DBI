@@ -36,11 +36,16 @@ export default async function handler(
       return res.status(500).json({ error: "File upload error" });
     }
 
-    const { userId, productId } = req.body;
+    const { userId, productId, price } = req.body;
+
     const pdfBuffer = req.file?.buffer;
-    if (!pdfBuffer) {
-      return res.status(400).json({ error: "No PDF file provided" });
+    if (!pdfBuffer || !userId || !productId || !price) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
+
+    // Buat nama file unik dengan format: contract_userId_productId_timestamp.pdf
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `contract_${userId}_${productId}_${timestamp}.pdf`;
 
     let client: MongoClient;
     try {
@@ -52,8 +57,8 @@ export default async function handler(
       // Buat bucket GridFS untuk penyimpanan PDF
       const bucket = new GridFSBucket(db, { bucketName: "pdfs" });
 
-      // Buat upload stream ke GridFS
-      const uploadStream = bucket.openUploadStream(req.file.originalname);
+      // Buat upload stream ke GridFS dengan nama file unik
+      const uploadStream = bucket.openUploadStream(filename);
       Readable.from(pdfBuffer).pipe(uploadStream);
 
       // Tunggu upload selesai
@@ -67,14 +72,14 @@ export default async function handler(
         data: {
           userId,
           productId,
-          price: 1000,
-          filename: req.file.originalname,
+          price: parseFloat(price),
+          filename: filename, // Simpan nama file unik
         },
       });
 
       return res.status(201).json({ message: "PDF saved", pdf: savedPdf });
     } catch (error) {
-      console.error("Upload Error:", error);
+      console.error("❌ Upload Error:", error);
       return res
         .status(500)
         .json({ error: "Error saving PDF", details: error });
