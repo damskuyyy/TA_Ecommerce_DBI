@@ -100,6 +100,12 @@ const Contractdigital = () => {
 
         console.log("✅ PDF berhasil diunggah");
         toast({ title: "Success", description: "PDF uploaded successfully!" });
+
+        // Reset form setelah sukses
+        form.reset();
+
+        // Kembali ke halaman sebelumnya
+        router.back();
       } else {
         console.error("❌ Gagal membuat kontrak");
         alert("Gagal membuat kontrak");
