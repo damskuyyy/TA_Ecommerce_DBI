@@ -52,8 +52,6 @@ const Contractdigital = () => {
       address: "",
       contractName: "",
       cost: "",
-      contractEmail: "",
-      contractPhone: "",
       startDate: "",
       endDate: "",
       scopeOfWork: "",
@@ -78,7 +76,7 @@ const Contractdigital = () => {
         "/api/contract/createPDF",
         {
           userId: session.user?.id,
-          productId: id,
+          productId: product.id,
           ...data,
         },
         { responseType: "arraybuffer" }
@@ -89,8 +87,8 @@ const Contractdigital = () => {
         const pdfBlob = new Blob([response.data], { type: "application/pdf" });
         const formData = new FormData();
         formData.append("userId", session.user?.id);
-        formData.append("productId", String(id));
-        formData.append("price", data.cost)
+        formData.append("productId", String(product.id));
+        formData.append("price", data.cost);
         formData.append(
           "pdfFile",
           new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
@@ -340,12 +338,6 @@ const Contractdigital = () => {
                   {[
                     { name: "contractName", label: "Contract Name" },
                     { name: "cost", label: "Cost", type: "number" },
-                    { name: "contractEmail", label: "Email", type: "email" },
-                    {
-                      name: "contractPhone",
-                      label: "Phone Number",
-                      type: "tel",
-                    },
                     { name: "startDate", label: "Start Date", type: "date" },
                     { name: "endDate", label: "End Date", type: "date" },
                   ].map(({ name, label, type }) => (

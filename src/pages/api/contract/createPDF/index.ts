@@ -18,8 +18,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       address,
       contractName,
       cost,
-      contractEmail,
-      contractPhone,
       startDate,
       endDate,
       scopeOfWork,
@@ -34,8 +32,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       !address ||
       !contractName ||
       !cost ||
-      !contractEmail ||
-      !contractPhone ||
       !startDate ||
       !endDate ||
       !scopeOfWork ||
@@ -66,8 +62,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     form.getTextField("address").setText(address);
     form.getTextField("contractName").setText(contractName);
     form.getTextField("cost").setText(cost);
-    form.getTextField("contractEmail").setText(contractEmail);
-    form.getTextField("contractPhone").setText(contractPhone);
     form.getTextField("startDate").setText(startDate);
     form.getTextField("endDate").setText(endDate);
     form.getTextField("scopeOfWork").setText(scopeOfWork);

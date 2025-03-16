@@ -3,8 +3,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const data = await prisma.contractDigital.findMany();
-    console.log(data);
+    const data = await prisma.contractDigital.findMany({
+      include: {
+        product: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
     res.status(200).json(data);
   } catch (error) {
     console.log(error);
