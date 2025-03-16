@@ -124,6 +124,15 @@ enum ContractStatus {
   COMPLETED
 }
 
+model PdfDocument {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  productId String
+  filename  String
+  createdAt DateTime @default(now())
+}
+
+
 
 model Admin {
   id       String @id @default(auto()) @map("_id") @db.ObjectId

@@ -42,25 +42,39 @@ const Contractdigital = () => {
 
   const handleSubmit = async () => {
     try {
+      // Generate PDF
       const response = await axios.post(
         "/api/contract/createPDF",
         {
-          userId: "Zitutt ngentutan",
-          productId: "674403a5174ecfa6e493c5d5",
-          signature: signature,
+          userId: "asdasdas",
+          productId: "asdasd",
+          signature,
         },
-        {
-          responseType: "arraybuffer", // Pastikan response dikembalikan sebagai binary
-        }
+        { responseType: "arraybuffer" }
       );
 
       if (response.status === 200) {
         console.log("✅ PDF berhasil dibuat");
 
-        // Buat blob dari response dan buka PDF
-        const blob = new Blob([response.data], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
+        // Simpan PDF ke Blob
+        const pdfBlob = new Blob([response.data], { type: "application/pdf" });
+
+        // Buat FormData untuk upload
+        const formData = new FormData();
+        formData.append("userId", "asdasd");
+        formData.append("productId", "asasas");
+        formData.append(
+          "pdfFile",
+          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
+        );
+
+        // Upload PDF ke GridFS
+        await axios.post("/api/contract/post/pdf", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        console.log("✅ PDF berhasil diunggah");
+        toast({ title: "Success", description: "PDF uploaded successfully!" });
       } else {
         console.error("❌ Gagal membuat kontrak");
         alert("Gagal membuat kontrak");
