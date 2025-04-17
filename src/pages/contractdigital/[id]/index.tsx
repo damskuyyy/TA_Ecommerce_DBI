@@ -45,15 +45,13 @@ const Contractdigital = () => {
 
   const form = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
+      fullName: "",
       address: "",
       contractName: "",
       cost: "",
       startDate: "",
       endDate: "",
+      chooseFeatures: "",
       scopeOfWork: "",
       agreement: false,
       signature: "",
@@ -306,12 +304,10 @@ const Contractdigital = () => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8"
               >
+                <h2 className="text-xl font-bold my-4">Personal Info</h2>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { name: "firstName", label: "First Name" },
-                    { name: "lastName", label: "Last Name" },
-                    { name: "email", label: "Email", type: "email" },
-                    { name: "phoneNumber", label: "Phone Number", type: "tel" },
+                    { name: "fullName", label: "Full Name", className: "col-span-2",},
                     {
                       name: "address",
                       label: "Address",
@@ -366,6 +362,32 @@ const Contractdigital = () => {
                       )}
                     />
                   ))}
+
+                  <FormField
+                    control={form.control}
+                    name="features"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2">
+                        <FormLabel>Choose Features</FormLabel>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2 text-sm">
+                          {["Authentification", "Product Page", "Shopping Cart", "Payment Integration", "Admin Dashboard", "Notifications"].map((feature) => (
+                            <label key={feature} className="flex items-center space-x-2">
+                              <Checkbox
+                                checked={field.value?.includes(feature)}
+                                onCheckedChange={(checked) => {
+                                  const newValue = checked
+                                    ? [...(field.value || []), feature]
+                                    : (field.value || []).filter((f) => f !== feature);
+                                  field.onChange(newValue);
+                                }}
+                              />
+                              <span>{feature}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="scopeOfWork"
