@@ -47,14 +47,11 @@ const Contractdigital = () => {
     defaultValues: {
       fullName: "",
       address: "",
-      contractName: "",
-      cost: "",
       startDate: "",
       endDate: "",
-      chooseFeatures: "",
+      features: [],
       scopeOfWork: "",
       agreement: false,
-      signature: "",
     },
     mode: "onChange",
   });
@@ -62,6 +59,7 @@ const Contractdigital = () => {
   const agreement = form.watch("agreement");
 
   const onSubmit = async (data: any) => {
+    console.log("data form: ", data);
     if (
       !Object.values(data).every((value) => value !== "" && value !== false)
     ) {
@@ -70,50 +68,26 @@ const Contractdigital = () => {
     }
 
     try {
-      const response = await axios.post(
-        "/api/contract/createPDF",
-        {
-          userId: session.user?.id,
-          productId: product.id,
-          ...data,
-        },
-        { responseType: "arraybuffer" }
-      );
+      const response = await axios.post("/api/contract/post/user", {
+        userId: session.user?.id,
+        productId: product.id,
+        ...data,
+      });
 
-      if (response.status === 200) {
-        console.log("✅ PDF berhasil dibuat");
-        const pdfBlob = new Blob([response.data], { type: "application/pdf" });
-        const formData = new FormData();
-        formData.append("userId", session.user?.id);
-        formData.append("productId", String(product.id));
-        formData.append("price", data.cost);
-        formData.append(
-          "pdfFile",
-          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
-        );
-
-        await axios.post("/api/contract/post/pdf", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        console.log("✅ PDF berhasil diunggah");
-        toast({ title: "Success", description: "PDF uploaded successfully!" });
-
-        // Reset form setelah sukses
-        form.reset();
-
-        // Kembali ke halaman sebelumnya
-        router.back();
+      if (response.status === 201) {
+        console.log("✅ Draft contract created:", response.data);
+        alert("Draft kontrak berhasil disimpan.");
       } else {
-        console.error("❌ Gagal membuat kontrak");
-        alert("Gagal membuat kontrak");
+        console.warn("⚠️ Kontrak dibuat, tapi respons tidak sesuai:", response);
+        alert("Terjadi sesuatu yang tidak terduga.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Error generating contract:", error);
       alert("Terjadi kesalahan saat membuat kontrak.");
     }
   };
 
+ 
   const getData = async () => {
     setLoad(true);
     if (id) {
@@ -307,7 +281,11 @@ const Contractdigital = () => {
                 <h2 className="text-xl font-bold my-4">Personal Info</h2>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { name: "fullName", label: "Full Name", className: "col-span-2",},
+                    {
+                      name: "fullName",
+                      label: "Full Name",
+                      className: "col-span-2",
+                    },
                     {
                       name: "address",
                       label: "Address",
@@ -338,8 +316,6 @@ const Contractdigital = () => {
                 <h2 className="text-xl font-bold my-4">Contract Info</h2>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { name: "contractName", label: "Contract Name" },
-                    { name: "cost", label: "Cost", type: "number" },
                     { name: "startDate", label: "Start Date", type: "date" },
                     { name: "endDate", label: "End Date", type: "date" },
                   ].map(({ name, label, type }) => (
@@ -370,14 +346,27 @@ const Contractdigital = () => {
                       <FormItem className="col-span-2">
                         <FormLabel>Choose Features</FormLabel>
                         <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2 text-sm">
-                          {["Authentification", "Product Page", "Shopping Cart", "Payment Integration", "Admin Dashboard", "Notifications"].map((feature) => (
-                            <label key={feature} className="flex items-center space-x-2">
+                          {[
+                            "Authentification",
+                            "Product Page",
+                            "Shopping Cart",
+                            "Payment Integration",
+                            "Admin Dashboard",
+                            "Notifications",
+                          ].map((feature) => (
+                            <label
+                              key={feature}
+                              className="flex items-center space-x-2"
+                            >
                               <Checkbox
                                 checked={field.value?.includes(feature)}
                                 onCheckedChange={(checked) => {
                                   const newValue = checked
                                     ? [...(field.value || []), feature]
-                                    : (field.value || []).filter((f) => f !== feature);
+                                    : (field.value || []).filter(
+                                        (f) => f !== feature
+                                      );
+
                                   field.onChange(newValue);
                                 }}
                               />
@@ -406,9 +395,9 @@ const Contractdigital = () => {
                   />
                 </div>
 
-                <SignaturePad
+                {/* <SignaturePad
                   onSave={(signature) => form.setValue("signature", signature)}
-                />
+                /> */}
                 <div className="flex items-center gap-2 mt-4">
                   <FormField
                     control={form.control}

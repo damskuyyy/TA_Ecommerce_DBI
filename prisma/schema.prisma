@@ -101,27 +101,45 @@ model Orders {
 
 
 model ContractDigital {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  productId  String
-  product    Product  @relation(fields: [productId], references: [id])
-  price      Float
-  filename     String
-  status     ContractStatus @default(PENDING)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  productId   String
+  product     Product         @relation(fields: [productId], references: [id])
+
+  // User-provided
+  contractName String?
+  fullName      String?
+  address       String?
+  cost          Float?
+  startDate     DateTime?
+  endDate       DateTime?
+
+  // Admin-completed
+  features      String[]
+  scopeOfWork   String?
+  
+  // PDF-related
+  filename      String?
+  isFinalized   Boolean        @default(false)
+
+  status        ContractStatus @default(PENDING_APPROVAL)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([userId]) 
   @@index([productId]) 
   @@index([status])
 }
 
+
 enum ContractStatus {
-  PENDING 
-  APPROVED
-  REJECTED
+  PENDING_APPROVAL
+  AWAITING_CLIENT_SIGNATURE
+  AWAITING_PAYMENT
+  ACTIVE
   COMPLETED
+  CANCELED
 }
 
 model PdfDocument {
