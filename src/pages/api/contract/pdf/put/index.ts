@@ -27,7 +27,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") {
+  if (req.method !== "PUT") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
@@ -36,16 +36,16 @@ export default async function handler(
       return res.status(500).json({ error: "File upload error" });
     }
 
-    const { userId, productId, price } = req.body;
+    const { contractId, userId } = req.body;
 
     const pdfBuffer = req.file?.buffer;
-    if (!pdfBuffer || !userId || !productId || !price) {
+    if (!pdfBuffer || !userId) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     // Buat nama file unik dengan format: contract_userId_productId_timestamp.pdf
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const filename = `contract_${userId}_${productId}_${timestamp}.pdf`;
+    const filename = `contract_${contractId}_${userId}_${timestamp}.pdf`;
 
     let client: MongoClient;
     try {
@@ -68,11 +68,9 @@ export default async function handler(
       });
 
       // Simpan metadata ke database Prisma
-      const savedPdf = await prisma.contractDigital.create({
+      const savedPdf = await prisma.contractDigital.update({
+        where: { id: contractId },
         data: {
-          userId,
-          productId,
-          price: parseFloat(price),
           filename: filename, // Simpan nama file unik
         },
       });

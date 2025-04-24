@@ -16,22 +16,42 @@ export default async function handler(
     cost,
     startDate,
     endDate,
-    features,
+    descriptionContract,
+    features = [],
     scopeOfWork,
-    signature,
+    signature, // base64 ‑ "data:image/png;base64,...."
   } = req.body;
 
   try {
+    /* ---------------------------------------------------------- */
+    /* 1.  Setup dokumen                                          */
+    /* ---------------------------------------------------------- */
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([595, 842]);
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const page = pdfDoc.addPage([595, 842]); // A4 (pts)
+    const font = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+    const bold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
     const margin = 50;
     let y = 800;
 
-    const drawText = (text: string, x: number, y: number, size = 12) => {
-      page.drawText(text, { x, y, size, font, color: rgb(0, 0, 0) });
-    };
+    /* ---------------------------------------------------------- */
+    /* 2.  Util untuk gambar teks & wrap                          */
+    /* ---------------------------------------------------------- */
+
+    const drawText = (
+      text: string,
+      x: number,
+      y: number,
+      size = 12,
+      isBold = false
+    ) =>
+      page.drawText(text, {
+        x,
+        y,
+        size,
+        font: isBold ? bold : font,
+        color: rgb(0, 0, 0),
+      });
 
     const drawWrappedText = (
       text: string,
@@ -49,35 +69,69 @@ export default async function handler(
       return yPos;
     };
 
-    // Title
-    drawText("Digital Contract", margin, y, 18);
+    /* ---------------------------------------------------------- */
+    /* 3.  JUDUL tebal + underline                                */
+    /* ---------------------------------------------------------- */
+
+    const title = "KONTRAK PERJANJIAN PEMBUATAN PERANGKAT LUNAK";
+    const titleSize = 18;
+    const titleWidth = bold.widthOfTextAtSize(title, titleSize);
+    const titleX = (page.getWidth() - titleWidth) / 2;
+
+    drawText(title, titleX, y, titleSize, true);
+    // garis bawah
+    page.drawLine({
+      start: { x: titleX, y: y - 4 },
+      end: { x: titleX + titleWidth, y: y - 4 },
+      thickness: 1.5,
+      color: rgb(0, 0, 0),
+    });
     y -= 40;
 
-    // Basic info
-    drawText(`Contract Name: ${contractName}`, margin, (y -= 20));
-    drawText(`Client Name: ${fullName}`, margin, (y -= 20));
-    drawText(`Address: ${address}`, margin, (y -= 20));
-    drawText(`Project Cost: Rp ${cost}`, margin, (y -= 20));
-    drawText(`Start Date: ${startDate}`, margin, (y -= 20));
-    drawText(`End Date: ${endDate}`, margin, (y -= 20));
+    /* ---------------------------------------------------------- */
+    /* 4.  Informasi dasar                                        */
+    /* ---------------------------------------------------------- */
+    const info = [
+      [`Contract Name`, contractName],
+      [`Description`, descriptionContract],
+      [`Client Name`, fullName],
+      [`Address`, address],
+      [`Project Cost`, `Rp ${cost}`],
+      [`Start Date`, startDate],
+      [`End Date`, endDate],
+    ];
 
-    // Features
-    y -= 25;
-    drawText("Features:", margin, (y -= 15));
-    features?.forEach((feature: string) => {
-      drawText(`- ${feature}`, margin + 20, (y -= 15));
+    info.forEach(([label, value]) => {
+      drawText(`${label}:`, margin, (y -= 18), 12, true);
+      drawText(String(value || "-"), margin + 120, y);
     });
 
-    // Scope of Work
+    /* ---------------------------------------------------------- */
+    /* 5.  Fitur                                                  */
+    /* ---------------------------------------------------------- */
     y -= 25;
-    drawText("Scope of Work:", margin, (y -= 15));
+    drawText("Features:", margin, (y -= 15), 12, true);
+    features.forEach((f: string) => {
+      drawText(`• ${f}`, margin + 20, (y -= 15));
+    });
+
+    /* ---------------------------------------------------------- */
+    /* 6.  Scope of Work                                          */
+    /* ---------------------------------------------------------- */
+    y -= 25;
+    drawText("Scope of Work:", margin, (y -= 15), 12, true);
     y = drawWrappedText(scopeOfWork, margin + 20, y - 10, 15, 90);
 
-    // Signature
+    /* ---------------------------------------------------------- */
+    /* 7.  Signature                                              */
+    /* ---------------------------------------------------------- */
     if (signature) {
-      const signatureImage = await pdfDoc.embedPng(signature);
-      const dims = signatureImage.scale(0.5);
-      page.drawImage(signatureImage, {
+      // hilangkan prefix data URI jika ada
+      const base64 = signature.replace(/^data:image\/\w+;base64,/, "");
+      const img = await pdfDoc.embedPng(base64);
+      const dims = img.scale(0.5);
+
+      page.drawImage(img, {
         x: margin,
         y: y - dims.height - 20,
         width: dims.width,
@@ -86,15 +140,17 @@ export default async function handler(
       y -= dims.height + 30;
     }
 
-    // Signature name and date
-    drawText(`Signed by: ${fullName}`, margin, y);
+    drawText(`Signed by: Admin`, margin, y);
     drawText(`Signed at: ${new Date().toLocaleDateString()}`, margin, y - 15);
 
+    /* ---------------------------------------------------------- */
+    /* 8.  Kirim PDF                                              */
+    /* ---------------------------------------------------------- */
     const pdfBytes = await pdfDoc.save();
     res.setHeader("Content-Type", "application/pdf");
     res.status(200).send(Buffer.from(pdfBytes));
   } catch (err) {
-    console.error(err);
+    console.error("❌ PDF generation error:", err);
     res.status(500).json({ message: "Failed to generate contract." });
   }
 }

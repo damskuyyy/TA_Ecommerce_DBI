@@ -83,6 +83,9 @@ const ProfilePage = ({
   const [nameLoad, setNameLoad] = useState(false);
   const [emailLoad, setEmailLoad] = useState(false);
 
+  const [contractData, setContractData] = useState([]);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
   const getDataUser = async () => {
     setLoad(true);
     if (session?.user) {
@@ -101,6 +104,22 @@ const ProfilePage = ({
       }
     }
   };
+
+  const getContractData = async () => {
+    try {
+      const resp = await axios(
+        `/api/contract/get?userId=${user.id}&status=AWAITING_CLIENT_SIGNATURE`
+      );
+      setContractData(resp.data);
+      console.log("dataContract: ", resp.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getContractData();
+  }, []);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -195,6 +214,13 @@ const ProfilePage = ({
     });
   };
 
+  // Handle preview PDF
+  const handlePreview = (filename: string) => {
+    if (!filename) return;
+    const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
+    setPdfUrl(fileUrl);
+  };
+
   const transactionValue = 0.05; // 5% transaction fee
   const applicationValue = 0.02; // 2% application fee
   const taxRate = 0.1; // 10% tax
@@ -233,6 +259,10 @@ const ProfilePage = ({
               <ShoppingBasketIcon size={20} />
               Recent Order
             </TabsTrigger>
+            <TabsTrigger value="contract" className="flex items-center gap-2">
+              <ShoppingBasketIcon size={20} />
+              Contract
+            </TabsTrigger>
           </TabsList>
           <Scrollbar orientation="horizontal" />
         </ScrollArea>
@@ -249,29 +279,29 @@ const ProfilePage = ({
               <div className="flex flex-col w-full gap-5">
                 <Card className="w-full">
                   <CardContent className="pt-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 group">
-                          <div className="relative">
-                            <img
-                              src={user.image}
-                              alt="userImage"
-                              className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-foreground"
-                            />
-                            <button className="p-1 absolute"></button>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 group">
+                        <div className="relative">
+                          <img
+                            src={user.image}
+                            alt="userImage"
+                            className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-foreground"
+                          />
+                          <button className="p-1 absolute"></button>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-semibold capitalize dark:text-white">
+                              {user.name}
+                            </h2>
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h2 className="text-xl font-semibold capitalize dark:text-white">
-                                {user.name}
-                              </h2>
-                            </div>
-                            <p className="text-gray-500">{user.email}</p>
-                          </div>
+                          <p className="text-gray-500">{user.email}</p>
                         </div>
                       </div>
-                      <h3 className="text-2xl font-bold mb-5">
-                        Personal Information
-                      </h3>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-5">
+                      Personal Information
+                    </h3>
                     <Table className="w-fit">
                       <TableBody>
                         <TableRow>
@@ -796,6 +826,100 @@ const ProfilePage = ({
                 <div className="overflow-x-auto shadow-md"></div>
               </div>
             </TabsContent>
+            <TabsContent
+              value="contract"
+              className="w-full lg:mt-8 md:mt-6 mt-5"
+            >
+              <div className="bg-white rounded-lg lg:p-2 p-1 dark:bg-black">
+                <h2 className="text-xl pb-3 border-b font-semibold w-full">
+                  Contract
+                </h2>
+                <ScrollArea className="lg:pb-0 pb-4">
+                  <Table className="min-w-full divide-y divide-gray-200 mt-4 dark:divide-gray-800">
+                    <TableCaption>A list of your recent invoices.</TableCaption>
+                    <TableHeader className="bg-gray-50 dark:bg-gray-900">
+                      <TableRow>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Id Contract
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Products
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Price
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Contract
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950 dark:divide-gray-700">
+                      {contractData && contractData.length > 0 ? (
+                        contractData.map((item, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                              {item.id}
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                              {item.contractName}
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                              {item.cost}
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                              {item.status}
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                              <Button
+                                onClick={() => handlePreview(item.filename)}
+                                className="bg-gray-400 text-black px-2 py-2 rounded-md"
+                              >
+                                Preview
+                              </Button>
+                            </TableCell>
+                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                              <Button className="bg-gray-400 text-black px-2 py-2 rounded-md">
+                                Sign
+                              </Button>
+                              <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
+                                Cancel
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <p>No Contract</p>
+                      )}
+                    </TableBody>
+                  </Table>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+                <div className="overflow-x-auto shadow-md"></div>
+              </div>
+            </TabsContent>
+            {pdfUrl && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Preview Contract</h2>
+                    <Button
+                      onClick={() => setPdfUrl(null)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-md"
+                    >
+                      Close
+                    </Button>
+                  </div>
+                  <iframe src={pdfUrl} className="w-full flex-grow" />
+                </div>
+              </div>
+            )}
           </>
         )}
       </Tabs>

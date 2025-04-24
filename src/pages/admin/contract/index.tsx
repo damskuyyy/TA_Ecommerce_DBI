@@ -71,58 +71,64 @@ const Contract: React.FC = () => {
 
   const agreement = form.watch("agreement");
 
-  const onSubmit = async (id: string) => {
-    // console.log("data form: ", data);
-    console.log("contractData :", contractData);
-
+  const onSubmit = async (item: any) => {
     const values = form.getValues();
 
-    console.log("values:", values);
-    console.log("contractId:", id);
-
     try {
-      await axios.put("/api/contract/edit", {
-        contractId: id, // ⬅️ sesuai dengan API
-        status: "Completed", // atau "Processing", tergantung kebutuhan
-        ...values, // optional kalau kamu mau kirim data lain juga
+      // Update kontrak dengan PUT request
+      const response = await axios.put("/api/contract/put", {
+        contractId: item.id, // Sesuai dengan API
+        status: "AWAITING_CLIENT_SIGNATURE", // atau "Processing"
+        ...values, // Kirim data yang diperbarui
       });
 
-      alert("Kontrak berhasil diperbarui!");
-      form.reset();
-      getContractData(); // refresh data di tabel
+      console.log("Response after PUT:", response.data);
+
+      // Cek apakah response.data berisi data kontrak yang benar
+      if (!response.data || !response.data.contract) {
+        throw new Error("Data kontrak tidak tersedia dalam response.");
+      }
+
+      const updatedContract = response.data.contract;
+
+      // Kirim data ke API untuk pembuatan PDF
+      const pdfResponse = await axios.post(
+        "/api/contract/post/admin",
+        updatedContract,
+        {
+          responseType: "arraybuffer",
+        }
+      );
+
+      if (pdfResponse.status === 200) {
+        // Logika setelah PDF berhasil dibuat
+        const pdfBlob = new Blob([pdfResponse.data], {
+          type: "application/pdf",
+        });
+
+        const formData = new FormData();
+        formData.append("contractId", updatedContract.id);
+        formData.append("userId", updatedContract.userID);
+        formData.append(
+          "pdfFile",
+          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
+        );
+
+        // Upload PDF ke server
+        await axios.put("/api/contract/pdf/put", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+        form.reset();
+        getContractData();
+      } else {
+        throw new Error("Gagal membuat PDF");
+      }
     } catch (err) {
-      console.error("❌ Error updating contract:", err);
-      alert("Terjadi kesalahan saat memperbarui kontrak.");
+      console.error("❌ Error:", err);
+      alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
     }
-
-    // if (response.status === 200) {
-    //   console.log("✅ PDF berhasil dibuat");
-    //   const pdfBlob = new Blob([response.data], { type: "application/pdf" });
-    //   const formData = new FormData();
-    //   formData.append("userId", session.user?.id);
-    //   formData.append("productId", String(product.id));
-    //   formData.append("price", data.cost);
-    //   formData.append(
-    //     "pdfFile",
-    //     new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
-    //   );
-
-    //   await axios.post("/api/contract/post/pdf", formData, {
-    //     headers: { "Content-Type": "multipart/form-data" },
-    //   });
-
-    //   console.log("✅ PDF berhasil diunggah");
-    //   toast({ title: "Success", description: "PDF uploaded successfully!" });
-
-    //   // Reset form setelah sukses
-    //   form.reset();
-
-    //   // Kembali ke halaman sebelumnya
-    //   router.back();
-    // } else {
-    //   console.error("❌ Gagal membuat kontrak");
-    //   alert("Gagal membuat kontrak");
-    // }
   };
 
   return (
@@ -216,6 +222,10 @@ const Contract: React.FC = () => {
                           <span>End Date</span>
                           <span>{item.endDate}</span>
                         </div>
+                        <div className="grid grid-cols-2 items-center gap-4">
+                          <span>Description Contract</span>
+                          <span>{item.descriptionContract}</span>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                           <span>Features</span>
                           <ul>
@@ -243,7 +253,7 @@ const Contract: React.FC = () => {
                             <Form {...form}>
                               <form
                                 onSubmit={form.handleSubmit(() =>
-                                  onSubmit(item.id)
+                                  onSubmit(item)
                                 )}
                                 className="space-y-8"
                               >

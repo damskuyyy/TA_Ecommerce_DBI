@@ -9,11 +9,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const { contractId, status } = req.body;
+    const { contractId, contractName, cost, signature, status } = req.body;
 
     // Validasi request body
-    if (!contractId || !status) {
-      return res.status(400).json({ error: "contractId and status are required" });
+    if (!contractId || !contractName || !cost || !signature || !status) {
+      return res
+        .status(400)
+        .json({ error: "contractId and status are required" });
     }
 
     // Validasi status agar sesuai dengan enum ContractStatus
@@ -33,7 +35,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Update status kontrak di database
     const updatedContract = await prisma.contractDigital.update({
       where: { id: contractId },
-      data: { status },
+      data: {
+        status,
+        ...(contractName && { contractName }),
+        ...(cost && { cost: parseFloat(cost) }),
+        ...(signature && { signature }),
+      },
     });
 
     return res.status(200).json({ success: true, contract: updatedContract });

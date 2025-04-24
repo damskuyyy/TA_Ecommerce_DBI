@@ -107,7 +107,6 @@ model ContractDigital {
   productId   String
   product     Product         @relation(fields: [productId], references: [id])
 
-  // User-provided
   contractName String?
   fullName      String?
   address       String?
@@ -115,13 +114,15 @@ model ContractDigital {
   startDate     DateTime?
   endDate       DateTime?
 
-  // Admin-completed
+  descriptionContract String
   features      String[]
   scopeOfWork   String?
   
   // PDF-related
   filename      String?
   isFinalized   Boolean        @default(false)
+
+  signature String?
 
   status        ContractStatus @default(PENDING_APPROVAL)
   createdAt     DateTime       @default(now())

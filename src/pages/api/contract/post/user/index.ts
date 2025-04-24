@@ -17,6 +17,7 @@ export default async function handler(
       address,
       startDate,
       endDate,
+      descriptionContract,
       features,
       scopeOfWork,
     } = req.body;
@@ -29,6 +30,7 @@ export default async function handler(
       !address ||
       !startDate ||
       !endDate ||
+      !descriptionContract ||
       !features ||
       !scopeOfWork
     ) {
@@ -43,6 +45,7 @@ export default async function handler(
         address,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
+        descriptionContract,
         features,
         scopeOfWork,
         isFinalized: false,
@@ -50,7 +53,9 @@ export default async function handler(
       },
     });
 
-    return res.status(201).json({ message: "Draft contract created", contract });
+    return res
+      .status(201)
+      .json({ message: "Draft contract created", contract });
   } catch (error) {
     console.error("Error handling contract:", error);
     return res.status(500).json({ error: "Internal Server Error" });

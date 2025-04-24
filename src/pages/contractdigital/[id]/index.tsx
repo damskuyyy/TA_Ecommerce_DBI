@@ -49,6 +49,7 @@ const Contractdigital = () => {
       address: "",
       startDate: "",
       endDate: "",
+      descriptionContract: "",
       features: [],
       scopeOfWork: "",
       agreement: false,
@@ -87,7 +88,6 @@ const Contractdigital = () => {
     }
   };
 
- 
   const getData = async () => {
     setLoad(true);
     if (id) {
@@ -338,6 +338,22 @@ const Contractdigital = () => {
                       )}
                     />
                   ))}
+                  <FormField
+                    control={form.control}
+                    name="descriptionContract"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2">
+                        <FormLabel>Description Contract</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Description Contract"
+                            {...field}
+                            required
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
                   <FormField
                     control={form.control}
