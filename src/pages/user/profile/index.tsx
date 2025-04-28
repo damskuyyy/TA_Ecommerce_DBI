@@ -285,6 +285,7 @@ const ProfilePage = ({
         });
 
         alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+        setIsSignature(false);
         getContractData();
       } else {
         throw new Error("Gagal membuat PDF");
@@ -965,7 +966,7 @@ const ProfilePage = ({
                                   setSelectedContract(item);
                                 }}
                               >
-                                Fill Data and Sign
+                                Sign
                               </Button>
                               <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
                                 Cancel
