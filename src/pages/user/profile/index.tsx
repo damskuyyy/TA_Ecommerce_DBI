@@ -48,6 +48,9 @@ import {
 import Alerts from "@/components/ui/alerts";
 import formattedPrice from "@/utils/formattedPrice";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
+import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
+import { DialogHeader } from "@/components/ui/dialog";
+import SignaturePad from "@/components/ui/signature-pad";
 
 const ProfilePage = ({
   items,
@@ -85,6 +88,8 @@ const ProfilePage = ({
 
   const [contractData, setContractData] = useState([]);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [isSignature, setIsSignature] = useState<boolean>(false);
+  const [signature, setSignature] = useState<string | null>(null);
 
   const getDataUser = async () => {
     setLoad(true);
@@ -219,6 +224,11 @@ const ProfilePage = ({
     if (!filename) return;
     const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
     setPdfUrl(fileUrl);
+  };
+
+  // Handle Sign
+  const handleSign = async () => {
+    console.log("Signature: ", signature);
   };
 
   const transactionValue = 0.05; // 5% transaction fee
@@ -885,8 +895,8 @@ const ProfilePage = ({
                               </Button>
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
-                              <Button className="bg-gray-400 text-black px-2 py-2 rounded-md">
-                                Sign
+                              <Button onClick={() => setIsSignature(true)}>
+                                Fill Data and Sign
                               </Button>
                               <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
                                 Cancel
@@ -904,6 +914,24 @@ const ProfilePage = ({
                 <div className="overflow-x-auto shadow-md"></div>
               </div>
             </TabsContent>
+            {isSignature && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-4 rounded-lg shadow-lg flex flex-col">
+                  <SignaturePad onSave={(sign) => setSignature(sign)} />
+                  <div className="flex justify-end items-center mt-4 gap-4">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setIsSignature(null)}
+                    >
+                      Close
+                    </Button>
+                    <Button onClick={handleSign}>
+                      Confirm and Accept Contract
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
             {pdfUrl && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">

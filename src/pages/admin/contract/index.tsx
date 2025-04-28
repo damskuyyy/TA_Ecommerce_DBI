@@ -245,7 +245,7 @@ const Contract: React.FC = () => {
                     <div className="flex gap-4">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button>try</Button>
+                          <Button>Fill Data and Sign</Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>Fill Data and Sign</DialogHeader>
@@ -324,9 +324,6 @@ const Contract: React.FC = () => {
                           </div>
                         </DialogContent>
                       </Dialog>
-                      <Button className="bg-gray-400 text-black px-2 py-2 rounded-md">
-                        Fill Data and Sign
-                      </Button>
                       <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
                         Reject
                       </Button>
