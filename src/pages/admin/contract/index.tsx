@@ -38,7 +38,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 const Contract: React.FC = () => {
   const [contractData, setContractData] = useState([]);
-  // const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -63,11 +63,11 @@ const Contract: React.FC = () => {
   }, []);
 
   // Handle preview PDF
-  // const handlePreview = (filename: string) => {
-  //   if (!filename) return;
-  //   const fileUrl = `http://localhost:3000/api/contract/post/getPdf?filename=${filename}`;
-  //   setPdfUrl(fileUrl);
-  // };
+  const handlePreview = (filename: string) => {
+    if (!filename) return;
+    const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
+    setPdfUrl(fileUrl);
+  };
 
   const agreement = form.watch("agreement");
 
@@ -77,12 +77,10 @@ const Contract: React.FC = () => {
     try {
       // Update kontrak dengan PUT request
       const response = await axios.put("/api/contract/put", {
+        ...values, // Kirim data yang diperbarui
         contractId: item.id, // Sesuai dengan API
         status: "AWAITING_CLIENT_SIGNATURE", // atau "Processing"
-        ...values, // Kirim data yang diperbarui
       });
-
-      console.log("Response after PUT:", response.data);
 
       // Cek apakah response.data berisi data kontrak yang benar
       if (!response.data || !response.data.contract) {
@@ -93,7 +91,7 @@ const Contract: React.FC = () => {
 
       // Kirim data ke API untuk pembuatan PDF
       const pdfResponse = await axios.post(
-        "/api/contract/post/admin",
+        "/api/contract/pdf/post",
         updatedContract,
         {
           responseType: "arraybuffer",
@@ -167,6 +165,7 @@ const Contract: React.FC = () => {
                 {/* <TableHead>Price</TableHead> */}
                 <TableHead>Status</TableHead>
                 <TableHead>Data</TableHead>
+                <TableHead>Contract</TableHead>
                 <TableHead>Action</TableHead>
                 <TableHead>Created At</TableHead>
               </TableRow>
@@ -191,14 +190,7 @@ const Contract: React.FC = () => {
                       {item.status}
                     </span>
                   </TableCell>
-                  {/* <TableCell>
-                    <Button
-                      onClick={() => handlePreview(item.filename)}
-                      className="bg-gray-400 text-black px-2 py-2 rounded-md"
-                    >
-                      Preview
-                    </Button>
-                  </TableCell> */}
+
                   <TableCell>
                     <Dialog>
                       <DialogTrigger asChild>
@@ -242,88 +234,102 @@ const Contract: React.FC = () => {
                     </Dialog>
                   </TableCell>
                   <TableCell>
+                    {item.status != "PENDING_APPROVAL" ? (
+                      <Button
+                        onClick={() => handlePreview(item.filename)}
+                        className="bg-gray-400 text-black px-2 py-2 rounded-md"
+                      >
+                        Preview
+                      </Button>
+                    ) : (
+                      <span>-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <div className="flex gap-4">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button>Fill Data and Sign</Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>Fill Data and Sign</DialogHeader>
-                          <div>
-                            <Form {...form}>
-                              <form
-                                onSubmit={form.handleSubmit(() =>
-                                  onSubmit(item)
-                                )}
-                                className="space-y-8"
-                              >
-                                {[
-                                  {
-                                    name: "contractName",
-                                    label: "Contract Name",
-                                    type: "text",
-                                  },
-                                  {
-                                    name: "cost",
-                                    label: "Cost",
-                                    type: "number",
-                                  },
-                                ].map(({ name, label, type }) => (
-                                  <FormField
-                                    key={name}
-                                    control={form.control}
-                                    name={name}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{label}</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            placeholder={label}
-                                            type={type}
-                                            {...field}
-                                            required
-                                          />
-                                        </FormControl>
-                                      </FormItem>
-                                    )}
-                                  ></FormField>
-                                ))}
-                                <SignaturePad
-                                  onSave={(signature) =>
-                                    form.setValue("signature", signature)
-                                  }
-                                />
-                                <div className="flex items-center gap-2 mt-4">
-                                  <FormField
-                                    control={form.control}
-                                    name="agreement"
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                            required
-                                          />
-                                        </FormControl>
-                                        <span>Setuju</span>
-                                      </FormItem>
-                                    )}
-                                  />
-                                </div>
-
-                                <Button
-                                  type="submit"
-                                  className="mt-4 w-full bg-black text-white"
-                                  disabled={!agreement}
+                      {item.status == "PENDING_APPROVAL" && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button>Fill Data and Sign</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>Fill Data and Sign</DialogHeader>
+                            <div>
+                              <Form {...form}>
+                                <form
+                                  onSubmit={form.handleSubmit(() =>
+                                    onSubmit(item)
+                                  )}
+                                  className="space-y-8"
                                 >
-                                  Create Contract
-                                </Button>
-                              </form>
-                            </Form>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                                  {[
+                                    {
+                                      name: "contractName",
+                                      label: "Contract Name",
+                                      type: "text",
+                                    },
+                                    {
+                                      name: "cost",
+                                      label: "Cost",
+                                      type: "number",
+                                    },
+                                  ].map(({ name, label, type }) => (
+                                    <FormField
+                                      key={name}
+                                      control={form.control}
+                                      name={name}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>{label}</FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              placeholder={label}
+                                              type={type}
+                                              {...field}
+                                              required
+                                            />
+                                          </FormControl>
+                                        </FormItem>
+                                      )}
+                                    ></FormField>
+                                  ))}
+                                  <SignaturePad
+                                    onSave={(signature) =>
+                                      form.setValue("signature", signature)
+                                    }
+                                  />
+                                  <div className="flex items-center gap-2 mt-4">
+                                    <FormField
+                                      control={form.control}
+                                      name="agreement"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormControl>
+                                            <Checkbox
+                                              checked={field.value}
+                                              onCheckedChange={field.onChange}
+                                              required
+                                            />
+                                          </FormControl>
+                                          <span>Setuju</span>
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+
+                                  <Button
+                                    type="submit"
+                                    className="mt-4 w-full bg-black text-white"
+                                    disabled={!agreement}
+                                  >
+                                    Create Contract
+                                  </Button>
+                                </form>
+                              </Form>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      )}
                       <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
                         Reject
                       </Button>
@@ -338,7 +344,7 @@ const Contract: React.FC = () => {
       </div>
 
       {/* Modal Info*/}
-      {/* {pdfUrl && (
+      {pdfUrl && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
             <div className="flex justify-between items-center mb-4">
@@ -353,7 +359,7 @@ const Contract: React.FC = () => {
             <iframe src={pdfUrl} className="w-full flex-grow" />
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 };

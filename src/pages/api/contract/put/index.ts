@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const { contractId, contractName, cost, signature, status } = req.body;
-
+    console.log("STATUS: ", status);
     // Validasi request body
     if (!contractId || !contractName || !cost || !signature || !status) {
       return res

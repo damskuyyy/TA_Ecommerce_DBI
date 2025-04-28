@@ -9,7 +9,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         data: {
           product: { connect: { id: productId } },
           user: { connect: { id: userId } },
-          price,
           filename: pdfUrl,
         },
       });

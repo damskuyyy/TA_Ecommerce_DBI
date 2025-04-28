@@ -90,6 +90,7 @@ const ProfilePage = ({
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isSignature, setIsSignature] = useState<boolean>(false);
   const [signature, setSignature] = useState<string | null>(null);
+  const [selectedContract, setSelectedContract] = useState({});
 
   const getDataUser = async () => {
     setLoad(true);
@@ -228,7 +229,70 @@ const ProfilePage = ({
 
   // Handle Sign
   const handleSign = async () => {
-    console.log("Signature: ", signature);
+    try {
+      // Update kontrak dengan PUT request
+      const response = await axios.put("/api/contract/put", {
+        ...selectedContract, // Kirim data yang diperbarui
+        contractId: selectedContract.id,
+        status: "AWAITING_PAYMENT",
+      });
+
+      // Cek apakah response.data berisi data kontrak yang benar
+      if (!response.data || !response.data.contract) {
+        throw new Error("Data kontrak tidak tersedia dalam response.");
+      }
+
+      const updatedContract = response.data.contract;
+
+      // Kirim data ke API untuk pembuatan PDF
+      const pdfResponse = await axios.post(
+        "/api/contract/pdf/post",
+        {
+          fullName: updatedContract.fullName,
+          address: updatedContract.address,
+          contractName: updatedContract.contractName,
+          cost: updatedContract.cost,
+          startDate: updatedContract.startDate,
+          endDate: updatedContract.endDate,
+          descriptionContract: updatedContract.descriptionContract,
+          features: updatedContract.features,
+          scopeOfWork: updatedContract.scopeOfWork,
+          signature: updatedContract.signature,
+          userSignature: signature,
+        },
+        {
+          responseType: "arraybuffer",
+        }
+      );
+
+      if (pdfResponse.status === 200) {
+        // Logika setelah PDF berhasil dibuat
+        const pdfBlob = new Blob([pdfResponse.data], {
+          type: "application/pdf",
+        });
+
+        const formData = new FormData();
+        formData.append("contractId", updatedContract.id);
+        formData.append("userId", updatedContract.userID);
+        formData.append(
+          "pdfFile",
+          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
+        );
+
+        // Upload PDF ke server
+        await axios.put("/api/contract/pdf/put", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+        getContractData();
+      } else {
+        throw new Error("Gagal membuat PDF");
+      }
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+    }
   };
 
   const transactionValue = 0.05; // 5% transaction fee
@@ -895,7 +959,12 @@ const ProfilePage = ({
                               </Button>
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
-                              <Button onClick={() => setIsSignature(true)}>
+                              <Button
+                                onClick={() => {
+                                  setIsSignature(true);
+                                  setSelectedContract(item);
+                                }}
+                              >
                                 Fill Data and Sign
                               </Button>
                               <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
@@ -921,7 +990,7 @@ const ProfilePage = ({
                   <div className="flex justify-end items-center mt-4 gap-4">
                     <Button
                       variant="ghost"
-                      onClick={() => setIsSignature(null)}
+                      onClick={() => setIsSignature(false)}
                     >
                       Close
                     </Button>
