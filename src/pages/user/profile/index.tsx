@@ -113,11 +113,8 @@ const ProfilePage = ({
 
   const getContractData = async () => {
     try {
-      const resp = await axios(
-        `/api/contract/get?userId=${user.id}&status=AWAITING_CLIENT_SIGNATURE`
-      );
+      const resp = await axios(`/api/contract/get?userId=${user.id}`);
       setContractData(resp.data);
-      console.log("dataContract: ", resp.data);
     } catch (err) {
       console.log(err);
     }
@@ -337,6 +334,13 @@ const ProfilePage = ({
             <TabsTrigger value="contract" className="flex items-center gap-2">
               <ShoppingBasketIcon size={20} />
               Contract
+            </TabsTrigger>
+            <TabsTrigger
+              value="monitoringProgress"
+              className="flex items-center gap-2"
+            >
+              <ShoppingBasketIcon size={20} />
+              Monitoring Progress
             </TabsTrigger>
           </TabsList>
           <Scrollbar orientation="horizontal" />
@@ -943,31 +947,46 @@ const ProfilePage = ({
                               {item.id}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
-                              {item.contractName}
+                              {item.product.name}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
-                              {item.cost}
+                              {item.cost ? item.cost : "-"}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
                               {item.status}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
-                              <Button
-                                onClick={() => handlePreview(item.filename)}
-                                className="bg-gray-400 text-black px-2 py-2 rounded-md"
-                              >
-                                Preview
-                              </Button>
+                              {item.filename ? (
+                                <Button
+                                  onClick={() => handlePreview(item.filename)}
+                                  className="bg-gray-400 text-black px-2 py-2 rounded-md"
+                                >
+                                  Preview
+                                </Button>
+                              ) : (
+                                "-"
+                              )}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
-                              <Button
-                                onClick={() => {
-                                  setIsSignature(true);
-                                  setSelectedContract(item);
-                                }}
-                              >
-                                Sign
-                              </Button>
+                              {item.status == "AWAITING_CLIENT_SIGNATURE" && (
+                                <Button
+                                  onClick={() => {
+                                    setIsSignature(true);
+                                    setSelectedContract(item);
+                                  }}
+                                >
+                                  Sign
+                                </Button>
+                              )}
+                              {item.status == "AWAITING_PAYMENT" && (
+                                <Button
+                                  onClick={() => {
+                                    console.log("payment");
+                                  }}
+                                >
+                                  Pay
+                                </Button>
+                              )}
                               <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
                                 Cancel
                               </Button>
@@ -977,6 +996,51 @@ const ProfilePage = ({
                       ) : (
                         <p>No Contract</p>
                       )}
+                    </TableBody>
+                  </Table>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+                <div className="overflow-x-auto shadow-md"></div>
+              </div>
+            </TabsContent>
+            <TabsContent
+              value="monitoringProgress"
+              className="w-full lg:mt-8 md:mt-6 mt-5"
+            >
+              <div className="bg-white rounded-lg lg:p-2 p-1 dark:bg-black">
+                <h2 className="text-xl pb-3 border-b font-semibold w-full">
+                  Monitoring Progress
+                </h2>
+                <ScrollArea className="lg:pb-0 pb-4">
+                  <Table className="min-w-full divide-y divide-gray-200 mt-4 dark:divide-gray-800">
+                    <TableCaption>A list of your recent invoices.</TableCaption>
+                    <TableHeader className="bg-gray-50 dark:bg-gray-900">
+                      <TableRow>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Id Contract
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Products
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Price
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Contract
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </TableHead>
+                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950 dark:divide-gray-700">
+                      {[].map((item, idx) => (
+                        <TableRow key={idx}></TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                   <ScrollBar orientation="horizontal" />
