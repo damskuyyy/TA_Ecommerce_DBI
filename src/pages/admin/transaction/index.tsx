@@ -1,5 +1,4 @@
 import React from "react";
-import CardTransactions from "@/components/ui/cardTransactions";  // Import the Card component
 import {
   Table,
   TableBody,
@@ -31,33 +30,6 @@ const Transaction: React.FC = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-      </div>
-      {/* Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <CardTransactions
-          title="Total User"
-          value={40689}
-          description="8.5% Up from yesterday"
-          descriptionColor="text-green-500"
-        />
-        <CardTransactions
-          title="Total Order"
-          value={10293}
-          description="1.3% Up from past week"
-          descriptionColor="text-green-500"
-        />
-        <CardTransactions
-          title="Total Sales"
-          value="$89,000"
-          description="4.3% Down from yesterday"
-          descriptionColor="text-red-500"
-        />
-        <CardTransactions
-          title="Total Pending"
-          value={2040}
-          description="1.8% Up from yesterday"
-          descriptionColor="text-green-500"
-        />
       </div>
 
       {/* Table */}
