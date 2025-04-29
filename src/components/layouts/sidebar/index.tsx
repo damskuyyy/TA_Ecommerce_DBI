@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   ArrowLeftRightIcon, BookCheckIcon, FoldersIcon,
-  Home, LogsIcon, Package2, Users
+  Home, ListChecks, LogsIcon, Package2, Users
 } from "lucide-react";
 import { useRouter } from "next/router";
 
@@ -61,6 +61,13 @@ const Sidebar = () => {
             >
               <BookCheckIcon className="h-4 w-4" />
               Contract
+            </Link>
+            <Link
+              href="/admin/monitoring"
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/monitoring' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
+            >
+              <ListChecks className="h-4 w-4" />
+              Monitoring Progress
             </Link>
           </nav>
         </div>

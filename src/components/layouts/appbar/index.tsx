@@ -84,6 +84,14 @@ const Appbar = () => {
               <Users className="h-5 w-5" />
               Contract 
             </Link>
+            <Link
+              href="/admin/monitoring"
+              className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/monitoring' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
+              onClick={() => setSheetView(false)}
+            >
+              <Users className="h-5 w-5" />
+              Monitoring Progress 
+            </Link>
           </nav>
         </SheetContent>
       </Sheet>
