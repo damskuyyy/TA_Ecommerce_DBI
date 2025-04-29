@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import CardDashboard from "@/components/ui/cardDashboard"; // Import the Card component
 import {
   Table,
   TableBody,
@@ -68,34 +67,7 @@ const Dashboard: React.FC = () => {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        {/* Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <CardDashboard
-            title="Total User"
-            value={40689}
-            description="8.5% Up from yesterday"
-            descriptionColor="text-green-500"
-          />
-          <CardDashboard
-            title="Total Order"
-            value={10293}
-            description="1.3% Up from past week"
-            descriptionColor="text-green-500"
-          />
-          <CardDashboard
-            title="Total Sales"
-            value="$89,000"
-            description="4.3% Down from yesterday"
-            descriptionColor="text-red-500"
-          />
-          <CardDashboard
-            title="Total Pending"
-            value={2040}
-            description="1.8% Up from yesterday"
-            descriptionColor="text-green-500"
-          />
-        </div>
-
+        
         {/* Table */}
         <div className="bg-white rounded-lg lg:p-4 p-1 dark:bg-black">
           <h2 className="text-lg font-semibold text-gray-700 dark:text-w">Recent Orders</h2>
