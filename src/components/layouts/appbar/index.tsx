@@ -61,14 +61,6 @@ const Appbar = () => {
               Order
             </Link>
             <Link
-              href="/admin/transaction"
-              className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/transaction' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
-              onClick={() => setSheetView(false)}
-            >
-              <ArrowLeftRightIcon className="h-5 w-5" />
-              Transactions
-            </Link>
-            <Link
               href="/admin/discussion"
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/discussion' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
               onClick={() => setSheetView(false)}

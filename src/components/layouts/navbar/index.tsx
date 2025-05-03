@@ -169,18 +169,9 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
           <Link href={"/"} className="font-medium hover:opacity-80" onClick={() => setView(false)}>
             Home
           </Link>
-          <Accordion type="single" collapsible>
-            <AccordionItem value="item-1" className="m-0">
-              <AccordionTrigger className="font-semibold py-0 justify-start gap-3 m-0 h-full">
-                Company
-              </AccordionTrigger>
-              <AccordionContent className="flex flex-col gap-3 mt-3 w-full">
-                <Link href={"/aboutus"} className="hover:opacity-80 w-full" onClick={() => setView(false)}>About Us</Link>
-                <Link href={"/team"} className="hover:opacity-80 w-full" onClick={() => setView(false)}>Our Team</Link>
-                <Link href={"/#faqs"} className="hover:opacity-80 w-full" onClick={() => setView(false)}>Faq's</Link>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <Link href={"/aboutus"} className="font-medium hover:opacity-80" onClick={() => setView(false)}>
+            Company
+          </Link>
           <Link href={"/#services"} className="font-medium hover:opacity-80" onClick={() => setView(false)}>
             Services
           </Link>
@@ -192,25 +183,9 @@ const Navbar = ({ items, setItems, products, setProducts }: { items: ItemDataTyp
           <Link href={"/"} className="hover:opacity-80 font-semibold">
             Home
           </Link>
-          <DropdownMenu open={dropdownOpen2} onOpenChange={setDropdownOpen2}>
-            <DropdownMenuTrigger>
-              <div className="flex items-center gap-2 font-semibold">
-                Company
-                <ChevronDownIcon />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem className="font-semibold w-full">
-                <Link onClick={() => setDropdownOpen2(false)} className="w-full" href={"/aboutus"}>About Us</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="font-semibold w-full">
-                <Link onClick={() => setDropdownOpen2(false)} className="w-full" href={"/team"}>Our Team</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="font-semibold w-full">
-                <Link onClick={() => setDropdownOpen2(false)} className="w-full" href={"/#faqs"}>Faq's</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Link href={"/aboutus"} className="font-semibold hover:opacity-80">
+            Company
+          </Link>
           <Link href={"/#services"} className="font-semibold hover:opacity-80">
             Services
           </Link>

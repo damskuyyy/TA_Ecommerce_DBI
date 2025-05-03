@@ -42,13 +42,6 @@ const Sidebar = () => {
               Order
             </Link>
             <Link
-              href="/admin/transaction"
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/transaction' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
-            >
-              <ArrowLeftRightIcon className="h-4 w-4" />
-              Transactions
-            </Link>
-            <Link
               href="/admin/discussion"
               className={`flex items-center gap-3 rounded-lg px-3 py-2 ${pathname === '/admin/discussion' ? 'text-foreground bg-muted' : 'text-muted-foreground'} transition-all hover:text-primary`}
             >
