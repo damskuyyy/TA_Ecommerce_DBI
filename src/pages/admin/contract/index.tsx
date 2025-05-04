@@ -71,6 +71,7 @@ const Contract: React.FC = () => {
 
   const agreement = form.watch("agreement");
 
+  // PERLU DIRUBAH ALGORITMANYA, TIDAK PERLU FORM.GETVALUES()
   const onSubmit = async (item: any) => {
     const values = form.getValues();
 
