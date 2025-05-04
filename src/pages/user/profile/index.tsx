@@ -308,6 +308,10 @@ const ProfilePage = ({
     taxRate
   );
 
+  const handleViewProgress = (id: string) => {
+    console.log("View", id);
+  };
+
   return (
     <>
       <Head>
@@ -868,16 +872,13 @@ const ProfilePage = ({
                     <TableHeader className="bg-gray-50 dark:bg-gray-900">
                       <TableRow>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Id Contract
+                          Contract Name
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Products
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Price
-                        </TableHead>
-                        <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
                         </TableHead>
                         <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Contract
@@ -889,9 +890,41 @@ const ProfilePage = ({
                       </TableRow>
                     </TableHeader>
                     <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950 dark:divide-gray-700">
-                      {[].map((item, idx) => (
-                        <TableRow key={idx}></TableRow>
-                      ))}
+                      {contractData.length > 0 &&
+                        contractData
+                          .filter((item) => item.status === "ACTIVE")
+                          .map((item, idx) => (
+                            <TableRow key={idx}>
+                              <TableCell className="px-6 py-4 whitespace-nowrap">
+                                {item.contractName}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 whitespace-nowrap">
+                                {item.product.name}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 whitespace-nowrap">
+                                {item.cost ? item.cost : "-"}
+                              </TableCell>
+                              <TableCell className="px-6 py-4 whitespace-nowrap">
+                                {item.filename ? (
+                                  <Button
+                                    onClick={() => handlePreview(item.filename)}
+                                    className="bg-gray-400 text-black px-2 py-2 rounded-md"
+                                  >
+                                    Preview
+                                  </Button>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  onClick={() => handleViewProgress(item.id)}
+                                >
+                                  View Progress
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                     </TableBody>
                   </Table>
                   <ScrollBar orientation="horizontal" />

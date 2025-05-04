@@ -159,10 +159,10 @@ const Monitoring: React.FC = () => {
                         Preview
                       </Button>
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">
+                    <TableCell className="px-6 py-4 whitespace-nowrap flex gap-2">
                       <Dialog onOpenChange={() => handleOpenDialog(item.id)}>
                         <DialogTrigger asChild>
-                          <Button>Update Progress</Button>
+                          <Button variant={"outline"}>Update Progress</Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
@@ -219,6 +219,7 @@ const Monitoring: React.FC = () => {
                           </div>
                         </DialogContent>
                       </Dialog>
+                      <Button variant={"default"}>Completed</Button>
                     </TableCell>
                   </TableRow>
                 ))}
