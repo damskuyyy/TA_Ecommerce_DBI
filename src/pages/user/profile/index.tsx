@@ -51,6 +51,7 @@ import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 import { DialogHeader } from "@/components/ui/dialog";
 import SignaturePad from "@/components/ui/signature-pad";
+import { useRouter } from "next/router";
 
 const ProfilePage = ({
   items,
@@ -91,6 +92,8 @@ const ProfilePage = ({
   const [isSignature, setIsSignature] = useState<boolean>(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState({});
+
+  const router = useRouter();
 
   const getDataUser = async () => {
     setLoad(true);
@@ -309,7 +312,11 @@ const ProfilePage = ({
   );
 
   const handleViewProgress = (id: string) => {
-    console.log("View", id);
+    try {
+      router.push(`/user/profile/progress/${id}`);
+    } catch (error) {
+      console.error("Gagal membuka halaman progress:", error);
+    }
   };
 
   return (

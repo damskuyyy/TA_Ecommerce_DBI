@@ -7,19 +7,29 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    /* -------------------------------------------------------- */
-    /* 1.  Ambil query‑string                                   */
-    /* -------------------------------------------------------- */
-    const { userId, status } = req.query;
+    const { id, userId, status } = req.query;
 
-    // Bangun objek filter Prisma secara dinamis
+    // Jika query mengandung id, ambil satu data kontrak
+    if (id && typeof id === "string") {
+      const contract = await prisma.contractDigital.findUnique({
+        where: { id },
+        include: {
+          product: { select: { name: true } },
+        },
+      });
+
+      if (!contract) {
+        return res.status(404).json({ msg: "Contract not found" });
+      }
+
+      return res.status(200).json(contract);
+    }
+
+    // Kalau tidak ada id, ambil banyak data berdasarkan filter lain
     const where: any = {};
     if (userId && typeof userId === "string") where.userId = userId;
     if (status && typeof status === "string") where.status = status;
 
-    /* -------------------------------------------------------- */
-    /* 2.  Query database                                       */
-    /* -------------------------------------------------------- */
     const contracts = await prisma.contractDigital.findMany({
       where,
       include: {
