@@ -18,13 +18,15 @@ export default async function handler(
         .json({ message: "ID diperlukan untuk menghapus diskusi" });
     }
 
-    const deletedDiscuss = await prisma.discuss.delete({
-      where: { id },
-    });
+    const deleted = await prisma.$transaction([
+      prisma.message.deleteMany({ where: { discussId: id } }),
+      prisma.discuss.delete({ where: { id } }),
+    ]);
 
-    return res
-      .status(200)
-      .json({ message: "Diskusi berhasil dihapus", deletedDiscuss });
+    return res.status(200).json({
+      message: "Diskusi dan pesan berhasil dihapus",
+      deletedDiscuss: deleted[1],
+    });
   } catch (error: any) {
     console.error("Gagal menghapus diskusi:", error);
 

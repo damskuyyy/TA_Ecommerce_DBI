@@ -130,6 +130,22 @@ const Contract: React.FC = () => {
     }
   };
 
+  const handleRejectContract = async (id: string) => {
+    try {
+      const confirmDelete = confirm(
+        "Apakah kamu yakin ingin menolak kontrak ini?"
+      );
+      if (!confirmDelete) return;
+
+      await axios.delete(`/api/contract/delete/${id}`);
+      alert("Kontrak berhasil ditolak");
+      getContractData();
+    } catch (e) {
+      console.error("❌ Gagal menolak kontrak:", e);
+      alert("Terjadi kesalahan saat menolak kontrak");
+    }
+  };
+
   return (
     <div className="p-4 space-y-6">
       <div className="space-y-2">
@@ -331,7 +347,10 @@ const Contract: React.FC = () => {
                           </DialogContent>
                         </Dialog>
                       )}
-                      <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
+                      <Button
+                        className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit"
+                        onClick={() => handleRejectContract(item.id)}
+                      >
                         Reject
                       </Button>
                     </div>

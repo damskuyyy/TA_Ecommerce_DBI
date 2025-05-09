@@ -107,7 +107,8 @@ export default function Discussion() {
   const handleDeleteDiscussion = async (id: string) => {
     try {
       const resp = await axios.delete(`/api/discuss/delete/${id}`);
-      console.log("Berhasil menghapus diskusi: ", resp.data);
+      alert("Berhasil menghapus diskusi: ", resp.data);
+      fetchDiscussion();
     } catch (e) {
       console.log("Gagal menghapus diskusi: ", e);
     }
