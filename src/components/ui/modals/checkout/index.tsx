@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useCallback, useEffect, SetStateAction, Dispatch } from "react";
-=======
 import React, { useState, useCallback, SetStateAction, Dispatch } from "react";
->>>>>>> 8b30526 (push order & checkout TA)
 import { useDropzone } from "react-dropzone";
 import {
   Dialog,
@@ -16,15 +12,6 @@ import { Button } from "../../button";
 import { ProductDataType } from "@/types/productDataTypes";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
-<<<<<<< HEAD
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { Image } from "lucide-react";
-import formattedPrice from "@/utils/formattedPrice";
-import generateInvoiceId from "@/utils/generateInvoiceId";
-
-// Komponen Modal
-=======
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -43,34 +30,11 @@ interface PaymentProofModalProps {
   handlePostOrder: () => void;
 }
 
->>>>>>> 8b30526 (push order & checkout TA)
 const PaymentProofModal = ({
   isOpen,
   onClose,
   image,
   setImage,
-<<<<<<< HEAD
-  handlePostOrder
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  image: File[],
-  setImage: Dispatch<SetStateAction<File[]>>,
-  handlePostOrder:  () => void
-}) => {
-  
-  
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles && acceptedFiles[0]) {
-      // Validasi tipe file
-      if (!acceptedFiles[0].type.startsWith('image/')) {
-        alert('Please upload an image file.');
-        return;
-      }
-      setImage(acceptedFiles);
-    }
-  }, []);
-=======
   handlePostOrder,
 }: PaymentProofModalProps) => {
   const onDrop = useCallback(
@@ -85,16 +49,12 @@ const PaymentProofModal = ({
     },
     [setImage]
   );
->>>>>>> 8b30526 (push order & checkout TA)
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     maxFiles: 1,
   });
 
-<<<<<<< HEAD
-  
-=======
   return (
     <AnimatePresence>
       {isOpen && (
@@ -187,55 +147,10 @@ const CryptoDetailsModal = ({
     setAccounts([]);
     toast.success("Wallet disconnected!");
   };
->>>>>>> 8b30526 (push order & checkout TA)
 
   if (!isOpen) return null;
 
   return (
-<<<<<<< HEAD
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          Upload Payment Proof
-        </h2>
-        <div
-          {...getRootProps()}
-          className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${isDragActive ? "border-blue-500" : "border-gray-300"
-            }`}
-        >
-          <input {...getInputProps()} />
-          <div className="flex flex-col items-center">
-            <div className="mb-2">
-              <Image />
-            </div>
-            {image.length > 0 ? (
-              <p className="text-gray-500">{image[0].name}</p>
-            ) : (
-              <>
-                <p className="text-gray-500 mb-1">Attach File</p>
-                <p className="text-gray-400">or Drag & Drop</p>
-              </>
-            )}
-          </div>
-        </div>
-        <Button onClick={() =>{
-          handlePostOrder()
-          onClose()
-        }} className="w-full">
-          Submit
-        </Button>
-        <Button onClick={onClose} className="w-full mt-2" variant="secondary">
-          Cancel
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-const ModalCheckout = ({
-  data
-}: { data: ProductDataType }) => {
-=======
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white text-black p-6 rounded-lg w-[600px] max-w-lg text-center mx-auto">
         <motion.div
@@ -349,7 +264,6 @@ const ModalCheckout = ({
 // ModalCheckout Component
 const ModalCheckout = ({ data }: { data: ProductDataType }) => {
   const [showUploadModal, setShowUploadModal] = useState(false);
->>>>>>> 8b30526 (push order & checkout TA)
   const [isModalOpen, setModalOpen] = useState(false);
   const { toast } = useToast();
   const fee = data.price && data.price * 0.004;
@@ -357,17 +271,11 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
   const appFee = 0.002;
   const total = data.price + (fee + data.price * tax + data.price * appFee);
   const [load, setLoad] = useState(false);
-<<<<<<< HEAD
-  const { data: session, status } : any = useSession();
-=======
   const { data: session, status }: any = useSession();
->>>>>>> 8b30526 (push order & checkout TA)
   const { push } = useRouter();
   const [showCryptoModal, setShowCryptoModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [image, setImage] = useState<File[]>([]);
-<<<<<<< HEAD
-=======
   const [showCryptoDetails, setShowCryptoDetails] = useState(false);
   const [selectedCryptoData, setSelectedCryptoData] = useState({
     name: "",
@@ -478,7 +386,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
       </Dialog>
     );
   };
->>>>>>> 8b30526 (push order & checkout TA)
 
   const handleDebitCardPayment = async () => {
     if (status === "authenticated") {
@@ -486,15 +393,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         amount: total,
         description: `Payout for ${data.name} on the marketplace dbix.my.id`,
         items: [
-<<<<<<< HEAD
-          {
-            name: data.name,
-            quantity: 1,
-            price: data.price,
-          },
-=======
           { name: data.name, quantity: 1, price: data.price },
->>>>>>> 8b30526 (push order & checkout TA)
         ],
       };
       setLoad(true);
@@ -502,23 +401,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         const resp = await axios.post("/api/payment/create-checkout", bodyXendit);
         if (resp.status === 200) {
           setLoad(false);
-<<<<<<< HEAD
-          toast({
-            description: "Creating invoice success!",
-          })
-
-          
-
-          setTimeout(() => {
-            window.open(resp.data.data.invoiceUrl);
-            setModalOpen(true);
-          }, 500);
-        } else {
-          toast({
-            description: "Creating invoice Failed!",
-            variant: "destructive",
-          });
-=======
           toast({ description: "Invoice created. Please upload payment proof!" });
   
           // Buka upload payment proof modal
@@ -529,29 +411,16 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
           }, 500);
         } else {
           toast({ description: "Creating invoice Failed!", variant: "destructive" });
->>>>>>> 8b30526 (push order & checkout TA)
         }
       } catch (error) {
         console.log(error);
         setLoad(false);
-<<<<<<< HEAD
-        toast({
-          description: "Error server!",
-          variant: "destructive",
-        });
-      }
-    } else {
-      toast({
-        title: "Opps!",
-        description: "You must login to continue this transaction 😁😁",
-=======
         toast({ description: "Server error!", variant: "destructive" });
       }
     } else {
       toast({
         title: "Oops!",
         description: "You must login to continue!",
->>>>>>> 8b30526 (push order & checkout TA)
         variant: "destructive",
       });
       setTimeout(() => {
@@ -559,12 +428,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
       }, 1500);
     }
   };
-<<<<<<< HEAD
-
-
-=======
   
->>>>>>> 8b30526 (push order & checkout TA)
   const handlePostOrder = async () => {
     const convertFileToBase64 = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {
@@ -573,44 +437,15 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         reader.onerror = (error) => reject(error);
         reader.readAsDataURL(file);
       });
-<<<<<<< HEAD
-    };  
-    if (image && image[0]) {
-      try {
-        // Konversi file menjadi Base64
-        const base64Image = await convertFileToBase64(image[0]);
-  
-=======
     };
     if (image && image[0]) {
       try {
         const base64Image = await convertFileToBase64(image[0]);
 
->>>>>>> 8b30526 (push order & checkout TA)
         const bodyOrder = {
           orderId: `CARD-${generateInvoiceId()}`,
           products: [{ id: data.code_product, qty: 1 }],
           userId: [String(session?.user.id)],
-<<<<<<< HEAD
-          paymentProof: base64Image, // Kirim Base64 image
-          paymentMethods: paymentMethod,
-        };
-  
-        await axios.post('/api/order/post', bodyOrder);
-  
-        alert('Order berhasil dikirim!');
-      } catch (error) {
-        console.error(error);
-        alert('Terjadi kesalahan saat mengirim order.');
-      }
-    } else {
-      alert('Please provide an image!');
-    }
-  };
-  
-
-  
-=======
           paymentProof: base64Image,
           paymentMethods: paymentMethod,
         };
@@ -626,7 +461,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
       alert("Please provide an image!");
     }
   };
->>>>>>> 8b30526 (push order & checkout TA)
 
   return (
     <Dialog>
@@ -653,13 +487,9 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
             </h1>
             <p className="font-medium capitalize text-gray-500">
               Variant :{" "}
-<<<<<<< HEAD
-              <span className="text-zinc-950 font-bold">{data.variants[0]}</span>
-=======
               <span className="text-zinc-950 font-bold">
                 {data.variants[0]}
               </span>
->>>>>>> 8b30526 (push order & checkout TA)
             </p>
           </div>
           <p>{data.desc}</p>
@@ -689,21 +519,12 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
             <div className="flex flex-col gap-3 w-full">
               <h1>Payment methods</h1>
               <div className="flex items-center gap-3 justify-between w-full">
-<<<<<<< HEAD
-                {/* Trigger Crypto Modal */}
-=======
->>>>>>> 8b30526 (push order & checkout TA)
                 <Button
                   size={"sm"}
                   className="w-full"
                   onClick={() => {
-<<<<<<< HEAD
-                    setShowCryptoModal(true)
-                    setPaymentMethod('wallet')
-=======
                     setShowCryptoModal(true);
                     setPaymentMethod("wallet");
->>>>>>> 8b30526 (push order & checkout TA)
                   }}
                 >
                   Crypto currency
@@ -711,15 +532,9 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   size={"sm"}
                   className="w-full"
-<<<<<<< HEAD
-                  onClick={() =>{
-                    handleDebitCardPayment()
-                    setPaymentMethod('card')
-=======
                   onClick={() => {
                     handleDebitCardPayment();
                     setPaymentMethod("card");
->>>>>>> 8b30526 (push order & checkout TA)
                   }}
                 >
                   {load
@@ -729,22 +544,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
               </div>
             </div>
           </div>
-<<<<<<< HEAD
-
-          <PaymentProofModal
-            isOpen={isModalOpen}
-            onClose={() => setModalOpen(false)}
-            image={image}
-            setImage={setImage}
-            handlePostOrder={handlePostOrder}
-          />
-        </DialogDescription>
-      </DialogContent>
-
-      {/* Crypto Payment Modal */}
-      {showCryptoModal && (
-        <Dialog open={showCryptoModal} onOpenChange={setShowCryptoModal}>
-=======
           {showUploadModal && (
           <PaymentProofModal
             isOpen={showUploadModal}
@@ -766,7 +565,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
           open={showCryptoModal}
           onOpenChange={() => setShowCryptoModal(false)}
         >
->>>>>>> 8b30526 (push order & checkout TA)
           <DialogContent className="w-[400px] h-[450px] bg-white text-gray-900 p-6 rounded-lg">
             <DialogHeader>
               <DialogTitle className="text-center text-lg font-bold">
@@ -778,16 +576,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
-<<<<<<< HEAD
-                >
-                  <img
-                    src="https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=035"
-=======
                   onClick={() => clickedCrypto("BTC")}
                 >
                   <img
                     src="https://www.cryptologos.cc/logos/bitcoin-btc-logo.svg?v=040"
->>>>>>> 8b30526 (push order & checkout TA)
                     alt="BTC"
                     className="w-5 h-5"
                   />
@@ -796,16 +588,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
-<<<<<<< HEAD
-                >
-                  <img
-                    src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=035"
-=======
                   onClick={() => clickedCrypto("ETH")}
                 >
                   <img
                     src="https://www.cryptologos.cc/logos/ethereum-eth-logo.svg?v=040"
->>>>>>> 8b30526 (push order & checkout TA)
                     alt="ETH"
                     className="w-5 h-5"
                   />
@@ -814,16 +600,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
-<<<<<<< HEAD
-                >
-                  <img
-                    src="https://cryptologos.cc/logos/solana-sol-logo.png?v=035"
-=======
                   onClick={() => clickedCrypto("SOL")}
                 >
                   <img
                     src="https://www.cryptologos.cc/logos/solana-sol-logo.svg?v=040"
->>>>>>> 8b30526 (push order & checkout TA)
                     alt="Solana"
                     className="w-5 h-5"
                   />
@@ -832,16 +612,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
-<<<<<<< HEAD
-                >
-                  <img
-                    src="https://cryptologos.cc/logos/bnb-bnb-logo.png?v=035"
-=======
                   onClick={() => clickedCrypto("BNB")}
                 >
                   <img
                     src="https://www.cryptologos.cc/logos/bnb-bnb-logo.svg?v=040"
->>>>>>> 8b30526 (push order & checkout TA)
                     alt="BNB"
                     className="w-5 h-5"
                   />
@@ -850,16 +624,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
-<<<<<<< HEAD
-                >
-                  <img
-                    src="https://cryptologos.cc/logos/tether-usdt-logo.png?v=035"
-=======
                   onClick={() => clickedCrypto("USDT")}
                 >
                   <img
                     src="https://www.cryptologos.cc/logos/tether-usdt-logo.svg?v=040"
->>>>>>> 8b30526 (push order & checkout TA)
                     alt="USDT"
                     className="w-5 h-5"
                   />
@@ -868,16 +636,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
-<<<<<<< HEAD
-                >
-                  <img
-                    src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=035"
-=======
                   onClick={() => clickedCrypto("USDC")}
                 >
                   <img
                     src="https://www.cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=040"
->>>>>>> 8b30526 (push order & checkout TA)
                     alt="USDC"
                     className="w-5 h-5"
                   />
@@ -894,8 +656,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
           </DialogContent>
         </Dialog>
       )}
-<<<<<<< HEAD
-=======
 
       <CryptoDetailsModal
         isOpen={showCryptoDetails}
@@ -911,7 +671,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         isOpen={isTransactionSuccessOpen}
         onClose={() => setTransactionSuccessOpen(false)}
       />
->>>>>>> 8b30526 (push order & checkout TA)
     </Dialog>
   );
 };
