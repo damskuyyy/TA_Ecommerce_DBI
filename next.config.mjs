@@ -1,14 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-<<<<<<< HEAD
-  eslint:{
-    ignoreDuringBuilds: true
-  }
-};
-
-export default nextConfig;
-=======
   eslint: {
     ignoreDuringBuilds: true
   },
@@ -26,4 +18,3 @@ export default nextConfig;
 };
 
 export default nextConfig;
->>>>>>> 8b30526 (push order & checkout TA)
