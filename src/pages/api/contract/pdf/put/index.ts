@@ -38,6 +38,7 @@ export default async function handler(
 
     const { contractId, userId } = req.body;
 
+
     const pdfBuffer = req.file?.buffer;
     if (!pdfBuffer || !userId) {
       return res.status(400).json({ error: "Missing required fields" });

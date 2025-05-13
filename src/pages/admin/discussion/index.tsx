@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
 } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import DeleteDialog from "@/components/ui/deleteModal";
 
 const socket = io({
   path: "/api/socket",
@@ -57,6 +58,8 @@ export default function Discussion() {
   const [image, setImage] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { data: session } = useSession();
+  const [modalDeleteView, setModalDeleteView] = useState(false);
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -106,11 +109,14 @@ export default function Discussion() {
 
   const handleDeleteDiscussion = async (id: string) => {
     try {
+      setLoad(true);
       const resp = await axios.delete(`/api/discuss/delete/${id}`);
       alert("Berhasil menghapus diskusi: ", resp.data);
       fetchDiscussion();
     } catch (e) {
       console.log("Gagal menghapus diskusi: ", e);
+    } finally {
+      setLoad(false);
     }
   };
 
@@ -261,6 +267,12 @@ export default function Discussion() {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                  <DeleteDialog
+                    onDelete={() => handleDeleteDiscussion(d.id)}
+                    load={load}
+                    modalDeleteView={modalDeleteView}
+                    setModalDeleteView={setModalDeleteView}
+                  />
                 </div>
               ))
             ) : (

@@ -9,10 +9,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const { contractId, contractName, cost, signature, status } = req.body;
+    const { id, contractName, cost, signature, status } = req.body;
     console.log("STATUS: ", status);
     // Validasi request body
-    if (!contractId || !contractName || !cost || !signature || !status) {
+    if (!id || !contractName || !cost || !signature || !status) {
       return res
         .status(400)
         .json({ error: "contractId and status are required" });
@@ -25,7 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Periksa apakah kontrak ada
     const existingContract = await prisma.contractDigital.findUnique({
-      where: { id: contractId },
+      where: { id: id },
     });
 
     if (!existingContract) {
@@ -34,7 +34,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Update status kontrak di database
     const updatedContract = await prisma.contractDigital.update({
-      where: { id: contractId },
+      where: { id: id },
       data: {
         status,
         ...(contractName && { contractName }),
