@@ -1,16 +1,15 @@
-import { UserDataType } from "./userDataTypes";
-
-interface OrderDataTypes {
-  orderId: string,
-  products: [{
-    id: string,
-    qty: number
-  }],
-  status: string,
-  userId: string,
-  orderDate: Date
-  paymentProof: string,
-  paymentMethods: string
+export default interface OrderDataTypes {
+  id: string; // <- penting!
+  orderId: string;
+  userId: string;
+  status: string;
+  orderDate: string;
+  paymentMethods: string;
+  paymentProof: string;
+  products: {
+    id: string;
+    name?: string;
+    price?: number;
+    qty?: number;
+  }[];
 }
-
-export default OrderDataTypes;
