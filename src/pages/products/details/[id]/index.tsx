@@ -30,25 +30,14 @@ import { cn } from "@/lib/utils";
 import formattedPrice from "@/utils/formattedPrice";
 import { useProductStore } from "@/store/product";
 
-const ModalCheckout = dynamic(() => import("@/components/ui/modals/checkout"), {
-  //mengimpor dua komponen secra dinamis
-  ssr: false,
-});
-const ModalAddReview = dynamic(
-  () => import("@/components/ui/modals/addReview"),
-  { ssr: false } //opsi ssr = komponen hanya dimuat disisi klien, mencegah potensi masalah saat ssr
-);
-
 const Details = ({
   //komponen menerima 2 properti
   items, // array yang menyimpan daftar item dalam keranjang
-  setItems, // fungsi untuk memperbarui daftar item dalam keranjang
 }: {
   items: ItemDataType[];
   setItems: Dispatch<SetStateAction<ItemDataType[]>>; //menggunakan tipe data TypeScript
 }) => {
   const { id } = useRouter().query; //deklarasi state, mengambil parameter id dari url menggunakan userouter untuk menentukan produk yg sedang dilihat
-  const { data: session, status }: any = useSession(); //mengambil data sesi pengguna (login)
   const [product, setProduct] = useState<ProductDataType>(
     {} as ProductDataType
   ); //menyimpan data produk dari api
@@ -57,17 +46,10 @@ const Details = ({
   const [isReply, setIsReply] = useState(false); //status untuk menampilkan/menghilangkan balasan
   const replyRefs = useRef<HTMLFormElement>(null); //referensi dom untuk elemen form balasan
   const [load, setLoad] = useState(false); //loading data
-  const hasReviews = product?.reviews && product.reviews.length > 0;
-  const hasDiscuss = product?.discusses && product.discusses.length > 0;
   const [notesView, setNotesView] = useState(false); //status untuk buka/tutup modal catatan
   const [notes, setNotes] = useState(""); //menyimpan catatan yg ditambahkan pengguna
   const [notesDone, setNotesDone] = useState(false); //menandai apakah catatan telah diisi
   const notesRef = useRef<HTMLTextAreaElement>(null); //referensi dom untuk elemen teks area catetan
-  const [discussView, setDiscussView] = useState(false); //mirip dengan catatan tapi untuk diskusi
-  const [discuss, setDiscuss] = useState("");
-  const [discussDone, setDiscussDone] = useState(false);
-  const discussRef = useRef<HTMLTextAreaElement>(null);
-  const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
   const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
 
   const router = useRouter();
@@ -81,15 +63,6 @@ const Details = ({
     if (qty <= 1) {
       setQty(1);
     }
-  };
-
-  const handleViewReply = () => {
-    setIsReply(!isReply);
-    setTimeout(() => {
-      if (replyRefs.current) {
-        replyRefs.current.scrollIntoView();
-      }
-    }, 10); //buka/tutup form balsan
   };
 
   const handleViewNotes = () => {
@@ -150,47 +123,6 @@ const Details = ({
 
   const calculateSubtotal = (price: number) => {
     return price * qty; //menghitung subtotal harga berdasarkan harga per unit dikalikan jumlah produk
-  };
-
-  const handlePushItems = () => {
-    if (status === "authenticated" && session.user.role === "user") {
-      setItems((prevItems) => {
-        const itemExists = prevItems.some(
-          (item) => item.code_product === String(id)
-        );
-
-        if (itemExists) {
-          toast({
-            title: "Ouch!",
-            description:
-              "You have added into cart 😒! If you wanna update quantity, please update it on cart icon in the top right😁",
-            variant: "destructive",
-          }); //jika produk sdh berada di keranjang, akan ditampilkan notifikasi menggunkan toast ini
-          return prevItems;
-        } else {
-          toast({
-            title: "Thank you 😁",
-            description:
-              'The product has been added in your cart. Click "Cart icon" on top right to view your recent cart 😊',
-            variant: "default",
-          }); // menmabhakan produk ke keranjang jika pengguna sudah login
-          return [
-            ...prevItems,
-            { code_product: String(id), qty, variant, notes },
-          ];
-        }
-      });
-    } else {
-      toast({
-        className: cn(
-          "flex fixed md:max-w-[420px] md:top-4 md:right-4 top-0 right-0"
-        ),
-        title: "Uh Oh! 😒",
-        variant: "destructive",
-        description:
-          "You're not logged in 😑. Please login first to product into cart!",
-      }); //jika belum login, pengguna dieri peringatan untuk login menggunakan toast ini
-    }
   };
 
   return (
@@ -501,19 +433,9 @@ const Details = ({
                     </h1>
                   </div>
                   <div className="mt-5 w-full flex flex-col gap-3">
-                    <Button
-                      disabled={items.some(
-                        (item) => item.code_product === String(id)
-                      )}
-                      variant={"outline"}
-                      onClick={handlePushItems}
-                    >
-                      Add to cart
-                    </Button>
                     <Button onClick={handleCreateContract}>
                       Create Contract
                     </Button>
-                    {/* {load ? "" : <ModalCheckout data={product} />} */}
                   </div>
                 </CardContent>
                 <CardFooter></CardFooter>
