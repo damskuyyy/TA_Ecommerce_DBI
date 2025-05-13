@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  SetStateAction,
-  Dispatch,
-} from "react";
+import React, { useState, useCallback, SetStateAction, Dispatch } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   Dialog,
@@ -18,89 +12,258 @@ import { Button } from "../../button";
 import { ProductDataType } from "@/types/productDataTypes";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { Image } from "lucide-react";
+import { Image as ImageIcon, Copy, Wallet, Check, X, Upload } from "lucide-react";
 import formattedPrice from "@/utils/formattedPrice";
 import generateInvoiceId from "@/utils/generateInvoiceId";
+import { motion, AnimatePresence } from "framer-motion";
+import ModalSelectWallet from "@/components/ui/modals/wallet";
 
-// Komponen Modal
+// PaymentProofModal Component
+interface PaymentProofModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  image: File[];
+  setImage: Dispatch<SetStateAction<File[]>>;
+  handlePostOrder: () => void;
+}
+
 const PaymentProofModal = ({
   isOpen,
   onClose,
   image,
   setImage,
   handlePostOrder,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  image: File[];
-  setImage: Dispatch<SetStateAction<File[]>>;
-  handlePostOrder: () => void;
-}) => {
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles && acceptedFiles[0]) {
-      // Validasi tipe file
-      if (!acceptedFiles[0].type.startsWith("image/")) {
-        alert("Please upload an image file.");
-        return;
+}: PaymentProofModalProps) => {
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (acceptedFiles && acceptedFiles[0]) {
+        if (!acceptedFiles[0].type.startsWith("image/")) {
+          alert("Please upload an image file.");
+          return;
+        }
+        setImage(acceptedFiles);
       }
-      setImage(acceptedFiles);
-    }
-  }, []);
+    },
+    [setImage]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     maxFiles: 1,
   });
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          Upload Payment Proof
-        </h2>
-        <div
-          {...getRootProps()}
-          className={`border-2 border-dashed p-8 rounded-lg mb-4 text-center cursor-pointer ${
-            isDragActive ? "border-blue-500" : "border-gray-300"
-          }`}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         >
-          <input {...getInputProps()} />
-          <div className="flex flex-col items-center">
-            <div className="mb-2">
-              <Image />
+          <motion.div
+            className="bg-white rounded-xl p-6 w-96 flex flex-col items-center shadow-lg relative"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.8 }}
+          >
+            <h2 className="text-lg font-bold mb-4">Upload Payment Proof</h2>
+            <div
+              {...getRootProps()}
+              className={`border-2 border-dashed rounded-lg p-6 w-full text-center cursor-pointer ${
+                isDragActive ? "border-blue-500" : "border-gray-300"
+              }`}
+            >
+              <input {...getInputProps()} />
+              <div className="flex flex-col items-center gap-2">
+                <ImageIcon className="w-8 h-8 text-gray-400" />
+                {image.length > 0 ? (
+                  <p className="text-gray-500">{image[0].name}</p>
+                ) : (
+                  <>
+                    <p className="text-gray-600">Attach File</p>
+                    <p className="text-gray-400 text-xs">or drag and drop</p>
+                  </>
+                )}
+              </div>
             </div>
-            {image.length > 0 ? (
-              <p className="text-gray-500">{image[0].name}</p>
-            ) : (
-              <>
-                <p className="text-gray-500 mb-1">Attach File</p>
-                <p className="text-gray-400">or Drag & Drop</p>
-              </>
-            )}
-          </div>
-        </div>
-        <Button
-          onClick={() => {
-            handlePostOrder();
-            onClose();
-          }}
-          className="w-full"
-        >
-          Submit
-        </Button>
-        <Button onClick={onClose} className="w-full mt-2" variant="secondary">
-          Cancel
-        </Button>
-      </div>
-    </div>
+
+            <div className="flex flex-col gap-2 w-full mt-6">
+              <Button
+                onClick={() => {
+                  handlePostOrder();
+                  onClose();
+                }}
+                className="w-full"
+              >
+                Submit
+              </Button>
+              <Button
+                onClick={onClose}
+                variant="secondary"
+                className="w-full"
+              >
+                Cancel
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
+// CryptoDetailsModal Component
+const CryptoDetailsModal = ({
+  isOpen,
+  onClose,
+  selectedCryptoData,
+  product,
+  openUploadModal,
+  onPay,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedCryptoData: {
+    name: string;
+    logo: string;
+    address: string;
+    qr: string;
+  };
+  product: ProductDataType;
+  openUploadModal: () => void;
+  onPay: () => void;
+}) => { 
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [accounts, setAccounts] = useState<string[]>([]);
+  const { push } = useRouter();
+
+  const handleDisconnect = () => {
+    setIsConnected(false);
+    setAccounts([]);
+    toast.success("Wallet disconnected!");
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-white text-black p-6 rounded-lg w-[600px] max-w-lg text-center mx-auto">
+        <motion.div
+          initial={{ x: 500, opacity: 0 }} // Mulai dari luar layar (kanan)
+          animate={{ x: 0, opacity: 1 }} // Masuk ke tengah
+          exit={{ x: 500, opacity: 0 }} // Keluar ke kanan
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+          className="relative bg-white p-6 rounded-lg shadow-lg w-full"
+        >
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-center">
+              Detail Payment Crypto by {selectedCryptoData.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          {/* Logo Crypto */}
+          <div className="flex justify-center my-2">
+            <img
+              src={selectedCryptoData.logo}
+              alt="Crypto Logo"
+              className="w-14 h-14"
+            />
+          </div>
+
+          {/* Detail Produk */}
+          <p className="text-sm font-semibold">Product : {product.name}</p>
+          <p className="text-sm font-semibold">
+            Code Product : {product.code_product}{" "}
+          </p>
+          <p className="text-sm font-bold">
+            TOTAL : {formattedPrice.toCrypto(product.price, "BTC")}
+          </p>
+
+          {/* QR Code */}
+          <div className="flex justify-center my-3">
+            <img
+              src={selectedCryptoData.qr}
+              alt="QR Code"
+              className="w-28 h-28"
+            />
+          </div>
+
+          {/* Address Box */}
+          <div className="bg-[#0E111B] text-white p-3 rounded-md text-center text-sm font-mono">
+            {selectedCryptoData.address}
+            <button
+              className="bg-gray-700 text-white px-3 py-1 rounded-md flex items-center mx-auto mt-2"
+              onClick={() => {
+                navigator.clipboard.writeText(selectedCryptoData.address);
+                alert("Address copied to clipboard!");
+              }}
+            >
+              <Copy className="w-4 h-4 mr-1" /> Copy
+            </button>
+          </div>
+
+          {/* Tombol Connect Wallet & Pay */}
+          <div className="flex flex-col items-center gap-2 mt-4">
+            {isConnected ? (
+              <>
+                <button
+                  onClick={handleDisconnect}
+                  className="bg-red-600 text-white px-6 py-2 rounded-md w-48 flex items-center justify-center gap-x-2"
+                >
+                  <X className="w-5 h-5" />
+                  Disconnect
+                </button>
+                {/* Wallet address muncul jika terhubung */}
+                {accounts.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-2 break-all text-center w-48">
+                    Connected Wallet: <br /> {accounts[0]}
+                  </p>
+                )}
+              </>
+            ) : (
+              <button
+                onClick={() => setShowWalletModal(true)}
+                className="bg-[#0E111B] text-white px-6 py-2 rounded-md w-48 flex items-center justify-center gap-x-2"
+              >
+                <Wallet className="w-5 h-5" />
+                Connect Wallet
+              </button>
+            )}
+            <button
+            onClick={() => {
+              onClose(); 
+              setTimeout(() => {
+                openUploadModal(); 
+              }, 300);
+            }}
+            className="bg-[#0E111B] hover:bg-[#1a1e2e] active:scale-95 transition-all duration-200 text-white px-6 py-2 rounded-md w-48 flex items-center justify-center gap-x-2"
+          >
+            <Upload className="w-5 h-5" />
+            <span>Upload Payment Proof</span>
+          </button>
+          </div>
+        </motion.div>
+      </DialogContent>
+      {showWalletModal && (
+        <ModalSelectWallet
+          setConnected={setIsConnected}
+          setAccounts={setAccounts}
+          isOpen={showWalletModal}
+          onClose={() => setShowWalletModal(false)}
+        />
+      )}
+    </Dialog>
+  );
+};
+
+// ModalCheckout Component
 const ModalCheckout = ({ data }: { data: ProductDataType }) => {
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const { toast } = useToast();
   const fee = data.price && data.price * 0.004;
@@ -113,6 +276,116 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
   const [showCryptoModal, setShowCryptoModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [image, setImage] = useState<File[]>([]);
+  const [showCryptoDetails, setShowCryptoDetails] = useState(false);
+  const [selectedCryptoData, setSelectedCryptoData] = useState({
+    name: "",
+    logo: "",
+    address: "",
+    qr: "",
+  });
+  const [isTransactionSuccessOpen, setTransactionSuccessOpen] = useState(false);
+
+  const cryptoData = [
+    {
+      name: "BTC",
+      logo: "https://www.cryptologos.cc/logos/bitcoin-btc-logo.svg?v=040",
+      address: "tb1qtc0l0uz60k7rzlg7jwpq2u90k97vdfsewr3qdl",
+      qr: "https://res.cloudinary.com/dxbcdfojc/image/upload/v1742051801/DBI/QRCode_BTC_Testnet.png",
+    },
+    {
+      name: "ETH",
+      logo: "https://www.cryptologos.cc/logos/ethereum-eth-logo.svg?v=040",
+      address: "0x44AF940ac6c2f45D230B0b6Eb8C686Af4c4dBB4B",
+      qr: "https://res.cloudinary.com/dxbcdfojc/image/upload/v1741579853/DBI/QRCode_ETH.png",
+    },
+    {
+      name: "SOL",
+      logo: "https://www.cryptologos.cc/logos/solana-sol-logo.svg?v=040",
+      address: "HcBoVzYXFb4H3ftUjCykN1wcSiL1Eo8Cy8cgDeKAH1qj",
+      qr: "https://res.cloudinary.com/dxbcdfojc/image/upload/v1742055907/DBI/QRCode_SOL_testnet.png",
+    },
+    {
+      name: "BNB",
+      logo: "https://www.cryptologos.cc/logos/bnb-bnb-logo.svg?v=040",
+      address: "bc1qtc0l0uz60k7rzlg7jwpq2u90k97vdfsey92nkv",
+      qr: "",
+    },
+    {
+      name: "USDT",
+      logo: "https://www.cryptologos.cc/logos/tether-usdt-logo.svg?v=040",
+      address: "0x0x0x",
+      qr: "",
+    },
+    {
+      name: "USDC",
+      logo: "https://www.cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=040",
+      address: "0x0x0x",
+      qr: "",
+    },
+  ];
+
+  const clickedCrypto = (name: string) => {
+    const selected: any = cryptoData.find((item) => item.name === name);
+    setSelectedCryptoData(selected);
+    setShowCryptoModal(false);
+    setShowCryptoDetails(true);
+  };
+
+  const handlePay = () => {
+    setTransactionSuccessOpen(true);
+  };
+  // TransactionSuccessDialog Component
+  const TransactionSuccessDialog = ({
+    isOpen,
+    onClose,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+  }) => {
+    const router = useRouter();
+
+    const handleBackToHome = () => {
+      onClose(); 
+      router.push("/"); // Arahkan ke halaman home
+    };
+
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="w-[360px] rounded-xl px-6 py-8 flex flex-col items-center justify-start gap-6">
+          {/* Icon */}
+          <div className="w-[70px] h-[70px] rounded-full border-[6px] border-gray-200 flex items-center justify-center shadow-sm">
+            <div className="w-[52px] h-[52px] bg-[#6EC19A] rounded-full flex items-center justify-center">
+              <Check className="text-white w-6 h-6 stroke-[3px]" />
+            </div>
+          </div>
+
+          {/* Text */}
+          <div className="text-center mt-2">
+            <h2 className="text-base font-semibold text-black">
+              Transactions Success!
+            </h2>
+            <p className="text-gray-700 text-sm mt-1">
+              Congratulations! Your transaction <br />
+              completed successfully.
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-3 mt-6 w-full items-center">
+            <Button
+              className="bg-[#0E111B] text-white w-[300px] h-10 rounded-md text-sm font-medium"
+              onClick={handleBackToHome}
+            >
+              Back to home
+            </Button>
+            <Button className="bg-[#0E111B] text-white w-[300px] h-10 rounded-md text-sm font-medium">
+              View order
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   const handleDebitCardPayment = async () => {
     if (status === "authenticated") {
@@ -120,11 +393,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         amount: total,
         description: `Payout for ${data.name} on the marketplace dbix.my.id`,
         items: [
-          {
-            name: data.name,
-            quantity: 1,
-            price: data.price,
-          },
+          { name: data.name, quantity: 1, price: data.price },
         ],
       };
       setLoad(true);
@@ -135,32 +404,26 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         );
         if (resp.status === 200) {
           setLoad(false);
-          toast({
-            description: "Creating invoice success!",
-          });
-
+          toast({ description: "Invoice created. Please upload payment proof!" });
+  
+          // Buka upload payment proof modal
+          setShowUploadModal(true);
+  
           setTimeout(() => {
-            window.open(resp.data.data.invoiceUrl);
-            setModalOpen(true);
+            window.open(resp.data.data.invoiceUrl, "_blank");
           }, 500);
         } else {
-          toast({
-            description: "Creating invoice Failed!",
-            variant: "destructive",
-          });
+          toast({ description: "Creating invoice Failed!", variant: "destructive" });
         }
       } catch (error) {
         console.log(error);
         setLoad(false);
-        toast({
-          description: "Error server!",
-          variant: "destructive",
-        });
+        toast({ description: "Server error!", variant: "destructive" });
       }
     } else {
       toast({
-        title: "Opps!",
-        description: "You must login to continue this transaction 😁😁",
+        title: "Oops!",
+        description: "You must login to continue!",
         variant: "destructive",
       });
       setTimeout(() => {
@@ -168,7 +431,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
       }, 1500);
     }
   };
-
+  
   const handlePostOrder = async () => {
     const convertFileToBase64 = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {
@@ -180,14 +443,13 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
     };
     if (image && image[0]) {
       try {
-        // Konversi file menjadi Base64
         const base64Image = await convertFileToBase64(image[0]);
 
         const bodyOrder = {
           orderId: `CARD-${generateInvoiceId()}`,
           products: [{ id: data.code_product, qty: 1 }],
           userId: [String(session?.user.id)],
-          paymentProof: base64Image, // Kirim Base64 image
+          paymentProof: base64Image,
           paymentMethods: paymentMethod,
         };
 
@@ -233,7 +495,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
             <p className="font-medium capitalize text-gray-500">
               Variant :{" "}
               <span className="text-zinc-950 font-bold">
-                {data.variants ? data.variants[0] : ""}
+                {data.variants[0]}
               </span>
             </p>
           </div>
@@ -264,7 +526,6 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
             <div className="flex flex-col gap-3 w-full">
               <h1>Payment methods</h1>
               <div className="flex items-center gap-3 justify-between w-full">
-                {/* Trigger Crypto Modal */}
                 <Button
                   size={"sm"}
                   className="w-full"
@@ -290,20 +551,27 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
               </div>
             </div>
           </div>
-
+          {showUploadModal && (
           <PaymentProofModal
-            isOpen={isModalOpen}
-            onClose={() => setModalOpen(false)}
+            isOpen={showUploadModal}
+            onClose={() => setShowUploadModal(false)}
             image={image}
             setImage={setImage}
-            handlePostOrder={handlePostOrder}
+            handlePostOrder={async () => {
+              await handlePostOrder();
+              setShowUploadModal(false); // Tutup upload modal
+              setTransactionSuccessOpen(true); // Munculkan Transaction Success modal
+            }}
           />
+        )}
         </DialogDescription>
       </DialogContent>
 
-      {/* Crypto Payment Modal */}
       {showCryptoModal && (
-        <Dialog open={showCryptoModal} onOpenChange={setShowCryptoModal}>
+        <Dialog
+          open={showCryptoModal}
+          onOpenChange={() => setShowCryptoModal(false)}
+        >
           <DialogContent className="w-[400px] h-[450px] bg-white text-gray-900 p-6 rounded-lg">
             <DialogHeader>
               <DialogTitle className="text-center text-lg font-bold">
@@ -315,9 +583,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
+                  onClick={() => clickedCrypto("BTC")}
                 >
                   <img
-                    src="https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=035"
+                    src="https://www.cryptologos.cc/logos/bitcoin-btc-logo.svg?v=040"
                     alt="BTC"
                     className="w-5 h-5"
                   />
@@ -326,9 +595,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
+                  onClick={() => clickedCrypto("ETH")}
                 >
                   <img
-                    src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=035"
+                    src="https://www.cryptologos.cc/logos/ethereum-eth-logo.svg?v=040"
                     alt="ETH"
                     className="w-5 h-5"
                   />
@@ -337,9 +607,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
+                  onClick={() => clickedCrypto("SOL")}
                 >
                   <img
-                    src="https://cryptologos.cc/logos/solana-sol-logo.png?v=035"
+                    src="https://www.cryptologos.cc/logos/solana-sol-logo.svg?v=040"
                     alt="Solana"
                     className="w-5 h-5"
                   />
@@ -348,9 +619,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
+                  onClick={() => clickedCrypto("BNB")}
                 >
                   <img
-                    src="https://cryptologos.cc/logos/bnb-bnb-logo.png?v=035"
+                    src="https://www.cryptologos.cc/logos/bnb-bnb-logo.svg?v=040"
                     alt="BNB"
                     className="w-5 h-5"
                   />
@@ -359,9 +631,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
+                  onClick={() => clickedCrypto("USDT")}
                 >
                   <img
-                    src="https://cryptologos.cc/logos/tether-usdt-logo.png?v=035"
+                    src="https://www.cryptologos.cc/logos/tether-usdt-logo.svg?v=040"
                     alt="USDT"
                     className="w-5 h-5"
                   />
@@ -370,9 +643,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-2"
+                  onClick={() => clickedCrypto("USDC")}
                 >
                   <img
-                    src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=035"
+                    src="https://www.cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=040"
                     alt="USDC"
                     className="w-5 h-5"
                   />
@@ -389,6 +663,21 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
           </DialogContent>
         </Dialog>
       )}
+
+      <CryptoDetailsModal
+        isOpen={showCryptoDetails}
+        onClose={() => setShowCryptoDetails(false)}
+        selectedCryptoData={selectedCryptoData}
+        product={data}
+        onPay={handlePay}
+        openUploadModal={() => setShowUploadModal(true)} 
+      />
+
+      {/* Dialog Transaksi Sukses */}
+      <TransactionSuccessDialog
+        isOpen={isTransactionSuccessOpen}
+        onClose={() => setTransactionSuccessOpen(false)}
+      />
     </Dialog>
   );
 };

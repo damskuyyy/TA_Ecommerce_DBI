@@ -92,7 +92,7 @@ model Orders {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   orderId   String   @default("") 
   products  Json[]   @default([]) // id qty
-  status    String   @default("process") // payment order progress dueDate
+  status    String   @default("pending") // payment order Pending dueDate
   userId    String[] @db.ObjectId @default([])
   orderDate DateTime @default(now())
   paymentProof String @default("")

@@ -3,7 +3,7 @@ import prisma from "@/utils/prisma";
 import { randomUUID } from "crypto";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
-  const { orderId, products, status, userId, xenditId, orderDate, paymentProof, paymentMethods, cust } = req.body
+  const { orderId, products, status, userId, orderDate, paymentProof, paymentMethods } = req.body
 
   if (req.method === 'PUT') {
     try {
@@ -15,11 +15,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           products,
           status,
           userId,
-          xenditId,
           orderDate,
           paymentProof,
           paymentMethods,
-          cust
         }
       })
       res.status(200).json({
