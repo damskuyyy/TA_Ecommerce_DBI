@@ -37,16 +37,7 @@ import SignaturePad from "@/components/ui/signature-pad";
 import { Checkbox } from "@/components/ui/checkbox";
 import ContractPDF from "@/pages/pdf";
 
-import {
-  pdf,
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-  Image,
-} from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 
 const Contract: React.FC = () => {
   const [contractData, setContractData] = useState([]);
@@ -91,44 +82,34 @@ const Contract: React.FC = () => {
       // 2. Update kontrak ke MongoDB
       const response = await axios.put("/api/contract/put", {
         ...data,
+        // contractId: data.id,
         status: "AWAITING_CLIENT_SIGNATURE",
       });
 
-      console.log("✅ Response dari /api/contract/put:", response.data);
-
-      const updatedContract = response.data?.contract;
-      if (!updatedContract || !updatedContract.id || !updatedContract.userID) {
-        throw new Error("Data kontrak tidak lengkap dalam response.");
+      if (!response.data || !response.data.contract) {
+        throw new Error("Data kontrak tidak tersedia dalam response.");
       }
 
-      // 3. Convert blob ke array buffer untuk upload
+      const updatedContract = response.data.contract;
+
+      // 3. Generate ulang PDF dalam bentuk arraybuffer untuk upload (server-side friendly)
       const pdfBuffer = await blob.arrayBuffer();
 
-      // 4. Siapkan FormData
       const formData = new FormData();
       formData.append("contractId", updatedContract.id);
       formData.append("userId", updatedContract.userId);
       formData.append(
         "pdfFile",
-        new File([pdfBuffer], "contract.pdf", {
-          type: "application/pdf",
-        })
+        new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
       );
 
-      // 5. Upload ke API PDF
+      // 4. Upload PDF ke MongoDB (via API handler)
       const uploadResponse = await axios.put(
         "/api/contract/pdf/put",
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         }
-      );
-
-      console.log(
-        "✅ Response dari /api/contract/pdf/put:",
-        uploadResponse.data
       );
 
       if (uploadResponse.status === 201) {
@@ -138,9 +119,9 @@ const Contract: React.FC = () => {
       } else {
         throw new Error("Gagal mengunggah PDF ke server.");
       }
-    } catch (err: any) {
-      console.error("❌ Error:", err?.response?.data || err.message || err);
-      alert(`Terjadi kesalahan: ${err?.message || "tidak diketahui"}`);
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
     }
   };
 

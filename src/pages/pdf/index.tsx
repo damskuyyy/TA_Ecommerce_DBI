@@ -275,14 +275,17 @@ const ContractPDF = ({ data }: { data: any }) => (
       <View style={styles.signatureSection}>
         <View style={styles.signatureBox}>
           <Text>Pihak Pertama</Text>
+          {data.userSignature && (
+            <Image style={styles.signature} src={data.userSignature} />
+          )}
           <View style={styles.spacer} />
-          <Text>[Nama Klien]</Text>
+          <Text>{data.fullName}</Text>
         </View>
         <View style={styles.signatureBox}>
           <Text>Pihak Kedua</Text>
           <Image style={styles.signature} src={data.signature} />
           <View style={styles.spacer} />
-          <Text>[Nama Pengembang]</Text>
+          <Text>Ramzi Daffa</Text>
         </View>
       </View>
     </Page>

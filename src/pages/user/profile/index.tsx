@@ -52,6 +52,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 import { DialogHeader } from "@/components/ui/dialog";
 import SignaturePad from "@/components/ui/signature-pad";
 import { useRouter } from "next/router";
+import ContractPDF from "@/pages/pdf";
+import { pdf } from "@react-pdf/renderer";
 
 const ProfilePage = ({
   items,
@@ -244,52 +246,40 @@ const ProfilePage = ({
 
       const updatedContract = response.data.contract;
 
-      // Kirim data ke API untuk pembuatan PDF
-      const pdfResponse = await axios.post(
-        "/api/contract/pdf/post",
-        {
-          fullName: updatedContract.fullName,
-          address: updatedContract.address,
-          contractName: updatedContract.contractName,
-          cost: updatedContract.cost,
-          startDate: updatedContract.startDate,
-          endDate: updatedContract.endDate,
-          descriptionContract: updatedContract.descriptionContract,
-          features: updatedContract.features,
-          scopeOfWork: updatedContract.scopeOfWork,
-          signature: updatedContract.signature,
-          userSignature: signature,
-        },
-        {
-          responseType: "arraybuffer",
-        }
+      const data = {
+        fullName: updatedContract.fullName,
+        address: updatedContract.address,
+        contractName: updatedContract.contractName,
+        cost: updatedContract.cost,
+        startDate: updatedContract.startDate,
+        endDate: updatedContract.endDate,
+        descriptionContract: updatedContract.descriptionContract,
+        features: updatedContract.features,
+        scopeOfWork: updatedContract.scopeOfWork,
+        signature: updatedContract.signature,
+        userSignature: signature,
+      };
+
+      const blob = await pdf(<ContractPDF data={data} />).toBlob();
+
+      const pdfBuffer = await blob.arrayBuffer();
+
+      const formData = new FormData();
+      formData.append("contractId", updatedContract.id);
+      formData.append("userId", updatedContract.userID);
+      formData.append(
+        "pdfFile",
+        new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
       );
 
-      if (pdfResponse.status === 200) {
-        // Logika setelah PDF berhasil dibuat
-        const pdfBlob = new Blob([pdfResponse.data], {
-          type: "application/pdf",
-        });
+      // Upload PDF ke server
+      await axios.put("/api/contract/pdf/put", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-        const formData = new FormData();
-        formData.append("contractId", updatedContract.id);
-        formData.append("userId", updatedContract.userID);
-        formData.append(
-          "pdfFile",
-          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
-        );
-
-        // Upload PDF ke server
-        await axios.put("/api/contract/pdf/put", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
-        setIsSignature(false);
-        getContractData();
-      } else {
-        throw new Error("Gagal membuat PDF");
-      }
+      alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+      setIsSignature(false);
+      getContractData();
     } catch (err) {
       console.error("❌ Error:", err);
       alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
