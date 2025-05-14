@@ -35,6 +35,18 @@ import {
 import { Input } from "@/components/ui/input";
 import SignaturePad from "@/components/ui/signature-pad";
 import { Checkbox } from "@/components/ui/checkbox";
+import ContractPDF from "@/pages/pdf";
+
+import {
+  pdf,
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Font,
+  Image,
+} from "@react-pdf/renderer";
 
 const Contract: React.FC = () => {
   const [contractData, setContractData] = useState([]);
@@ -71,62 +83,64 @@ const Contract: React.FC = () => {
 
   const agreement = form.watch("agreement");
 
-  // PERLU DIRUBAH ALGORITMANYA, TIDAK PERLU FORM.GETVALUES()
-  const onSubmit = async (item: any) => {
-    const values = form.getValues();
-
+  const onSubmit = async (data: any) => {
     try {
-      // Update kontrak dengan PUT request
+      // 1. Generate PDF preview (gunakan @react-pdf/renderer)
+      const blob = await pdf(<ContractPDF data={data} />).toBlob();
+
+      // 2. Update kontrak ke MongoDB
       const response = await axios.put("/api/contract/put", {
-        ...values, // Kirim data yang diperbarui
-        contractId: item.id, // Sesuai dengan API
-        status: "AWAITING_CLIENT_SIGNATURE", // atau "Processing"
+        ...data,
+        status: "AWAITING_CLIENT_SIGNATURE",
       });
 
-      // Cek apakah response.data berisi data kontrak yang benar
-      if (!response.data || !response.data.contract) {
-        throw new Error("Data kontrak tidak tersedia dalam response.");
+      console.log("✅ Response dari /api/contract/put:", response.data);
+
+      const updatedContract = response.data?.contract;
+      if (!updatedContract || !updatedContract.id || !updatedContract.userID) {
+        throw new Error("Data kontrak tidak lengkap dalam response.");
       }
 
-      const updatedContract = response.data.contract;
+      // 3. Convert blob ke array buffer untuk upload
+      const pdfBuffer = await blob.arrayBuffer();
 
-      // Kirim data ke API untuk pembuatan PDF
-      const pdfResponse = await axios.post(
-        "/api/contract/pdf/post",
-        updatedContract,
+      // 4. Siapkan FormData
+      const formData = new FormData();
+      formData.append("contractId", updatedContract.id);
+      formData.append("userId", updatedContract.userId);
+      formData.append(
+        "pdfFile",
+        new File([pdfBuffer], "contract.pdf", {
+          type: "application/pdf",
+        })
+      );
+
+      // 5. Upload ke API PDF
+      const uploadResponse = await axios.put(
+        "/api/contract/pdf/put",
+        formData,
         {
-          responseType: "arraybuffer",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (pdfResponse.status === 200) {
-        // Logika setelah PDF berhasil dibuat
-        const pdfBlob = new Blob([pdfResponse.data], {
-          type: "application/pdf",
-        });
+      console.log(
+        "✅ Response dari /api/contract/pdf/put:",
+        uploadResponse.data
+      );
 
-        const formData = new FormData();
-        formData.append("contractId", updatedContract.id);
-        formData.append("userId", updatedContract.userID);
-        formData.append(
-          "pdfFile",
-          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
-        );
-
-        // Upload PDF ke server
-        await axios.put("/api/contract/pdf/put", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
+      if (uploadResponse.status === 201) {
         alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
         form.reset();
         getContractData();
       } else {
-        throw new Error("Gagal membuat PDF");
+        throw new Error("Gagal mengunggah PDF ke server.");
       }
-    } catch (err) {
-      console.error("❌ Error:", err);
-      alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+    } catch (err: any) {
+      console.error("❌ Error:", err?.response?.data || err.message || err);
+      alert(`Terjadi kesalahan: ${err?.message || "tidak diketahui"}`);
     }
   };
 
@@ -274,8 +288,8 @@ const Contract: React.FC = () => {
                             <div>
                               <Form {...form}>
                                 <form
-                                  onSubmit={form.handleSubmit(() =>
-                                    onSubmit(item)
+                                  onSubmit={form.handleSubmit((data) =>
+                                    onSubmit({ ...item, ...data })
                                   )}
                                   className="space-y-8"
                                 >
