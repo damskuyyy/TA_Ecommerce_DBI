@@ -15,7 +15,18 @@ import {
   DropdownMenuItem,
 } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import DeleteDialog from "@/components/ui/deleteModal";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
+
 
 const socket = io({
   path: "/api/socket",
@@ -58,8 +69,6 @@ export default function Discussion() {
   const [image, setImage] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { data: session } = useSession();
-  const [modalDeleteView, setModalDeleteView] = useState(false);
-  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -109,14 +118,10 @@ export default function Discussion() {
 
   const handleDeleteDiscussion = async (id: string) => {
     try {
-      setLoad(true);
       const resp = await axios.delete(`/api/discuss/delete/${id}`);
-      alert("Berhasil menghapus diskusi: ", resp.data);
       fetchDiscussion();
     } catch (e) {
       console.log("Gagal menghapus diskusi: ", e);
-    } finally {
-      setLoad(false);
     }
   };
 
@@ -168,11 +173,11 @@ export default function Discussion() {
       setSelectedDiscussion((prev) =>
         prev
           ? {
-              ...prev,
-              messages: prev.messages.map((msg) =>
-                msg.id === tempId ? { ...newMessage, status: "sent" } : msg
-              ),
-            }
+            ...prev,
+            messages: prev.messages.map((msg) =>
+              msg.id === tempId ? { ...newMessage, status: "sent" } : msg
+            ),
+          }
           : prev
       );
 
@@ -185,11 +190,11 @@ export default function Discussion() {
       setSelectedDiscussion((prev) =>
         prev
           ? {
-              ...prev,
-              messages: prev.messages.map((msg) =>
-                msg.id === tempId ? { ...msg, status: "failed" } : msg
-              ),
-            }
+            ...prev,
+            messages: prev.messages.map((msg) =>
+              msg.id === tempId ? { ...msg, status: "failed" } : msg
+            ),
+          }
           : prev
       );
     }
@@ -224,11 +229,10 @@ export default function Discussion() {
                 <div
                   key={d.id}
                   onClick={() => setSelectedDiscussion(d)}
-                  className={`p-2 ${
-                    selectedDiscussion?.id === d.id
+                  className={`p-2 ${selectedDiscussion?.id === d.id
                       ? "bg-gray-900 text-white hover:bg-gray-900"
                       : "text-gray-900"
-                  } rounded-lg cursor-pointer flex gap-2 items-center hover:bg-gray-200 mb-2`}
+                    } rounded-lg cursor-pointer flex gap-2 items-center hover:bg-gray-200 mb-2`}
                 >
                   <Avatar>
                     <AvatarImage src={d.product.image[0]} />
@@ -240,8 +244,8 @@ export default function Discussion() {
                       {d.messages[d.messages.length - 1]?.content
                         ? d.messages[d.messages.length - 1]?.content
                         : d.messages[d.messages.length - 1]?.image
-                        ? "Image"
-                        : "Belum ada pesan"}
+                          ? "Image"
+                          : "Belum ada pesan"}
                     </p>
                   </div>
                   <DropdownMenu>
@@ -254,25 +258,37 @@ export default function Discussion() {
                       align="end"
                       className="py-2 px-1 bg-white w-40 text-gray-900 shadow-md"
                     >
-                      <DropdownMenuItem
-                        onSelect={() => console.log("Delete clicked")}
-                      >
-                        <Button
-                          onClick={() => handleDeleteDiscussion(d.id)}
-                          variant={"ghost"}
-                          className="w-full hover:border-none hover:outline-none hover:ring-0"
-                        >
-                          Delete
-                        </Button>
+                      <DropdownMenuItem asChild>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="w-full text-left hover:border-none hover:outline-none hover:ring-0"
+                            >
+                              Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Konfirmasi Penghapusan</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Apakah kamu yakin ingin menghapus diskusi ini? Tindakan ini tidak dapat dibatalkan.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Batal</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-600 hover:bg-red-700"
+                                onClick={() => handleDeleteDiscussion(d.id)}
+                              >
+                                Hapus
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <DeleteDialog
-                    onDelete={() => handleDeleteDiscussion(d.id)}
-                    load={load}
-                    modalDeleteView={modalDeleteView}
-                    setModalDeleteView={setModalDeleteView}
-                  />
                 </div>
               ))
             ) : (
@@ -302,16 +318,14 @@ export default function Discussion() {
                 {selectedDiscussion.messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex ${
-                      msg?.admin ? "justify-end" : "justify-start"
-                    } mb-2`}
+                    className={`flex ${msg?.admin ? "justify-end" : "justify-start"
+                      } mb-2`}
                   >
                     <div
-                      className={`px-4 py-2 rounded-lg ${
-                        msg?.admin
+                      className={`px-4 py-2 rounded-lg ${msg?.admin
                           ? "bg-gray-900 text-white rounded-br-none"
                           : "bg-white text-gray-900 rounded-bl-none"
-                      }`}
+                        }`}
                     >
                       {msg.image ? (
                         <img
