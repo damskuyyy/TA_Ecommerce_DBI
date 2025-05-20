@@ -50,8 +50,6 @@ const Contractdigital = () => {
       startDate: "",
       endDate: "",
       descriptionContract: "",
-      features: [],
-      scopeOfWork: "",
       agreement: false,
     },
     mode: "onChange",
@@ -354,66 +352,7 @@ const Contractdigital = () => {
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="features"
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Choose Features</FormLabel>
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2 text-sm">
-                          {[
-                            "Authentification",
-                            "Product Page",
-                            "Shopping Cart",
-                            "Payment Integration",
-                            "Admin Dashboard",
-                            "Notifications",
-                          ].map((feature) => (
-                            <label
-                              key={feature}
-                              className="flex items-center space-x-2"
-                            >
-                              <Checkbox
-                                checked={field.value?.includes(feature)}
-                                onCheckedChange={(checked) => {
-                                  const newValue = checked
-                                    ? [...(field.value || []), feature]
-                                    : (field.value || []).filter(
-                                        (f) => f !== feature
-                                      );
-
-                                  field.onChange(newValue);
-                                }}
-                              />
-                              <span>{feature}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="scopeOfWork"
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Scope of Work</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Scope of Work"
-                            {...field}
-                            required
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
                 </div>
-
-                {/* <SignaturePad
-                  onSave={(signature) => form.setValue("signature", signature)}
-                /> */}
                 <div className="flex items-center gap-2 mt-4">
                   <FormField
                     control={form.control}

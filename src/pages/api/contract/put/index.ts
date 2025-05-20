@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient, ContractStatus } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -9,43 +9,45 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const { id, contractName, cost, signature, status } = req.body;
-    console.log("STATUS: ", status);
-    // Validasi request body
-    if (!id || !contractName || !cost || !signature || !status) {
-      return res
-        .status(400)
-        .json({ error: "contractId and status are required" });
-    }
+    const { id, contractName, cost, features, scopeOfWork } = req.body;
 
-    // Validasi status agar sesuai dengan enum ContractStatus
-    if (!Object.values(ContractStatus).includes(status)) {
-      return res.status(400).json({ error: "Invalid status value" });
+    // Validasi field wajib
+    if (
+      !id ||
+      typeof contractName !== "string" ||
+      typeof scopeOfWork !== "string" ||
+      !Array.isArray(features) ||
+      isNaN(parseFloat(cost))
+    ) {
+      return res.status(400).json({
+        error:
+          "id, contractName (string), cost (number), features (array), and scopeOfWork (string) are required.",
+      });
     }
 
     // Periksa apakah kontrak ada
     const existingContract = await prisma.contractDigital.findUnique({
-      where: { id: id },
+      where: { id },
     });
 
     if (!existingContract) {
       return res.status(404).json({ error: "Contract not found" });
     }
 
-    // Update status kontrak di database
+    // Update kontrak
     const updatedContract = await prisma.contractDigital.update({
-      where: { id: id },
+      where: { id },
       data: {
-        status,
-        ...(contractName && { contractName }),
-        ...(cost && { cost: parseFloat(cost) }),
-        ...(signature && { signature }),
+        contractName,
+        cost: parseFloat(cost),
+        features,
+        scopeOfWork,
       },
     });
 
     return res.status(200).json({ success: true, contract: updatedContract });
   } catch (error) {
-    console.error("Error updating contract status:", error);
+    console.error("Error updating contract:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   } finally {
     await prisma.$disconnect();

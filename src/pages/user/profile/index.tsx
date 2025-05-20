@@ -94,6 +94,8 @@ const ProfilePage = ({
   const [isSignature, setIsSignature] = useState<boolean>(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState({});
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [feedback, setFeedback] = useState("");
 
   const router = useRouter();
 
@@ -223,10 +225,40 @@ const ProfilePage = ({
   };
 
   // Handle preview PDF
-  const handlePreview = (filename: string) => {
-    if (!filename) return;
-    const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
-    setPdfUrl(fileUrl);
+  // const handlePreview = (filename: string) => {
+  //   if (!filename) return;
+  //   const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
+  //   setPdfUrl(fileUrl);
+  // };
+
+  const handlePreview = (contract) => {
+    setSelectedContract(contract);
+    setIsPreviewDialogOpen(true);
+  };
+
+  const handleSendFeedback = async () => {
+    if (!feedback.trim()) {
+      alert("Feedback tidak boleh kosong");
+      return;
+    }
+
+    try {
+      const res = await axios.post("/api/contract/post/feedback", {
+        contractId: selectedContract.id,
+        content: feedback,
+      });
+
+      if (res.status === 201) {
+        alert("Feedback berhasil dikirim!");
+      } else {
+        alert("Gagal mengirim feedback.");
+      }
+    } catch (error) {
+      console.error("Error saat mengirim feedback:", error);
+      alert("Terjadi kesalahan saat mengirim feedback.");
+    } finally {
+      setFeedback("");
+    }
   };
 
   // Handle Sign
@@ -808,7 +840,7 @@ const ProfilePage = ({
                               {item.status}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
-                              {item.filename ? (
+                              {/* {item.filename ? (
                                 <Button
                                   onClick={() => handlePreview(item.filename)}
                                   className="bg-gray-400 text-black px-2 py-2 rounded-md"
@@ -817,7 +849,11 @@ const ProfilePage = ({
                                 </Button>
                               ) : (
                                 "-"
-                              )}
+                              )} */}
+
+                              <Button onClick={() => handlePreview(item)}>
+                                Preview
+                              </Button>
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
                               {item.status == "AWAITING_CLIENT_SIGNATURE" && (
@@ -947,19 +983,56 @@ const ProfilePage = ({
                 </div>
               </div>
             )}
-            {pdfUrl && (
+            {isPreviewDialogOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Preview Contract</h2>
                     <Button
-                      onClick={() => setPdfUrl(null)}
+                      onClick={() => setIsPreviewDialogOpen(false)}
                       className="bg-red-500 text-white px-4 py-2 rounded-md"
                     >
                       Close
                     </Button>
                   </div>
-                  <iframe src={pdfUrl} className="w-full flex-grow" />
+                  {/* <iframe src={pdfUrl} className="w-full flex-grow" /> */}
+                  <div className="space-y-2">
+                    <p>
+                      <strong>ID:</strong> {selectedContract.id}
+                    </p>
+                    <p>
+                      <strong>Cost:</strong> {selectedContract.cost}
+                    </p>
+                    <div className="md:col-span-2">
+                      <strong>Features:</strong>
+                      <ul className="list-disc list-inside pl-4">
+                        {selectedContract.features?.length > 0 ? (
+                          selectedContract.features.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))
+                        ) : (
+                          <li className="list-none">Fitur Tidak Ada</li>
+                        )}
+                      </ul>
+                    </div>
+                    <p>
+                      <strong>Scope of Work:</strong>{" "}
+                      {selectedContract.scopeOfWork}
+                    </p>
+                    <div className="mt-6">
+                      <h3 className="font-semibold mb-2">Feedback Pengguna</h3>
+                      <textarea
+                        className="w-full p-2 border rounded-md mb-2"
+                        rows={3}
+                        placeholder="Tulis feedback Anda di sini..."
+                        value={feedback}
+                        onChange={(e) => setFeedback(e.target.value)}
+                      />
+                      <Button onClick={handleSendFeedback}>
+                        Kirim Feedback
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

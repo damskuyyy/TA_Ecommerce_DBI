@@ -33,7 +33,6 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import SignaturePad from "@/components/ui/signature-pad";
 import { Checkbox } from "@/components/ui/checkbox";
 import ContractPDF from "@/pages/pdf";
 import { pdf } from "@react-pdf/renderer";
@@ -42,12 +41,14 @@ const Contract = () => {
   const [contractData, setContractData] = useState([]);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [features, setFeatures] = useState([""]);
 
   const form = useForm({
     defaultValues: {
       contractName: "",
       cost: "",
-      signature: "",
+      features: [],
+      scopeOfWork: "",
       agreement: false,
     },
   });
@@ -73,50 +74,95 @@ const Contract = () => {
 
   const agreement = form.watch("agreement");
 
+  const handleAddFeature = () => {
+    const newFeatures = [...features, ""];
+    setFeatures(newFeatures);
+    form.setValue("features", newFeatures);
+  };
+
+  const handleFeatureChange = (index, value) => {
+    const newFeatures = [...features];
+    newFeatures[index] = value;
+    setFeatures(newFeatures);
+    form.setValue("features", newFeatures);
+  };
+
+  const handleDeleteFeature = (index) => {
+    const newFeatures = features.filter((_, i) => i !== index);
+    setFeatures(newFeatures);
+    form.setValue("features", newFeatures);
+  };
+
+  // const onSubmit = async (data) => {
+  //   return console.log("data: ", data);
+  //   setIsSubmitting(true);
+  //   try {
+  //     const pdfPromise = pdf(<ContractPDF data={data} />).toBlob();
+
+  //     const response = await axios.put("/api/contract/put", {
+  //       ...data,
+  //       status: "AWAITING_CLIENT_SIGNATURE",
+  //     });
+
+  //     if (!response.data?.contract) {
+  //       throw new Error("Data kontrak tidak tersedia.");
+  //     }
+
+  //     const updatedContract = response.data.contract;
+  //     const blob = await pdfPromise;
+  //     const pdfBuffer = await blob.arrayBuffer();
+
+  //     const formData = new FormData();
+  //     formData.append("contractId", updatedContract.id);
+  //     formData.append("userId", updatedContract.userId);
+  //     formData.append(
+  //       "pdfFile",
+  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+  //     );
+
+  //     const uploadResponse = await axios.put(
+  //       "/api/contract/pdf/put",
+  //       formData,
+  //       {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       }
+  //     );
+
+  //     if (uploadResponse.status === 201) {
+  //       alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+  //       form.reset();
+  //       setFeatures([""]);
+  //       getContractData();
+  //     } else {
+  //       throw new Error("Gagal mengunggah PDF ke server.");
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ Error:", err);
+  //     alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
   const onSubmit = async (data) => {
+    console.log("data: ", data);
     setIsSubmitting(true);
     try {
-      const pdfPromise = pdf(<ContractPDF data={data} />).toBlob();
-
       const response = await axios.put("/api/contract/put", {
         ...data,
-        status: "AWAITING_CLIENT_SIGNATURE",
       });
 
-      if (!response.data?.contract) {
-        throw new Error("Data kontrak tidak tersedia.");
-      }
-
-      const updatedContract = response.data.contract;
-      const blob = await pdfPromise;
-      const pdfBuffer = await blob.arrayBuffer();
-
-      const formData = new FormData();
-      formData.append("contractId", updatedContract.id);
-      formData.append("userId", updatedContract.userId);
-      formData.append(
-        "pdfFile",
-        new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
-      );
-
-      const uploadResponse = await axios.put(
-        "/api/contract/pdf/put",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-
-      if (uploadResponse.status === 201) {
-        alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+      if (response.status === 200) {
+        alert("Data berhasil ditambahkan!");
         form.reset();
+        setFeatures([""]);
         getContractData();
       } else {
-        throw new Error("Gagal mengunggah PDF ke server.");
+        throw new Error("Respon server tidak sesuai.");
       }
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+      alert("Data gagal ditambahkan!");
     } finally {
       setIsSubmitting(false);
     }
@@ -160,8 +206,6 @@ const Contract = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-
-      {/* Table */}
       <div className="bg-white shadow rounded-lg p-4 dark:bg-black">
         <div className="overflow-x-auto">
           <Table className="min-w-full divide-y divide-gray-200 mt-4">
@@ -205,6 +249,26 @@ const Contract = () => {
                       <DialogContent>
                         <DialogHeader>Info Data Client</DialogHeader>
                         {/* Add client info here */}
+                        <div className="grid grid-cols-2 items-center gap-4">
+                          <span>Full Name</span>
+                          <span>{item.fullName}</span>
+                        </div>
+                        <div className="grid grid-cols-2 items-center gap-4">
+                          <span>Address</span>
+                          <span>{item.address}</span>
+                        </div>
+                        <div className="grid grid-cols-2 items-center gap-4">
+                          <span>Start Date</span>
+                          <span>{item.startDate}</span>
+                        </div>
+                        <div className="grid grid-cols-2 items-center gap-4">
+                          <span>End Date</span>
+                          <span>{item.endDate}</span>
+                        </div>
+                        <div className="grid grid-cols-2 items-center gap-4">
+                          <span>Description Contract</span>
+                          <span>{item.descriptionContract}</span>
+                        </div>
                       </DialogContent>
                     </Dialog>
                   </TableCell>
@@ -225,10 +289,10 @@ const Contract = () => {
                       {item.status === "PENDING_APPROVAL" && (
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button>Fill Data and Sign</Button>
+                            <Button>Fill Data</Button>
                           </DialogTrigger>
                           <DialogContent>
-                            <DialogHeader>Fill Data and Sign</DialogHeader>
+                            <DialogHeader>Fill Data</DialogHeader>
                             <Form {...form}>
                               <form
                                 onSubmit={form.handleSubmit((data) =>
@@ -236,42 +300,84 @@ const Contract = () => {
                                 )}
                                 className="space-y-8"
                               >
-                                {[
-                                  {
-                                    name: "contractName",
-                                    label: "Contract Name",
-                                    type: "text",
-                                  },
-                                  {
-                                    name: "cost",
-                                    label: "Cost",
-                                    type: "number",
-                                  },
-                                ].map(({ name, label, type }) => (
-                                  <FormField
-                                    key={name}
-                                    control={form.control}
-                                    name={name}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{label}</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            placeholder={label}
-                                            type={type}
-                                            {...field}
-                                            required
-                                          />
-                                        </FormControl>
-                                      </FormItem>
-                                    )}
-                                  />
-                                ))}
-                                <SignaturePad
-                                  onSave={(signature) =>
-                                    form.setValue("signature", signature)
-                                  }
+                                <FormField
+                                  control={form.control}
+                                  name="cost"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Cost</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          placeholder="Cost"
+                                          {...field}
+                                          required
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
                                 />
+
+                                <div>
+                                  <FormLabel>Features</FormLabel>
+                                  <div className="space-y-2">
+                                    {features.map((feature, index) => (
+                                      <div
+                                        key={index}
+                                        className="flex gap-2 items-center"
+                                      >
+                                        <Input
+                                          placeholder={`Feature ${index + 1}`}
+                                          type="text"
+                                          value={feature}
+                                          onChange={(e) =>
+                                            handleFeatureChange(
+                                              index,
+                                              e.target.value
+                                            )
+                                          }
+                                          required
+                                        />
+                                        <Button
+                                          type="button"
+                                          variant="destructive"
+                                          onClick={() =>
+                                            handleDeleteFeature(index)
+                                          }
+                                        >
+                                          Delete
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    className="mt-2 bg-gray-100 text-black"
+                                    onClick={handleAddFeature}
+                                  >
+                                    + Tambah Feature
+                                  </Button>
+                                </div>
+
+                                <FormField
+                                  control={form.control}
+                                  name="scopeOfWork"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Scope Of Work</FormLabel>
+                                      <FormControl>
+                                        <textarea
+                                          className="w-full border border-gray-300 p-2 rounded"
+                                          placeholder="Scope Of Work"
+                                          rows={4}
+                                          {...field}
+                                          required
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+
                                 <div className="flex items-center gap-2 mt-4">
                                   <FormField
                                     control={form.control}
@@ -319,24 +425,6 @@ const Contract = () => {
           </Table>
         </div>
       </div>
-
-      {/* Modal PDF Preview */}
-      {pdfUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Preview Contract</h2>
-              <Button
-                onClick={() => setPdfUrl(null)}
-                className="bg-red-500 text-white px-4 py-2 rounded-md"
-              >
-                Close
-              </Button>
-            </div>
-            <iframe src={pdfUrl} className="w-full flex-grow" />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
