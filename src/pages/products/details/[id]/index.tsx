@@ -15,18 +15,14 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import { TabsContent } from "@radix-ui/react-tabs";
 import Gallery from "@/components/ui/galery";
 import Head from "next/head";
-import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { PenBoxIcon, Trash2Icon } from "lucide-react";
 import { ItemDataType } from "@/types/itemsDataTypes";
-import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
 import formattedPrice from "@/utils/formattedPrice";
 import { useProductStore } from "@/store/product";
 
@@ -43,13 +39,7 @@ const Details = ({
   ); //menyimpan data produk dari api
   const [variant, setVariant] = useState(""); //menyimpan varian produk yang dipilih
   const [qty, setQty] = useState(1); //mengelola jumlah produk yg ingin ditambahkan ke keranjang, default 1
-  const [isReply, setIsReply] = useState(false); //status untuk menampilkan/menghilangkan balasan
-  const replyRefs = useRef<HTMLFormElement>(null); //referensi dom untuk elemen form balasan
   const [load, setLoad] = useState(false); //loading data
-  const [notesView, setNotesView] = useState(false); //status untuk buka/tutup modal catatan
-  const [notes, setNotes] = useState(""); //menyimpan catatan yg ditambahkan pengguna
-  const [notesDone, setNotesDone] = useState(false); //menandai apakah catatan telah diisi
-  const notesRef = useRef<HTMLTextAreaElement>(null); //referensi dom untuk elemen teks area catetan
   const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
 
   const router = useRouter();
@@ -64,28 +54,6 @@ const Details = ({
       setQty(1);
     }
   };
-
-  const handleViewNotes = () => {
-    setNotesView(true); //membuka modal catatan
-  };
-  const handleCloseNotes = () => {
-    setNotesView(false); //menutup modal
-  };
-  const handleDoneNotes = () => {
-    setNotesView(false);
-    if (notesRef.current) {
-      setNotes(notesRef.current.value);
-      notesRef.current.value = notes;
-    } //menyimpan catatan yang ditulis
-  };
-
-  useEffect(() => {
-    if (notes === "") {
-      setNotesDone(false);
-    } else {
-      setNotesDone(true);
-    }
-  }, [notes]); //memastikan status notesdone diperbarui berdasarkan isi catetan
 
   const handleAddDiscuss = () => {
     const updatedProduct = { ...product, variant: variant };
@@ -162,24 +130,6 @@ const Details = ({
                         dangerouslySetInnerHTML={{ __html: product.desc }}
                       />
                     )}
-                    <div className="flex justify-between flex-wrap w-fit gap-3 items-center">
-                      <div className="flex items-center gap-1">
-                        <p className="text-sm font-medium">
-                          Sold {product.sold}
-                        </p>
-                      </div>
-                      <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                      <div className="flex items-center gap-1">
-                        <StarIcon color="orange" />
-                        <p className="text-sm font-medium">{product.rate}</p>
-                      </div>
-                      <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                      <div className="flex items-center gap-1">
-                        <p className="text-sm font-medium">
-                          Discuss ({product.discusses?.length})
-                        </p>
-                      </div>
-                    </div>
                   </div>
                   {load ? (
                     <Skeleton className="w-3/4 h-5" />
@@ -208,7 +158,6 @@ const Details = ({
                         ))
                       )}
                     </div>
-                    <div></div>
                   </div>
                   <hr />
                   <Tabs
@@ -306,7 +255,7 @@ const Details = ({
             <div className="w-full">
               <Card className="flex flex-col">
                 <CardHeader className="font-bold text-lg">
-                  Set Amount and Notes
+                  Set Amount
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
                   <p className="text-gray-500">
@@ -363,69 +312,7 @@ const Details = ({
                       </span>{" "}
                     </p>
                   </div>
-                  {notesView ? (
-                    <div className="flex flex-col gap-3 w-full items-end mb-3">
-                      <Textarea
-                        className="h-20 text-sm"
-                        placeholder="Type a notes here..."
-                        ref={notesRef}
-                        onChange={(e) => setNotes(e.target.value)}
-                        value={notes}
-                      />
-                      <div className="flex items-center gap-3">
-                        <Button
-                          onClick={handleCloseNotes}
-                          size={"sm"}
-                          variant={"destructive"}
-                        >
-                          Cancel
-                        </Button>
-                        <Button size={"sm"} onClick={handleDoneNotes}>
-                          Done
-                        </Button>
-                      </div>
-                    </div>
-                  ) : notesDone && notes !== "" ? (
-                    <div className="text-sm text-gray-500 p-2 border rounded-md w-full flex relative">
-                      <div className="flex flex-col gap-1 w-full">
-                        <p className="text-sm font-medium text-zinc-950">
-                          Notes :
-                        </p>
-                        <span className="text-wrap overflow-hidden">
-                          {notes}
-                        </span>
-                      </div>
-                      <div className="flex items-center w-fit gap-2 right-2 justify-between absolute">
-                        <button
-                          onClick={() => {
-                            setNotesDone(false);
-                            setNotes("");
-                          }}
-                          className="hover:opacity-100 opacity-50"
-                        >
-                          <Trash2Icon color="#000000" size={16} />
-                        </button>
-                        <button
-                          onClick={() => setNotesView(true)}
-                          className="hover:opacity-100 opacity-50"
-                        >
-                          <PenBoxIcon size={16} color="#000000" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <Button
-                      disabled={items.some(
-                        (item) => item.code_product === String(id)
-                      )}
-                      onClick={handleViewNotes}
-                      variant={"outline"}
-                      className="flex text-sm items-center justify-start gap-2"
-                    >
-                      <Pencil2Icon />
-                      Add Notes
-                    </Button>
-                  )}
+
                   <div className="flex justify-between">
                     <h1 className="text-gray-500 font-medium">Subtotal</h1>
                     <h1 className="font-medium">
