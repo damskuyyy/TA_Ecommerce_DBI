@@ -118,7 +118,6 @@ const ProductsPage = () => {
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code product</TableHead>
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</TableHead>
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</TableHead>
-                <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variants</TableHead>
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</TableHead>
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</TableHead>
                 <TableHead className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></TableHead>
@@ -131,11 +130,6 @@ const ProductsPage = () => {
                     <TableCell className="px-6 py-2 whitespace-nowrap">{item.code_product}</TableCell>
                     <TableCell className="px-6 py-2 whitespace-nowrap">{item.name}</TableCell>
                     <TableCell className="px-6 py-2 whitespace-nowrap">{formattedPrice.toIDR(item.price)}</TableCell>
-                    <TableCell className="px-6 py-2 whitespace-nowrap flex items-center gap-2">
-                      {item.variants.map((variant, Index) => (
-                        <Badge className='capitalize' key={Index}>{variant}</Badge>
-                      ))}
-                    </TableCell>
                     <TableCell className="px-6 py-2 whitespace-nowrap capitalize">{item.category}</TableCell>
                     <TableCell className="px-6 flex items-center gap-2 py-2 whitespace-nowrap" title='Zoom'>
                       <ModalZoomImage src={item.image[0]} alt={item.name} />

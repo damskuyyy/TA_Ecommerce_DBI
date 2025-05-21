@@ -138,28 +138,7 @@ const Details = ({
                       {formattedPrice.toIDR(product.price)}
                     </h1>
                   )}
-                  <hr />
-                  <div className="flex flex-col gap-3">
-                    <h1 className="font-semibold">Choose Variants :</h1>
-                    <div className="flex items-center gap-3">
-                      {load ? (
-                        <Skeleton className="w-1/4 h-5" />
-                      ) : (
-                        product.variants?.map((item, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setVariant(item)}
-                            size={"sm"}
-                            variant={variant === item ? "default" : "outline"}
-                            className="capitalize"
-                          >
-                            {item}
-                          </Button>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                  <hr />
+                  <h1 className="font-semibold text-sm">(Harga dapat berubah sesuai permintaan)</h1>
                   <Tabs
                     defaultValue="details"
                     className="w-full flex flex-col gap-5 items-start"
@@ -258,13 +237,6 @@ const Details = ({
                   Set Amount
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
-                  <p className="text-gray-500">
-                    Variant:{" "}
-                    <span className="font-medium text-black capitalize">
-                      {variant}
-                    </span>
-                  </p>
-                  <hr />
                   <div className="flex items-center gap-2">
                     <div className="border rounded-md flex justify-between items-center gap-1">
                       <Button
