@@ -52,6 +52,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 import { DialogHeader } from "@/components/ui/dialog";
 import SignaturePad from "@/components/ui/signature-pad";
 import { useRouter } from "next/router";
+import ModalCheckout from "@/components/ui/modals/checkout";
 
 const ProfilePage = ({
   items,
@@ -92,6 +93,18 @@ const ProfilePage = ({
   const [isSignature, setIsSignature] = useState<boolean>(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState({});
+  const [openCheckout, setOpenCheckout] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleOpenCheckout = (productData: any) => {
+    if (!productData.variants || !Array.isArray(productData.variants)) {
+      console.error("Invalid product data:", productData);
+      alert("Product data is invalid. Please try again.");
+      return;
+    }
+    setSelectedProduct(productData);
+    setOpenCheckout(true);
+  };
 
   const router = useRouter();
 
@@ -842,9 +855,21 @@ const ProfilePage = ({
                               )}
                               {item.status == "AWAITING_PAYMENT" && (
                                 <Button
-                                  onClick={() => {
-                                    console.log("payment");
-                                  }}
+                                  onClick={() =>
+                                    handleOpenCheckout({
+                                      name: item.product.name,
+                                      price: item.cost,
+                                      image: Array.isArray(item.product.image)
+                                        ? item.product.image
+                                        : [item.product.image],
+                                      variants: item.product.variants || [
+                                        "Default Variant",
+                                      ],
+                                      desc: "Payment for contract " + item.id,
+                                      code_product: item.product.code_product,
+                                    })
+                                  }
+                                  className="bg-[#12163F] hover:bg-[#101430] text-white px-4 py-2 rounded-lg"
                                 >
                                   Pay
                                 </Button>
@@ -864,6 +889,13 @@ const ProfilePage = ({
                 </ScrollArea>
                 <div className="overflow-x-auto shadow-md"></div>
               </div>
+              {openCheckout && selectedProduct && (
+                <ModalCheckout
+                  open={openCheckout}
+                  onClose={() => setOpenCheckout(false)}
+                  data={selectedProduct}
+                />
+              )}
             </TabsContent>
             <TabsContent
               value="monitoringProgress"

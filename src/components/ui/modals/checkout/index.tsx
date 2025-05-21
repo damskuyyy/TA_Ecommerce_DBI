@@ -15,7 +15,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { Image as ImageIcon, Copy, Wallet, Check, X, Upload } from "lucide-react";
+import {
+  Image as ImageIcon,
+  Copy,
+  Wallet,
+  Check,
+  X,
+  Upload,
+} from "lucide-react";
 import formattedPrice from "@/utils/formattedPrice";
 import generateInvoiceId from "@/utils/generateInvoiceId";
 import { motion, AnimatePresence } from "framer-motion";
@@ -101,11 +108,7 @@ const PaymentProofModal = ({
               >
                 Submit
               </Button>
-              <Button
-                onClick={onClose}
-                variant="secondary"
-                className="w-full"
-              >
+              <Button onClick={onClose} variant="secondary" className="w-full">
                 Cancel
               </Button>
             </div>
@@ -136,7 +139,7 @@ const CryptoDetailsModal = ({
   product: ProductDataType;
   openUploadModal: () => void;
   onPay: () => void;
-}) => { 
+}) => {
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [accounts, setAccounts] = useState<string[]>([]);
@@ -235,17 +238,17 @@ const CryptoDetailsModal = ({
               </button>
             )}
             <button
-            onClick={() => {
-              onClose(); 
-              setTimeout(() => {
-                openUploadModal(); 
-              }, 300);
-            }}
-            className="bg-[#0E111B] hover:bg-[#1a1e2e] active:scale-95 transition-all duration-200 text-white px-6 py-2 rounded-md w-48 flex items-center justify-center gap-x-2"
-          >
-            <Upload className="w-5 h-5" />
-            <span>Upload Payment Proof</span>
-          </button>
+              onClick={() => {
+                onClose();
+                setTimeout(() => {
+                  openUploadModal();
+                }, 300);
+              }}
+              className="bg-[#0E111B] hover:bg-[#1a1e2e] active:scale-95 transition-all duration-200 text-white px-6 py-2 rounded-md w-48 flex items-center justify-center gap-x-2"
+            >
+              <Upload className="w-5 h-5" />
+              <span>Upload Payment Proof</span>
+            </button>
           </div>
         </motion.div>
       </DialogContent>
@@ -262,9 +265,16 @@ const CryptoDetailsModal = ({
 };
 
 // ModalCheckout Component
-const ModalCheckout = ({ data }: { data: ProductDataType }) => {
+const ModalCheckout = ({
+  open,
+  onClose,
+  data,
+}: {
+  open: boolean;
+  onClose: () => void;
+  data: ProductDataType;
+}) => {
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
   const { toast } = useToast();
   const fee = data.price && data.price * 0.004;
   const tax = 0.05;
@@ -345,8 +355,12 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
     const router = useRouter();
 
     const handleBackToHome = () => {
-      onClose(); 
+      onClose();
       router.push("/"); // Arahkan ke halaman home
+    };
+
+    const handleViewOrder = () => {
+      router.push("/user/profile");
     };
 
     return (
@@ -378,7 +392,10 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
             >
               Back to home
             </Button>
-            <Button className="bg-[#0E111B] text-white w-[300px] h-10 rounded-md text-sm font-medium">
+            <Button
+              className="bg-[#0E111B] text-white w-[300px] h-10 rounded-md text-sm font-medium"
+              onClick={handleViewOrder}
+            >
               View order
             </Button>
           </div>
@@ -392,9 +409,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
       const bodyXendit = {
         amount: total,
         description: `Payout for ${data.name} on the marketplace dbix.my.id`,
-        items: [
-          { name: data.name, quantity: 1, price: data.price },
-        ],
+        items: [{ name: data.name, quantity: 1, price: data.price }],
       };
       setLoad(true);
       try {
@@ -404,16 +419,21 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         );
         if (resp.status === 200) {
           setLoad(false);
-          toast({ description: "Invoice created. Please upload payment proof!" });
-  
+          toast({
+            description: "Invoice created. Please upload payment proof!",
+          });
+
           // Buka upload payment proof modal
           setShowUploadModal(true);
-  
+
           setTimeout(() => {
             window.open(resp.data.data.invoiceUrl, "_blank");
           }, 500);
         } else {
-          toast({ description: "Creating invoice Failed!", variant: "destructive" });
+          toast({
+            description: "Creating invoice Failed!",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.log(error);
@@ -431,7 +451,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
       }, 1500);
     }
   };
-  
+
   const handlePostOrder = async () => {
     const convertFileToBase64 = (file: File): Promise<string> => {
       return new Promise((resolve, reject) => {
@@ -466,24 +486,15 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger>
-        <Button size={"default"} className="font-medium w-full">
-          Buy now!
-        </Button>
-      </DialogTrigger>
+  <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="flex justify-between gap-5">
         <DialogHeader className="w-1/2">
           <DialogTitle>
-            {data ? (
-              <img
-                src={data?.image ? data.image[0] : ""}
-                alt={data?.name}
-                className="w-full h-[26rem] object-cover rounded-md"
-              />
-            ) : (
-              <p>loading...</p>
-            )}
+            <img
+              src={data.image[0]}
+              alt={data.name}
+              className="w-full h-[26rem] object-cover rounded-md"
+            />
           </DialogTitle>
         </DialogHeader>
         <DialogDescription className="w-1/2 flex flex-col gap-5">
@@ -552,18 +563,18 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
             </div>
           </div>
           {showUploadModal && (
-          <PaymentProofModal
-            isOpen={showUploadModal}
-            onClose={() => setShowUploadModal(false)}
-            image={image}
-            setImage={setImage}
-            handlePostOrder={async () => {
-              await handlePostOrder();
-              setShowUploadModal(false); // Tutup upload modal
-              setTransactionSuccessOpen(true); // Munculkan Transaction Success modal
-            }}
-          />
-        )}
+            <PaymentProofModal
+              isOpen={showUploadModal}
+              onClose={() => setShowUploadModal(false)}
+              image={image}
+              setImage={setImage}
+              handlePostOrder={async () => {
+                await handlePostOrder();
+                setShowUploadModal(false); // Tutup upload modal
+                setTransactionSuccessOpen(true); // Munculkan Transaction Success modal
+              }}
+            />
+          )}
         </DialogDescription>
       </DialogContent>
 
@@ -670,7 +681,7 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
         selectedCryptoData={selectedCryptoData}
         product={data}
         onPay={handlePay}
-        openUploadModal={() => setShowUploadModal(true)} 
+        openUploadModal={() => setShowUploadModal(true)}
       />
 
       {/* Dialog Transaksi Sukses */}
@@ -681,5 +692,4 @@ const ModalCheckout = ({ data }: { data: ProductDataType }) => {
     </Dialog>
   );
 };
-
 export default ModalCheckout;

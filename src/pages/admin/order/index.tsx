@@ -1,5 +1,4 @@
-"use client";
-
+// File: src/pages/admin/order/index.tsx
 import React, { useEffect, useState, useRef } from "react";
 import {
   Table,
@@ -168,7 +167,7 @@ const OrderTable: React.FC = () => {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/admin">DBI</BreadcrumbLink>
+              <BreadcrumbLink href="/admin">DBIX</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -187,17 +186,27 @@ const OrderTable: React.FC = () => {
         <div className="flex items-center space-x-4">
           <Popover>
             <PopoverTrigger>
-              <button onClick={handleDateClick} className="bg-white text-gray-600 px-4 py-2 rounded-lg dark:bg-gray-950 dark:text-white">
+              <button
+                onClick={handleDateClick}
+                className="bg-white text-gray-600 px-4 py-2 rounded-lg dark:bg-gray-950 dark:text-white"
+              >
                 Date
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 dark:bg-gray-950 dark:text-white">
-              <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md"/>
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md"
+              />
             </PopoverContent>
           </Popover>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <button className="bg-white text-gray-600 px-4 py-2 rounded-lg dark:bg-gray-950 dark:text-white">Order Status</button>
+              <button className="bg-white text-gray-600 px-4 py-2 rounded-lg dark:bg-gray-950 dark:text-white">
+                Order Status
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuSeparator />
