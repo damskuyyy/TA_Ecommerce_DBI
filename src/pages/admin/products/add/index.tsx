@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import dynamic from 'next/dynamic';
-import { FolderPlusIcon, ImagePlusIcon, Loader, LoaderCircle, X } from 'lucide-react';
+import { FolderPlusIcon, ImagePlusIcon, LoaderCircle, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import axios from 'axios';
 import {
@@ -28,16 +28,12 @@ const AddProductPage = () => {
   const [price, setPrice] = useState(0)
   const [stock, setStock] = useState(0)
   const [minOrder, setMinOrder] = useState(1)
-  const [variants, setVariants] = useState<string[]>([])
-  const [variantValue, setVariantValue] = useState('')
   const [image, setImage] = useState<string[]>([])
   const [imageValue, setImageValue] = useState('')
   const [information, setInformation] = useState('')
   const [details, setDetails] = useState('')
   const [category, setCategory] = useState('website')
-  const [variationInputView, setVariationInputView] = useState(false)
   const [imageInputView, setImageInputView] = useState(false)
-  const variationInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [load, setLoad] = useState(false)
   const { toast } = useToast()
@@ -62,15 +58,6 @@ const AddProductPage = () => {
     "(TOKEN) - ERC 20, BSC 20, TRC 20",
   ]
   //handleAddVariant menambahkan variant
-  const handleAddVariation = (e: FormEvent) => {
-    e.preventDefault()
-    setVariants((prev) => [...prev, variantValue])
-    setVariantValue('')
-    if (variationInputRef.current) {
-      variationInputRef.current.value = ''
-      variationInputRef.current.focus()
-    }
-  }
   const handleAddImage = (e: FormEvent) => {
     e.preventDefault()
     setImage((prev) => [...prev, imageValue])
@@ -81,16 +68,10 @@ const AddProductPage = () => {
     }
   }
 
-  const handleDeleteVariants = (index: number) => {
-    const values = variants.filter((_, i) => i !== index)
-    setVariants(values)
-  }
   const handleDeleteImage = (index: number) => {
     const values = image.filter((_, i) => i !== index)
     setImage(values)
   }
-
-
 
   const handleSave = async () => {
     setLoad(true)
@@ -100,19 +81,16 @@ const AddProductPage = () => {
       desc: description,
       price,
       stock,
-      variants,
       image,
       spec,
       information,
-      sold: 0,
-      rate: 0,
       minOrder,
       details
     }
 
 
 
-    if (!productName || !category || !description || !spec || !information || !details || !price || !stock || !minOrder || !variants || !image) {
+    if (!productName || !category || !description || !spec || !information || !details || !price || !stock || !minOrder || !image) {
       toast({
         className: cn(
           'top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4'
@@ -286,38 +264,6 @@ const AddProductPage = () => {
                       required
                       className='mt-2'
                     />
-                  </div>
-                  <div>
-                    <Label htmlFor="variation">Variants<span className="text-red-500">*</span></Label>
-                    {variationInputView ? (
-                      <div className='flex flex-col gap-2 w-full mt-2 mb-4'>
-                        <ul className='inline-flex flex-wrap gap-5'>
-                          {variants.map((item, index) => (
-                            <li key={index} className='relative cursor-default text-muted-foreground group text-sm'>
-                              <Badge>{item}</Badge>
-                              <button onClick={() => handleDeleteVariants(index)} className='p-0.5 absolute rounded-md -top-2 bg-destructive hidden group-hover:block -right-3'>
-                                <span className='text-white'><X size={14} /></span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                        <form onSubmit={handleAddVariation} className='space-y-2'>
-                          <Input required ref={variationInputRef} type='text' placeholder='Type a variation here...' onChange={(e) => setVariantValue(e.target.value)} />
-                          <div className='flex items-center gap-2'>
-                            <Button type='submit' size={'sm'} className='w-fit'>Add</Button>
-                            <Button type='button' onClick={() => {
-                              setVariantValue('')
-                              setVariationInputView(false)
-                            }} size={'sm'} className='w-fit' variant={'destructive'}>Cancel</Button>
-                          </div>
-                        </form>
-                      </div>
-                    ) : (
-                      <button onClick={() => setVariationInputView(true)} className='border mt-2 hover:border-primary transition-colors border-dashed w-full rounded-md h-24 flex justify-center flex-col gap-2 items-center'>
-                        <FolderPlusIcon />
-                        <p className='text-muted-foreground text-sm'>Add Variation</p>
-                      </button>
-                    )}
                   </div>
                 </div>
               </CardContent>
