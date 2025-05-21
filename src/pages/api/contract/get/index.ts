@@ -34,6 +34,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       where,
       include: {
         product: { select: { name: true } },
+        feedback: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

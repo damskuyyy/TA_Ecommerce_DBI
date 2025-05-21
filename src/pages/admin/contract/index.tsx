@@ -36,12 +36,18 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import ContractPDF from "@/pages/pdf";
 import { pdf } from "@react-pdf/renderer";
+import SignaturePad from "@/components/ui/signature-pad";
 
 const Contract = () => {
   const [contractData, setContractData] = useState([]);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedContract, setSelectedContract] = useState(null);
   const [features, setFeatures] = useState([""]);
+
+  const [signature, setSignature] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -52,6 +58,25 @@ const Contract = () => {
       agreement: false,
     },
   });
+
+  // Reset form setiap kali dialog open/selectedContract berubah
+  useEffect(() => {
+    if (openDialog && selectedContract) {
+      form.reset({
+        contractName: selectedContract.contractName || "",
+        cost: selectedContract.cost || "",
+        features: selectedContract.features || [""],
+        scopeOfWork: selectedContract.scopeOfWork || "",
+        agreement: false,
+      });
+      setFeatures(
+        selectedContract.features && selectedContract.features.length > 0
+          ? selectedContract.features
+          : [""]
+      );
+    }
+    // eslint-disable-next-line
+  }, [openDialog, selectedContract]);
 
   const getContractData = async () => {
     try {
@@ -69,6 +94,7 @@ const Contract = () => {
   const handlePreview = (filename) => {
     if (!filename) return;
     const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
+    console.log(fileUrl);
     setPdfUrl(fileUrl);
   };
 
@@ -94,7 +120,6 @@ const Contract = () => {
   };
 
   // const onSubmit = async (data) => {
-  //   return console.log("data: ", data);
   //   setIsSubmitting(true);
   //   try {
   //     const pdfPromise = pdf(<ContractPDF data={data} />).toBlob();
@@ -144,27 +169,197 @@ const Contract = () => {
   //   }
   // };
 
+  // const handleSign = async () => {
+  //   if (!selectedContract || !signature) {
+  //     alert("Tanda tangan harus diisi!");
+  //     return;
+  //   }
+
+  //   setSigning(true); // Aktifkan loading state
+
+  //   try {
+  //     // 1. Update status kontrak
+  //     const response = await axios.put("/api/contract/put", {
+  //       ...selectedContract,
+  //       status: "AWAITING_PAYMENT", // Atau status lain sesuai flow kamu
+  //     });
+
+  //     if (!response.data?.contract) {
+  //       throw new Error("Data kontrak tidak tersedia.");
+  //     }
+
+  //     const updatedContract = response.data.contract;
+
+  //     // 2. Generate PDF
+  //     const data = {
+  //       fullName: updatedContract.fullName,
+  //       address: updatedContract.address,
+  //       contractName: updatedContract.contractName,
+  //       cost: updatedContract.cost,
+  //       startDate: updatedContract.startDate,
+  //       endDate: updatedContract.endDate,
+  //       descriptionContract: updatedContract.descriptionContract,
+  //       features: updatedContract.features,
+  //       scopeOfWork: updatedContract.scopeOfWork,
+  //       signature: updatedContract.signature,
+  //       adminSignature: signature
+  //     };
+  //     const blob = await pdf(<ContractPDF data={data} />).toBlob();
+  //     const pdfBuffer = await blob.arrayBuffer();
+
+  //     // 3. Upload PDF ke server
+  //     const formData = new FormData();
+  //     formData.append("contractId", updatedContract.id);
+  //     formData.append("userId", updatedContract.userId);
+  //     formData.append(
+  //       "pdfFile",
+  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+  //     );
+
+  //     const uploadResponse = await axios.put(
+  //       "/api/contract/pdf/put",
+  //       formData,
+  //       {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       }
+  //     );
+
+  //     if (uploadResponse.status === 201 || uploadResponse.status === 200) {
+  //       alert("Kontrak berhasil ditandatangani dan PDF telah dibuat!");
+  //       setSignature(null);
+  //       setSelectedContract(null);
+  //       setOpenDialog(false);
+  //       getContractData();
+  //     } else {
+  //       throw new Error("Gagal mengunggah PDF ke server.");
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ Error:", err);
+  //     alert("Terjadi kesalahan saat menandatangani kontrak.");
+  //   } finally {
+  //     setSigning(false); // Matikan loading state
+  //   }
+  // };
+
   const onSubmit = async (data) => {
-    console.log("data: ", data);
     setIsSubmitting(true);
     try {
+      // 1. Update kontrak ke status AWAITING_CLIENT_SIGNATURE
       const response = await axios.put("/api/contract/put", {
         ...data,
+        status: "AWAITING_CLIENT_SIGNATURE",
       });
 
-      if (response.status === 200) {
-        alert("Data berhasil ditambahkan!");
-        form.reset();
-        setFeatures([""]);
-        getContractData();
-      } else {
-        throw new Error("Respon server tidak sesuai.");
+      if (!response.data?.contract) {
+        throw new Error("Data kontrak tidak tersedia.");
       }
+
+      const updatedContract = response.data.contract;
+
+      // 2. Reset form, refresh data, tutup dialog secepatnya
+      form.reset();
+      setFeatures([""]);
+      getContractData();
+      alert("Data berhasil dikirim! PDF kontrak akan diunggah di background.");
+
+      // 3. Upload PDF ke server (background, tidak blocking)
+      (async () => {
+        try {
+          const pdfBlob = await pdf(
+            <ContractPDF data={updatedContract} />
+          ).toBlob();
+          const pdfBuffer = await pdfBlob.arrayBuffer();
+
+          const formData = new FormData();
+          formData.append("contractId", updatedContract.id);
+          formData.append("userId", updatedContract.userId);
+          formData.append(
+            "pdfFile",
+            new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+          );
+
+          await axios.put("/api/contract/pdf/put", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          // Optional: Toast sukses upload
+        } catch (err) {
+          console.error("Gagal upload PDF di background:", err);
+        }
+      })();
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Data gagal ditambahkan!");
+      alert("Terjadi kesalahan saat mengirim kontrak.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSign = async () => {
+    if (!selectedContract || !signature) {
+      alert("Tanda tangan harus diisi!");
+      return;
+    }
+
+    try {
+      // 1. Update kontrak ke status berikutnya (misal AWAITING_PAYMENT)
+      const response = await axios.put("/api/contract/put", {
+        ...selectedContract,
+        status: "AWAITING_PAYMENT",
+      });
+
+      if (!response.data?.contract) {
+        throw new Error("Data kontrak tidak tersedia.");
+      }
+
+      const updatedContract = response.data.contract;
+
+      // 2. Tutup dialog, refresh data, notifikasi
+      setSignature(null);
+      setSelectedContract(null);
+      setOpenDialog(false);
+      getContractData();
+      alert(
+        "Kontrak berhasil ditandatangani! File PDF akan diunggah di background."
+      );
+
+      // 3. Upload PDF di background (tidak blocking UI)
+      (async () => {
+        try {
+          const data = {
+            fullName: updatedContract.fullName,
+            address: updatedContract.address,
+            contractName: updatedContract.contractName,
+            cost: updatedContract.cost,
+            startDate: updatedContract.startDate,
+            endDate: updatedContract.endDate,
+            descriptionContract: updatedContract.descriptionContract,
+            features: updatedContract.features,
+            scopeOfWork: updatedContract.scopeOfWork,
+            signature: updatedContract.signature,
+            adminSignature: signature,
+          };
+          const blob = await pdf(<ContractPDF data={data} />).toBlob();
+          const pdfBuffer = await blob.arrayBuffer();
+
+          const formData = new FormData();
+          formData.append("contractId", updatedContract.id);
+          formData.append("userId", updatedContract.userId);
+          formData.append(
+            "pdfFile",
+            new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+          );
+
+          await axios.put("/api/contract/pdf/put", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          // Optional: toast sukses upload
+        } catch (err) {
+          console.error("Gagal upload PDF di background:", err);
+        }
+      })();
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Terjadi kesalahan saat menandatangani kontrak.");
     }
   };
 
@@ -273,7 +468,32 @@ const Contract = () => {
                     </Dialog>
                   </TableCell>
                   <TableCell>
-                    {item.status !== "PENDING_APPROVAL" ? (
+                    {item.status === "REVISION_REQUESTED" ? (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button>View Feedback</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>Feedback</DialogHeader>
+                          {/* Ambil feedback paling baru */}
+                          {item.feedback && item.feedback.length > 0 ? (
+                            <>
+                              <div className="whitespace-pre-wrap mb-2">
+                                {item.feedback[0].content}
+                              </div>
+                              <div className="mb-2 text-gray-700">
+                                <strong>Tanggal:</strong>{" "}
+                                {new Date(
+                                  item.feedback[0].createdAt
+                                ).toLocaleString()}
+                              </div>
+                            </>
+                          ) : (
+                            <div>Tidak ada feedback untuk kontrak ini.</div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    ) : item.status !== "PENDING_APPROVAL" ? (
                       <Button
                         onClick={() => handlePreview(item.filename)}
                         className="bg-gray-400 text-black px-2 py-2 rounded-md"
@@ -286,13 +506,34 @@ const Contract = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-4">
-                      {item.status === "PENDING_APPROVAL" && (
-                        <Dialog>
+                      {(item.status === "PENDING_APPROVAL" ||
+                        item.status === "REVISION_REQUESTED") && (
+                        <Dialog
+                          open={
+                            openDialog &&
+                            selectedContract &&
+                            selectedContract.id === item.id
+                          }
+                          onOpenChange={(open) => {
+                            setOpenDialog(open);
+                            if (open) {
+                              setSelectedContract(item);
+                            }
+                          }}
+                        >
                           <DialogTrigger asChild>
-                            <Button>Fill Data</Button>
+                            <Button>
+                              {item.status === "PENDING_APPROVAL"
+                                ? "Fill Data"
+                                : "Revisi Data"}
+                            </Button>
                           </DialogTrigger>
                           <DialogContent>
-                            <DialogHeader>Fill Data</DialogHeader>
+                            <DialogHeader>
+                              {item.status === "PENDING_APPROVAL"
+                                ? "Fill Data"
+                                : "Revisi Data Kontrak"}
+                            </DialogHeader>
                             <Form {...form}>
                               <form
                                 onSubmit={form.handleSubmit((data) =>
@@ -300,6 +541,25 @@ const Contract = () => {
                                 )}
                                 className="space-y-8"
                               >
+                                {/* Contract Name */}
+                                <FormField
+                                  control={form.control}
+                                  name="contractName"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Contract Name</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="text"
+                                          placeholder="Contract Name"
+                                          {...field}
+                                          required
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+                                {/* Cost */}
                                 <FormField
                                   control={form.control}
                                   name="cost"
@@ -318,6 +578,7 @@ const Contract = () => {
                                   )}
                                 />
 
+                                {/* Features */}
                                 <div>
                                   <FormLabel>Features</FormLabel>
                                   <div className="space-y-2">
@@ -359,6 +620,7 @@ const Contract = () => {
                                   </Button>
                                 </div>
 
+                                {/* Scope Of Work */}
                                 <FormField
                                   control={form.control}
                                   name="scopeOfWork"
@@ -378,6 +640,7 @@ const Contract = () => {
                                   )}
                                 />
 
+                                {/* Agreement Checkbox */}
                                 <div className="flex items-center gap-2 mt-4">
                                   <FormField
                                     control={form.control}
@@ -402,14 +665,43 @@ const Contract = () => {
                                   disabled={!agreement || isSubmitting}
                                 >
                                   {isSubmitting
-                                    ? "Creating..."
-                                    : "Create Contract"}
+                                    ? item.status === "PENDING_APPROVAL"
+                                      ? "Creating..."
+                                      : "Updating..."
+                                    : item.status === "PENDING_APPROVAL"
+                                    ? "Create Contract"
+                                    : "Update Contract"}
                                 </Button>
                               </form>
                             </Form>
                           </DialogContent>
                         </Dialog>
                       )}
+
+                      {item.status == "AWAITING_ADMIN_SIGNATURE" && (
+                        <Dialog
+                          open={
+                            openDialog &&
+                            selectedContract &&
+                            selectedContract.id === item.id
+                          }
+                          onOpenChange={(open) => {
+                            setOpenDialog(open);
+                            if (open) setSelectedContract(item);
+                          }}
+                        >
+                          <DialogTrigger>
+                            <Button>Sign</Button>
+                          </DialogTrigger>
+                          <DialogContent className="w-fit max-w-full">
+                            <SignaturePad onSave={setSignature} />
+                            <Button onClick={handleSign}>
+                              Confirm and Accept Contract
+                            </Button>
+                          </DialogContent>
+                        </Dialog>
+                      )}
+
                       <Button
                         className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit"
                         onClick={() => handleRejectContract(item.id)}
@@ -424,6 +716,23 @@ const Contract = () => {
             </TableBody>
           </Table>
         </div>
+        {/* Modal PDF Preview */}
+        {pdfUrl && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Preview Contract</h2>
+                <Button
+                  onClick={() => setPdfUrl(null)}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md"
+                >
+                  Close
+                </Button>
+              </div>
+              <iframe src={pdfUrl} className="w-full flex-grow" />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

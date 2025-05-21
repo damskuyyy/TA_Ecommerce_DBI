@@ -14,7 +14,9 @@ export default async function handler(
 
     // Validasi field
     if (!contractId || !content) {
-      return res.status(400).json({ error: "contractId and content are required" });
+      return res
+        .status(400)
+        .json({ error: "contractId and content are required" });
     }
 
     // Pastikan kontrak ada
@@ -31,6 +33,13 @@ export default async function handler(
       data: {
         contractId,
         content,
+      },
+    });
+
+    await prisma.contractDigital.update({
+      where: { id: contractId },
+      data: {
+        status: "REVISION_REQUESTED",
       },
     });
 

@@ -9,7 +9,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const { id, contractName, cost, features, scopeOfWork } = req.body;
+    const { id, contractName, cost, features, scopeOfWork, status, signature } =
+      req.body;
 
     // Validasi field wajib
     if (
@@ -42,6 +43,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         cost: parseFloat(cost),
         features,
         scopeOfWork,
+        status,
+        signature,
       },
     });
 

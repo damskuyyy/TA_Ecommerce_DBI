@@ -111,6 +111,8 @@ const styles = StyleSheet.create({
     height: 20,
   },
   signature: {},
+  featureItem: { marginBottom: 2 },
+  listBullet: { fontWeight: "bold" },
 });
 
 const ContractPDF = ({ data }: { data: any }) => (
@@ -197,8 +199,18 @@ const ContractPDF = ({ data }: { data: any }) => (
         {data.scopeOfWork}
       </Text>
       <Text style={styles.marginLeft20}>
-        <Text style={styles.listNumber}>6.</Text>Fitur utama :{" "}
+        <Text style={styles.listNumber}>6.</Text> Fitur utama :
       </Text>
+      {data.features && data.features.length > 0 ? (
+        data.features.map((feature, i) => (
+          <Text key={i} style={[styles.marginLeft40, styles.featureItem]}>
+            <Text style={styles.listBullet}>{`${i + 1}. `}</Text>
+            {feature}
+          </Text>
+        ))
+      ) : (
+        <Text style={styles.marginLeft40}>-</Text>
+      )}
 
       <Text style={styles.pasal}>Pasal 2 - Jangka Waktu Pengerjaan</Text>
       <Text style={styles.text}>
@@ -275,15 +287,17 @@ const ContractPDF = ({ data }: { data: any }) => (
       <View style={styles.signatureSection}>
         <View style={styles.signatureBox}>
           <Text>Pihak Pertama</Text>
-          {data.userSignature && (
-            <Image style={styles.signature} src={data.userSignature} />
+          {data.signature && (
+            <Image style={styles.signature} src={data.signature} />
           )}
           <View style={styles.spacer} />
           <Text>{data.fullName}</Text>
         </View>
         <View style={styles.signatureBox}>
           <Text>Pihak Kedua</Text>
-          <Image style={styles.signature} src={data.signature} />
+          {data.adminSignature && (
+            <Image style={styles.signature} src={data.adminSignature} />
+          )}
           <View style={styles.spacer} />
           <Text>Ramzi Daffa</Text>
         </View>
