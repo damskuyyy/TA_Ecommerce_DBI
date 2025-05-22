@@ -6,25 +6,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import {
+  BookCheckIcon,
   CheckCircleIcon,
   CircleUserRound,
-  CogIcon,
+  ListChecks,
   LoaderCircle,
   LockKeyholeIcon,
-  MinusIcon,
   PenSquareIcon,
-  PlusIcon,
   ShoppingBasketIcon,
-  Trash2Icon,
-  SquareArrowOutUpRightIcon,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
-import noData from "../../../../public/animations/nodata.json";
 import emailVerified from "../../../../public/animations/emailVerified.json";
 import Lottie from "lottie-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import {
@@ -45,17 +40,12 @@ import {
   calculateTotal,
   calculateTransactionFee,
 } from "@/utils/calcutale";
-import Alerts from "@/components/ui/alerts";
-import formattedPrice from "@/utils/formattedPrice";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
-import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
-import { DialogHeader } from "@/components/ui/dialog";
 import SignaturePad from "@/components/ui/signature-pad";
 import { useRouter } from "next/router";
 import ModalCheckout from "@/components/ui/modals/checkout";
 import ContractPDF from "@/pages/pdf";
 import { pdf } from "@react-pdf/renderer";
-import { Item } from "@radix-ui/react-accordion";
 
 const ProfilePage = ({
   items,
@@ -193,50 +183,50 @@ const ProfilePage = ({
     }
   };
 
-  const incrementQty = (index: number) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((item, i) =>
-        i === index ? { ...item, quantity: (item.quantity ?? 1) + 1 } : item
-      )
-    );
-    setItems((prevItems) =>
-      prevItems.map((item, i) =>
-        i === index ? { ...item, qty: (item.qty ?? 1) + 1 } : item
-      )
-    );
-  };
+  // const incrementQty = (index: number) => {
+  //   setProducts((prevProducts) =>
+  //     prevProducts.map((item, i) =>
+  //       i === index ? { ...item, quantity: (item.quantity ?? 1) + 1 } : item
+  //     )
+  //   );
+  //   setItems((prevItems) =>
+  //     prevItems.map((item, i) =>
+  //       i === index ? { ...item, qty: (item.qty ?? 1) + 1 } : item
+  //     )
+  //   );
+  // };
 
-  const decrementQty = (index: number) => {
-    setProducts((prevProducts) => {
-      const updatedProducts = prevProducts
-        .map((item, i) =>
-          i === index ? { ...item, quantity: (item.quantity ?? 1) - 1 } : item
-        )
-        .filter((item) => item.quantity && item.quantity > 0);
+  // const decrementQty = (index: number) => {
+  //   setProducts((prevProducts) => {
+  //     const updatedProducts = prevProducts
+  //       .map((item, i) =>
+  //         i === index ? { ...item, quantity: (item.quantity ?? 1) - 1 } : item
+  //       )
+  //       .filter((item) => item.quantity && item.quantity > 0);
 
-      if (updatedProducts.length === 0) {
-        setProducts([]);
-        return [];
-      } else {
-        return updatedProducts;
-      }
-    });
+  //     if (updatedProducts.length === 0) {
+  //       setProducts([]);
+  //       return [];
+  //     } else {
+  //       return updatedProducts;
+  //     }
+  //   });
 
-    setItems((prevItems) => {
-      const updatedItems = prevItems
-        .map((item, i) =>
-          i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item
-        )
-        .filter((item) => item.qty && item.qty > 0);
+  //   setItems((prevItems) => {
+  //     const updatedItems = prevItems
+  //       .map((item, i) =>
+  //         i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item
+  //       )
+  //       .filter((item) => item.qty && item.qty > 0);
 
-      if (updatedItems.length === 0) {
-        setItems([]);
-        return [];
-      } else {
-        return updatedItems;
-      }
-    });
-  };
+  //     if (updatedItems.length === 0) {
+  //       setItems([]);
+  //       return [];
+  //     } else {
+  //       return updatedItems;
+  //     }
+  //   });
+  // };
 
   // Handle preview PDF
   const handlePreview = (filename: string) => {
@@ -403,20 +393,20 @@ const ProfilePage = ({
     }
   };
 
-  const transactionValue = 0.05; // 5% transaction fee
-  const applicationValue = 0.02; // 2% application fee
-  const taxRate = 0.1; // 10% tax
+  // const transactionValue = 0.05; // 5% transaction fee
+  // const applicationValue = 0.02; // 2% application fee
+  // const taxRate = 0.1; // 10% tax
 
-  const subtotal = calculateSubtotal(products);
-  const transactionFee = calculateTransactionFee(subtotal, transactionValue);
-  const applicationFee = calculateApplicationFee(subtotal, applicationValue);
-  const tax = calculateTax(subtotal, taxRate);
-  const total = calculateTotal(
-    products,
-    transactionValue,
-    applicationValue,
-    taxRate
-  );
+  // const subtotal = calculateSubtotal(products);
+  // const transactionFee = calculateTransactionFee(subtotal, transactionValue);
+  // const applicationFee = calculateApplicationFee(subtotal, applicationValue);
+  // const tax = calculateTax(subtotal, taxRate);
+  // const total = calculateTotal(
+  //   products,
+  //   transactionValue,
+  //   applicationValue,
+  //   taxRate
+  // );
 
   const handleViewProgress = (id: string) => {
     try {
@@ -443,14 +433,14 @@ const ProfilePage = ({
               Security
             </TabsTrigger>
             <TabsTrigger value="contract" className="flex items-center gap-2">
-              <ShoppingBasketIcon size={20} />
+              <BookCheckIcon size={20} />
               Contract
             </TabsTrigger>
             <TabsTrigger
               value="monitoringProgress"
               className="flex items-center gap-2"
             >
-              <ShoppingBasketIcon size={20} />
+              <ListChecks size={20} />
               Monitoring Progress
             </TabsTrigger>
           </TabsList>
@@ -865,7 +855,11 @@ const ProfilePage = ({
                     <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950 dark:divide-gray-700">
                       {contractData.length > 0 &&
                         contractData
-                          .filter((item) => item.status === "ACTIVE")
+                          .filter(
+                            (item) =>
+                              item.status === "ACTIVE" ||
+                              item.status === "COMPLETED"
+                          )
                           .map((item, idx) => (
                             <TableRow key={idx}>
                               <TableCell className="px-6 py-4 whitespace-nowrap">

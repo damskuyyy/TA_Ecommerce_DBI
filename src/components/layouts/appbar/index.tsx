@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { ArrowLeftRightIcon, Bell, CircleUser, FoldersIcon, Home, LogsIcon, Menu, Package2, Search, Users } from 'lucide-react';
+import { ArrowLeftRightIcon, Bell, BookCheckIcon, CircleUser, FoldersIcon, Home, ListChecks, LogsIcon, Menu, Package2, Search, Users } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -73,7 +73,7 @@ const Appbar = () => {
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/contract' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
               onClick={() => setSheetView(false)}
             >
-              <Users className="h-5 w-5" />
+              <BookCheckIcon className="h-5 w-5" />
               Contract 
             </Link>
             <Link
@@ -81,7 +81,7 @@ const Appbar = () => {
               className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/admin/monitoring' ? 'text-foreground bg-muted' : 'text-muted-foreground'} hover:text-foreground`}
               onClick={() => setSheetView(false)}
             >
-              <Users className="h-5 w-5" />
+              <ListChecks className="h-5 w-5" />
               Monitoring Progress 
             </Link>
           </nav>
