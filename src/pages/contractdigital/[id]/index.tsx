@@ -52,8 +52,35 @@ const Contractdigital = () => {
 
   const agreement = form.watch("agreement");
 
+  // const onSubmit = async (data: any) => {
+  //   if (
+  //     !Object.values(data).every((value) => value !== "" && value !== false)
+  //   ) {
+  //     toast({ title: "Error", description: "All fields are required!" });
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await axios.post("/api/contract/post/user", {
+  //       userId: session.user?.id,
+  //       productId: product.id,
+  //       ...data,
+  //     });
+
+  //     if (response.status === 201) {
+  //       console.log("✅ Draft contract created:", response.data);
+  //       alert("Draft kontrak berhasil disimpan.");
+  //     } else {
+  //       console.warn("⚠️ Kontrak dibuat, tapi respons tidak sesuai:", response);
+  //       alert("Terjadi sesuatu yang tidak terduga.");
+  //     }
+  //   } catch (error: any) {
+  //     console.error("❌ Error generating contract:", error);
+  //     alert("Terjadi kesalahan saat membuat kontrak.");
+  //   }
+  // };
+
   const onSubmit = async (data: any) => {
-    console.log("data form: ", data);
     if (
       !Object.values(data).every((value) => value !== "" && value !== false)
     ) {
@@ -62,6 +89,39 @@ const Contractdigital = () => {
     }
 
     try {
+      // 1. Cek apakah ada kontrak belum dibayar
+      const unpaidStatuses = [
+        "PENDING_APPROVAL",
+        "AWAITING_CLIENT_SIGNATURE",
+        "AWAITING_ADMIN_SIGNATURE",
+        "AWAITING_PAYMENT",
+        "REVISION_REQUESTED",
+      ];
+
+      const checkRes = await axios(
+        `/api/contract/get?userId=${session.user?.id}`
+      );
+
+      const unpaidContracts = checkRes.data.filter((contract: any) =>
+        unpaidStatuses.includes(contract.status)
+      );
+
+      if (unpaidContracts.length > 0) {
+        const confirm = window.confirm(
+          "Anda masih memiliki kontrak yang belum dibayar. Apakah ingin membatalkan kontrak lama dan membuat yang baru?"
+        );
+
+        if (!confirm) return;
+
+        await Promise.all(
+          unpaidContracts.map((contract: any) =>
+            axios.delete(`/api/contract/delete/${contract.id}`)
+          )
+        );
+      }
+
+      console.log("hahai");
+      // 3. Lanjut buat kontrak baru
       const response = await axios.post("/api/contract/post/user", {
         userId: session.user?.id,
         productId: product.id,
@@ -147,7 +207,9 @@ const Contractdigital = () => {
                       {formattedPrice.toIDR(product.price)}
                     </h1>
                   )}
-                  <h1 className="font-semibold text-sm">(Harga dapat berubah sesuai permintaan)</h1>
+                  <h1 className="font-semibold text-sm">
+                    (Harga dapat berubah sesuai permintaan)
+                  </h1>
                   <Tabs
                     defaultValue="details"
                     className="w-full flex flex-col gap-5 items-start"
