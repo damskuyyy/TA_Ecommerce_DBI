@@ -53,6 +53,9 @@ import { DialogHeader } from "@/components/ui/dialog";
 import SignaturePad from "@/components/ui/signature-pad";
 import { useRouter } from "next/router";
 import ModalCheckout from "@/components/ui/modals/checkout";
+import ContractPDF from "@/pages/pdf";
+import { pdf } from "@react-pdf/renderer";
+import { Item } from "@radix-ui/react-accordion";
 
 const ProfilePage = ({
   items,
@@ -105,6 +108,8 @@ const ProfilePage = ({
     setSelectedProduct(productData);
     setOpenCheckout(true);
   };
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [feedback, setFeedback] = useState("");
 
   const router = useRouter();
 
@@ -236,76 +241,165 @@ const ProfilePage = ({
   // Handle preview PDF
   const handlePreview = (filename: string) => {
     if (!filename) return;
+    setIsPreviewDialogOpen(true);
     const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
     setPdfUrl(fileUrl);
   };
 
-  // Handle Sign
-  const handleSign = async () => {
+  // const handlePreview = (contract) => {
+  //   setSelectedContract(contract);
+  //   setIsPreviewDialogOpen(true);
+  // };
+
+  const handleSendFeedback = async () => {
+    if (!feedback.trim()) {
+      alert("Feedback tidak boleh kosong");
+      return;
+    }
+
     try {
-      // Update kontrak dengan PUT request
-      const response = await axios.put("/api/contract/put", {
-        ...selectedContract, // Kirim data yang diperbarui
+      console.log("SelectedContract: ", selectedContract);
+      const res = await axios.post("/api/contract/post/feedback", {
         contractId: selectedContract.id,
-        status: "AWAITING_PAYMENT",
+        content: feedback,
       });
 
-      // Cek apakah response.data berisi data kontrak yang benar
+      if (res.status === 201) {
+        alert("Feedback berhasil dikirim!");
+      } else {
+        alert("Gagal mengirim feedback.");
+      }
+    } catch (error) {
+      console.error("Error saat mengirim feedback:", error);
+      alert("Terjadi kesalahan saat mengirim feedback.");
+    } finally {
+      setFeedback("");
+    }
+  };
+
+  // // Handle Sign
+  // const handleSign = async () => {
+  //   try {
+  //     // Update kontrak dengan PUT request
+  //     const response = await axios.put("/api/contract/put", {
+  //       ...selectedContract, // Kirim data yang diperbarui
+  //       contractId: selectedContract.id,
+  //       status: "AWAITING_ADMIN_SIGNATURE",
+  //     });
+
+  //     // Cek apakah response.data berisi data kontrak yang benar
+  //     if (!response.data || !response.data.contract) {
+  //       throw new Error("Data kontrak tidak tersedia dalam response.");
+  //     }
+
+  //     const updatedContract = response.data.contract;
+
+  //     const data = {
+  //       fullName: updatedContract.fullName,
+  //       address: updatedContract.address,
+  //       contractName: updatedContract.contractName,
+  //       cost: updatedContract.cost,
+  //       startDate: updatedContract.startDate,
+  //       endDate: updatedContract.endDate,
+  //       descriptionContract: updatedContract.descriptionContract,
+  //       features: updatedContract.features,
+  //       scopeOfWork: updatedContract.scopeOfWork,
+  //       signature: signature,
+  //     };
+
+  //     const blob = await pdf(<ContractPDF data={data} />).toBlob();
+
+  //     const pdfBuffer = await blob.arrayBuffer();
+
+  //     const formData = new FormData();
+  //     formData.append("contractId", updatedContract.id);
+  //     formData.append("userId", updatedContract.userID);
+  //     formData.append(
+  //       "pdfFile",
+  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+  //     );
+
+  //     // Upload PDF ke server
+  //     await axios.put("/api/contract/pdf/put", formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+
+  //     alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+  //     setIsSignature(false);
+  //     getContractData();
+  //   } catch (err) {
+  //     console.error("❌ Error:", err);
+  //     alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+  //   }
+  // };
+
+  const handleSign = async () => {
+    if (!signature) {
+      alert("Silakan tanda tangani kontrak terlebih dahulu!");
+      return;
+    }
+    try {
+      // 1. Update status kontrak segera
+      const response = await axios.put("/api/contract/put", {
+        ...selectedContract,
+        contractId: selectedContract.id,
+        status: "AWAITING_ADMIN_SIGNATURE",
+        signature: signature,
+      });
+
       if (!response.data || !response.data.contract) {
         throw new Error("Data kontrak tidak tersedia dalam response.");
       }
-
       const updatedContract = response.data.contract;
 
-      // Kirim data ke API untuk pembuatan PDF
-      const pdfResponse = await axios.post(
-        "/api/contract/pdf/post",
-        {
-          fullName: updatedContract.fullName,
-          address: updatedContract.address,
-          contractName: updatedContract.contractName,
-          cost: updatedContract.cost,
-          startDate: updatedContract.startDate,
-          endDate: updatedContract.endDate,
-          descriptionContract: updatedContract.descriptionContract,
-          features: updatedContract.features,
-          scopeOfWork: updatedContract.scopeOfWork,
-          signature: updatedContract.signature,
-          userSignature: signature,
-        },
-        {
-          responseType: "arraybuffer",
-        }
+      // 2. Segera tutup dialog, refresh data, tampilkan notifikasi
+      setIsSignature(false);
+      getContractData();
+      alert(
+        "Kontrak berhasil ditandatangani! File PDF akan diunggah di background."
       );
 
-      if (pdfResponse.status === 200) {
-        // Logika setelah PDF berhasil dibuat
-        const pdfBlob = new Blob([pdfResponse.data], {
-          type: "application/pdf",
-        });
+      // 3. Upload PDF di background (tidak await)
+      (async () => {
+        try {
+          const data = {
+            fullName: updatedContract.fullName,
+            address: updatedContract.address,
+            contractName: updatedContract.contractName,
+            cost: updatedContract.cost,
+            startDate: updatedContract.startDate,
+            endDate: updatedContract.endDate,
+            descriptionContract: updatedContract.descriptionContract,
+            features: updatedContract.features,
+            scopeOfWork: updatedContract.scopeOfWork,
+            signature: signature,
+          };
+          const blob = await pdf(<ContractPDF data={data} />).toBlob();
+          const pdfBuffer = await blob.arrayBuffer();
 
-        const formData = new FormData();
-        formData.append("contractId", updatedContract.id);
-        formData.append("userId", updatedContract.userID);
-        formData.append(
-          "pdfFile",
-          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
-        );
+          const formData = new FormData();
+          formData.append("contractId", updatedContract.id);
+          formData.append(
+            "userId",
+            updatedContract.userId || updatedContract.userID
+          );
+          formData.append(
+            "pdfFile",
+            new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+          );
 
-        // Upload PDF ke server
-        await axios.put("/api/contract/pdf/put", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
-        setIsSignature(false);
-        getContractData();
-      } else {
-        throw new Error("Gagal membuat PDF");
-      }
+          await axios.put("/api/contract/pdf/put", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          // Bisa tambahkan notif/alert sukses upload di background jika mau
+        } catch (err) {
+          console.error("Gagal upload PDF di background:", err);
+          // Bisa tambahkan notif/alert gagal upload jika mau
+        }
+      })();
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+      alert("Terjadi kesalahan saat memperbarui kontrak.");
     }
   };
 
@@ -535,173 +629,6 @@ const ProfilePage = ({
                     </Table>
                   </CardContent>
                 </Card>
-                <div className="" id="cart">
-                  <h1 className="text-2xl font-semibold mb-3">Cart</h1>
-                  <hr />
-                </div>
-                {items.length > 0 || products.length > 0 ? (
-                  <div className="w-full flex lg:flex-row flex-col justify-between gap-2">
-                    <div className="lg:w-[70%] w-full pe-2 border-r">
-                      <div className="grid lg:grid-cols-2 w-full md:grid-cols-2 grid-cols-1 gap-5">
-                        {products.map((item, index) => (
-                          <Card
-                            key={index}
-                            className="pt-3 w-full flex justify-center items-center"
-                          >
-                            <CardContent className="flex items-start justify-between w-full">
-                              <div className="flex items-start gap-2">
-                                <img
-                                  src={item.image[0]}
-                                  alt={item.name}
-                                  className={`w-20 ${
-                                    item.notes ? "h-20" : "h-16"
-                                  } rounded-md object-cover `}
-                                />
-                                <div className="flex flex-col h-full items-start justify-between">
-                                  <p className="font-bold first-letter:uppercase">
-                                    {item.name}
-                                  </p>
-                                  <p className="font-medium text-sm">
-                                    Variant :{" "}
-                                    <span className="font-bold capitalize">
-                                      {item.variant}
-                                    </span>
-                                  </p>
-                                  <p className="font-medium text-sm">
-                                    {formattedPrice.toIDR(item.price)}
-                                  </p>
-                                  {item.notes && (
-                                    <p className="font-medium text-sm">
-                                      Notes :{" "}
-                                      <span className="capitalize font-normal text-gray-500 truncate overflow-hidden">
-                                        {item.notes}
-                                      </span>
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              <div
-                                className={`border rounded-md flex-col flex items-center ${
-                                  item.notes ? "h-20" : "h-16"
-                                } justify-between`}
-                              >
-                                <button
-                                  onClick={() => incrementQty(index)}
-                                  className="p-1 px-2 rounded-md hover:bg-secondary"
-                                >
-                                  <PlusIcon size={14} />
-                                </button>
-                                <p className="font-medium text-xs cursor-default">
-                                  {item.quantity}
-                                </p>
-                                <button
-                                  onClick={() => decrementQty(index)}
-                                  className="p-1 px-2 rounded-md hover:bg-secondary"
-                                >
-                                  {item.quantity && item.quantity <= 1 ? (
-                                    <Trash2Icon size={14} />
-                                  ) : (
-                                    <MinusIcon size={14} />
-                                  )}
-                                </button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="lg:w-[30%] w-full flex flex-col gap-2 px-1">
-                      {items.length > 0 && products.length > 0 && (
-                        <>
-                          <div className="flex w-full justify-between">
-                            <h1 className="font-semibold text-primary text-xs">
-                              Subtotal :
-                            </h1>
-                            <p className="text-gray-500 text-xs">
-                              {formattedPrice.toIDR(subtotal)}
-                            </p>
-                          </div>
-                          <hr />
-                          <div className="flex w-full justify-between">
-                            <h1 className="font-semibold text-primary text-xs">
-                              TAX :
-                            </h1>
-                            <p className="text-gray-500 text-xs text-right">
-                              ({taxRate * 100}%) {formattedPrice.toIDR(tax)}{" "}
-                            </p>
-                          </div>
-
-                          <div className="flex w-full justify-between">
-                            <h1 className="font-semibold text-primary text-xs">
-                              Transaction fee :
-                            </h1>
-                            <p className="text-gray-500 text-xs text-right">
-                              ({transactionValue * 100}%){" "}
-                              {formattedPrice.toIDR(transactionFee)}{" "}
-                            </p>
-                          </div>
-                          <div className="flex w-full justify-between">
-                            <h1 className="font-semibold text-primary text-xs">
-                              Application fee :
-                            </h1>
-                            <p className="text-gray-500 text-xs text-right">
-                              ({applicationValue * 100}%){" "}
-                              {formattedPrice.toIDR(applicationFee)}{" "}
-                            </p>
-                          </div>
-                          <hr />
-                          <div className="flex w-full justify-between">
-                            <h1 className="font-semibold text-primary text-xs">
-                              TOTAL :
-                            </h1>
-                            <p className="text-primary font-bold text-sm">
-                              {formattedPrice.toIDR(total)}
-                            </p>
-                          </div>
-                          <div className="w-full flex flex-col gap-2 mt-5">
-                            <Button
-                              onClick={() =>
-                                (window.location.href = `/user/profile/checkout/${user.name
-                                  ?.replace(" ", "-")
-                                  .toLowerCase()}`)
-                              }
-                            >
-                              Confirm
-                            </Button>
-
-                            <Alerts
-                              btn="Delete all"
-                              desc="As a result, the cart will be empty. and you must add your items again."
-                              ok={() => {
-                                setProducts([]);
-                                setItems([]);
-                                location.reload();
-                              }}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-3 border rounded-xl pb-4 shadow flex flex-col gap-3">
-                    <div className="flex w-full flex-col gap-6 items-center">
-                      <div className="flex flex-col gap-0 w-full items-center">
-                        <Lottie animationData={noData} className="w-1/4" />
-                        <h1 className="text-center text-gray-500">
-                          Unfortunately you haven't added the product to your
-                          cart. <br /> Click the add product button below to add
-                          the product to your cart.
-                        </h1>
-                      </div>
-                      <Link href={"/#products"}>
-                        <Button size={"sm"} className="w-fit items-center">
-                          Add product
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                )}
               </div>
             </TabsContent>
             <TabsContent value="security" className="lg:mt-8 md:mt-6 mt-5">
@@ -833,7 +760,10 @@ const ProfilePage = ({
                             <TableCell className="px-6 py-4 whitespace-nowrap">
                               {item.filename ? (
                                 <Button
-                                  onClick={() => handlePreview(item.filename)}
+                                  onClick={() => {
+                                    handlePreview(item.filename);
+                                    setSelectedContract(item);
+                                  }}
                                   className="bg-gray-400 text-black px-2 py-2 rounded-md"
                                 >
                                   Preview
@@ -841,6 +771,10 @@ const ProfilePage = ({
                               ) : (
                                 "-"
                               )}
+                              {/* 
+                              <Button onClick={() => handlePreview(item)}>
+                                Preview
+                              </Button> */}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
                               {item.status == "AWAITING_CLIENT_SIGNATURE" && (
@@ -944,16 +878,13 @@ const ProfilePage = ({
                                 {item.cost ? item.cost : "-"}
                               </TableCell>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
-                                {item.filename ? (
-                                  <Button
-                                    onClick={() => handlePreview(item.filename)}
-                                    className="bg-gray-400 text-black px-2 py-2 rounded-md"
-                                  >
-                                    Preview
-                                  </Button>
-                                ) : (
-                                  "-"
-                                )}
+                                {/* {item.filename ? ( */}
+                                <Button
+                                  onClick={() => handlePreview(item.filename)}
+                                  className="bg-gray-400 text-black px-2 py-2 rounded-md"
+                                >
+                                  Preview
+                                </Button>
                               </TableCell>
                               <TableCell>
                                 <Button
@@ -989,19 +920,38 @@ const ProfilePage = ({
                 </div>
               </div>
             )}
-            {pdfUrl && (
+            {pdfUrl && isPreviewDialogOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Preview Contract</h2>
                     <Button
-                      onClick={() => setPdfUrl(null)}
+                      onClick={() => setIsPreviewDialogOpen(false)}
                       className="bg-red-500 text-white px-4 py-2 rounded-md"
                     >
                       Close
                     </Button>
                   </div>
                   <iframe src={pdfUrl} className="w-full flex-grow" />
+                  {selectedContract.status == "AWAITING_CLIENT_SIGNATURE" && (
+                    <div className="space-y-2">
+                      <div className="mt-6">
+                        <h3 className="font-semibold mb-2">
+                          Feedback Pengguna
+                        </h3>
+                        <textarea
+                          className="w-full p-2 border rounded-md mb-2"
+                          rows={3}
+                          placeholder="Tulis feedback Anda di sini..."
+                          value={feedback}
+                          onChange={(e) => setFeedback(e.target.value)}
+                        />
+                        <Button onClick={handleSendFeedback}>
+                          Kirim Feedback
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

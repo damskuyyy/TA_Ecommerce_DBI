@@ -110,9 +110,12 @@ const styles = StyleSheet.create({
   spacer: {
     height: 20,
   },
+  signature: {},
+  featureItem: { marginBottom: 2 },
+  listBullet: { fontWeight: "bold" },
 });
 
-const ContractPDF = () => (
+const ContractPDF = ({ data }: { data: any }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.headerContainer}>
@@ -146,8 +149,12 @@ const ContractPDF = () => (
           memesan perangkat lunak.
         </Text>
       </View>
-      <Text style={[styles.marginLeft40, styles.bold]}>Nama : </Text>
-      <Text style={[styles.marginLeft40, styles.bold]}>Alamat : </Text>
+      <Text style={[styles.marginLeft40, styles.bold]}>
+        Nama : {data.fullName}
+      </Text>
+      <Text style={[styles.marginLeft40, styles.bold]}>
+        Alamat : {data.address}
+      </Text>
 
       <View style={styles.listItem}>
         <Text style={styles.listNumber}>2.</Text>
@@ -156,8 +163,10 @@ const ContractPDF = () => (
           mengembangkan perangkat lunak.
         </Text>
       </View>
-      <Text style={[styles.marginLeft40, styles.bold]}>Nama : </Text>
-      <Text style={[styles.marginLeft40, styles.bold]}>Alamat : </Text>
+      <Text style={[styles.marginLeft40, styles.bold]}>Nama : Ramzi Daffa</Text>
+      <Text style={[styles.marginLeft40, styles.bold]}>
+        Alamat : Jl. Sutawijaya No.89
+      </Text>
 
       <Text style={styles.text}>
         Masing – masing pihak telah sepakat untuk mengadakan perjanjian
@@ -173,9 +182,11 @@ const ContractPDF = () => (
       </Text>
       <Text style={styles.marginLeft20}>
         <Text style={styles.listNumber}>1.</Text>Nama proyek :{" "}
+        {data.contractName}
       </Text>
       <Text style={styles.marginLeft20}>
-        <Text style={styles.listNumber}>2.</Text>Deskripsi proyek :{" "}
+        <Text style={styles.listNumber}>2.</Text>Deskripsi proyek :
+        {data.descriptionContract}
       </Text>
       <Text style={styles.marginLeft20}>
         <Text style={styles.listNumber}>3.</Text>Platform :{" "}
@@ -184,20 +195,31 @@ const ContractPDF = () => (
         <Text style={styles.listNumber}>4.</Text>Teknologi yang digunakan :{" "}
       </Text>
       <Text style={styles.marginLeft20}>
-        <Text style={styles.listNumber}>5.</Text>Scope of Work :{" "}
+        <Text style={styles.listNumber}>5.</Text>Scope of Work :
+        {data.scopeOfWork}
       </Text>
       <Text style={styles.marginLeft20}>
-        <Text style={styles.listNumber}>6.</Text>Fitur utama :{" "}
+        <Text style={styles.listNumber}>6.</Text> Fitur utama :
       </Text>
+      {data.features && data.features.length > 0 ? (
+        data.features.map((feature, i) => (
+          <Text key={i} style={[styles.marginLeft40, styles.featureItem]}>
+            <Text style={styles.listBullet}>{`${i + 1}. `}</Text>
+            {feature}
+          </Text>
+        ))
+      ) : (
+        <Text style={styles.marginLeft40}>-</Text>
+      )}
 
       <Text style={styles.pasal}>Pasal 2 - Jangka Waktu Pengerjaan</Text>
       <Text style={styles.text}>
-        <Text style={styles.listNumber}>1.</Text>Pengerjaan dimulai pada
-        tanggal...{" "}
+        <Text style={styles.listNumber}>1.</Text>Pengerjaan dimulai pada tanggal{" "}
+        {data.startDate}
       </Text>
       <Text style={styles.text}>
         <Text style={styles.listNumber}>2.</Text>Pengerjaan harus selesai dengan
-        estimasi tanggal selesai...{" "}
+        estimasi tanggal selesai {data.endDate}
       </Text>
       <Text style={styles.text}>
         <Text style={styles.listNumber}>3.</Text> Jika terdapat keterlambatan
@@ -208,7 +230,7 @@ const ContractPDF = () => (
       <Text style={styles.pasal}>Pasal 3 - Biaya dan Pembayaran</Text>
       <Text style={styles.text}>
         <Text style={styles.listNumber}>1.</Text>Total biaya pengerjaan
-        perangkat lunak adalah [Jumlah Biaya].
+        perangkat lunak adalah {data.cost}.
       </Text>
 
       <Text style={styles.pasal}>Pasal 4 - Hak dan Kewajiban</Text>
@@ -265,27 +287,23 @@ const ContractPDF = () => (
       <View style={styles.signatureSection}>
         <View style={styles.signatureBox}>
           <Text>Pihak Pertama</Text>
+          {data.signature && (
+            <Image style={styles.signature} src={data.signature} />
+          )}
           <View style={styles.spacer} />
-          <Text>[Nama Klien]</Text>
+          <Text>{data.fullName}</Text>
         </View>
         <View style={styles.signatureBox}>
           <Text>Pihak Kedua</Text>
+          {data.adminSignature && (
+            <Image style={styles.signature} src={data.adminSignature} />
+          )}
           <View style={styles.spacer} />
-          <Text>[Nama Pengembang]</Text>
+          <Text>Ramzi Daffa</Text>
         </View>
       </View>
     </Page>
   </Document>
 );
 
-const KontrakPage = () => {
-  const generateAndOpen = async () => {
-    const blob = await pdf(<ContractPDF />).toBlob();
-    const url = URL.createObjectURL(blob);
-    window.open(url);
-  };
-
-  return <button onClick={generateAndOpen}>PDF</button>;
-};
-
-export default KontrakPage;
+export default ContractPDF;

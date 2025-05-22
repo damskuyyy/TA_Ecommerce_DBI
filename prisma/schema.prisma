@@ -117,7 +117,7 @@ model ContractDigital {
   descriptionContract String
   features      String[]
   scopeOfWork   String?
-  
+
   // PDF-related
   filename      String?
   isFinalized   Boolean        @default(false)
@@ -129,21 +129,35 @@ model ContractDigital {
   updatedAt     DateTime       @updatedAt
 
   progress ContractProgress[]
+  feedback Feedback[]
 
   @@index([userId]) 
   @@index([productId]) 
   @@index([status])
 }
 
-
 enum ContractStatus {
   PENDING_APPROVAL
   AWAITING_CLIENT_SIGNATURE
+  AWAITING_ADMIN_SIGNATURE
   AWAITING_PAYMENT
+  REVISION_REQUESTED
   ACTIVE
   COMPLETED
   CANCELED
 }
+
+model Feedback {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  contractId    String
+  contract      ContractDigital @relation(fields: [contractId], references: [id])
+  content       String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([contractId])
+}
+
 
 model PdfDocument {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -162,7 +176,6 @@ model ContractProgress {
 
   @@index([contractId])
 }
-
 
 
 

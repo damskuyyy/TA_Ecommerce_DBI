@@ -14,12 +14,7 @@ import formattedPrice from "@/utils/formattedPrice";
 import { useProductStore } from "@/store/product";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import Image from "next/image";
-import { StarIcon } from "@radix-ui/react-icons";
-import SignaturePad from "@/components/ui/signature-pad";
 import {
   Form,
   FormControl,
@@ -38,7 +33,7 @@ const Contractdigital = () => {
   const [variant, setVariant] = useState(""); //menyimpan varian produk yang dipilih
   const [load, setLoad] = useState(false); //loading data
   const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
-  const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
+  const [updated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
 
   const router = useRouter();
   const { selectedProduct } = useProductStore();
@@ -50,8 +45,6 @@ const Contractdigital = () => {
       startDate: "",
       endDate: "",
       descriptionContract: "",
-      features: [],
-      scopeOfWork: "",
       agreement: false,
     },
     mode: "onChange",
@@ -146,20 +139,6 @@ const Contractdigital = () => {
                         dangerouslySetInnerHTML={{ __html: product.desc }}
                       />
                     )}
-                    <div className="flex justify-between flex-wrap w-fit gap-3 items-center">
-                      <div className="flex items-center gap-1">
-                        <p className="text-sm font-medium">
-                          Sold {product.sold}
-                        </p>
-                      </div>
-                      <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                      <div className="flex items-center gap-1">
-                        <StarIcon color="orange" />
-                        <p className="text-sm font-medium">{product.rate}</p>
-                      </div>
-                      <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                      <div className="flex items-center gap-1"></div>
-                    </div>
                   </div>
                   {load ? (
                     <Skeleton className="w-3/4 h-5" />
@@ -168,28 +147,7 @@ const Contractdigital = () => {
                       {formattedPrice.toIDR(product.price)}
                     </h1>
                   )}
-                  <hr />
-                  <div className="flex flex-col gap-3">
-                    <h1 className="font-semibold">Choose Variants :</h1>
-                    <div className="flex items-center gap-3">
-                      {load ? (
-                        <Skeleton className="w-1/4 h-5" />
-                      ) : (
-                        product.variants?.map((item, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setVariant(item)}
-                            size={"sm"}
-                            variant={variant === item ? "default" : "outline"}
-                            className="capitalize"
-                          >
-                            {item}
-                          </Button>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                  <hr />
+                  <h1 className="font-semibold text-sm">(Harga dapat berubah sesuai permintaan)</h1>
                   <Tabs
                     defaultValue="details"
                     className="w-full flex flex-col gap-5 items-start"
@@ -354,66 +312,7 @@ const Contractdigital = () => {
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="features"
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Choose Features</FormLabel>
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2 text-sm">
-                          {[
-                            "Authentification",
-                            "Product Page",
-                            "Shopping Cart",
-                            "Payment Integration",
-                            "Admin Dashboard",
-                            "Notifications",
-                          ].map((feature) => (
-                            <label
-                              key={feature}
-                              className="flex items-center space-x-2"
-                            >
-                              <Checkbox
-                                checked={field.value?.includes(feature)}
-                                onCheckedChange={(checked) => {
-                                  const newValue = checked
-                                    ? [...(field.value || []), feature]
-                                    : (field.value || []).filter(
-                                        (f) => f !== feature
-                                      );
-
-                                  field.onChange(newValue);
-                                }}
-                              />
-                              <span>{feature}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="scopeOfWork"
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Scope of Work</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Scope of Work"
-                            {...field}
-                            required
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
                 </div>
-
-                {/* <SignaturePad
-                  onSave={(signature) => form.setValue("signature", signature)}
-                /> */}
                 <div className="flex items-center gap-2 mt-4">
                   <FormField
                     control={form.control}

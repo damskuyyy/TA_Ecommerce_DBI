@@ -18,8 +18,6 @@ export default async function handler(
       startDate,
       endDate,
       descriptionContract,
-      features,
-      scopeOfWork,
     } = req.body;
 
     // Validasi semua field penting harus ada
@@ -30,9 +28,7 @@ export default async function handler(
       !address ||
       !startDate ||
       !endDate ||
-      !descriptionContract ||
-      !features ||
-      !scopeOfWork
+      !descriptionContract
     ) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -46,8 +42,6 @@ export default async function handler(
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         descriptionContract,
-        features,
-        scopeOfWork,
         isFinalized: false,
         status: "PENDING_APPROVAL", // default status
       },

@@ -33,25 +33,54 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import SignaturePad from "@/components/ui/signature-pad";
 import { Checkbox } from "@/components/ui/checkbox";
+import ContractPDF from "@/pages/pdf";
+import { pdf } from "@react-pdf/renderer";
+import SignaturePad from "@/components/ui/signature-pad";
 
-const Contract: React.FC = () => {
+const Contract = () => {
   const [contractData, setContractData] = useState([]);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedContract, setSelectedContract] = useState(null);
+  const [features, setFeatures] = useState([""]);
+
+  const [signature, setSignature] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
       contractName: "",
       cost: "",
-      signature: "",
+      features: [],
+      scopeOfWork: "",
       agreement: false,
     },
   });
 
+  // Reset form setiap kali dialog open/selectedContract berubah
+  useEffect(() => {
+    if (openDialog && selectedContract) {
+      form.reset({
+        contractName: selectedContract.contractName || "",
+        cost: selectedContract.cost || "",
+        features: selectedContract.features || [""],
+        scopeOfWork: selectedContract.scopeOfWork || "",
+        agreement: false,
+      });
+      setFeatures(
+        selectedContract.features && selectedContract.features.length > 0
+          ? selectedContract.features
+          : [""]
+      );
+    }
+    // eslint-disable-next-line
+  }, [openDialog, selectedContract]);
+
   const getContractData = async () => {
     try {
-      const resp = await axios(`/api/contract/get`);
+      const resp = await axios("/api/contract/get");
       setContractData(resp.data);
     } catch (err) {
       console.log(err);
@@ -62,75 +91,279 @@ const Contract: React.FC = () => {
     getContractData();
   }, []);
 
-  // Handle preview PDF
-  const handlePreview = (filename: string) => {
+  const handlePreview = (filename) => {
     if (!filename) return;
     const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
+    console.log(fileUrl);
     setPdfUrl(fileUrl);
   };
 
   const agreement = form.watch("agreement");
 
-  // PERLU DIRUBAH ALGORITMANYA, TIDAK PERLU FORM.GETVALUES()
-  const onSubmit = async (item: any) => {
-    const values = form.getValues();
+  const handleAddFeature = () => {
+    const newFeatures = [...features, ""];
+    setFeatures(newFeatures);
+    form.setValue("features", newFeatures);
+  };
 
+  const handleFeatureChange = (index, value) => {
+    const newFeatures = [...features];
+    newFeatures[index] = value;
+    setFeatures(newFeatures);
+    form.setValue("features", newFeatures);
+  };
+
+  const handleDeleteFeature = (index) => {
+    const newFeatures = features.filter((_, i) => i !== index);
+    setFeatures(newFeatures);
+    form.setValue("features", newFeatures);
+  };
+
+  // const onSubmit = async (data) => {
+  //   setIsSubmitting(true);
+  //   try {
+  //     const pdfPromise = pdf(<ContractPDF data={data} />).toBlob();
+
+  //     const response = await axios.put("/api/contract/put", {
+  //       ...data,
+  //       status: "AWAITING_CLIENT_SIGNATURE",
+  //     });
+
+  //     if (!response.data?.contract) {
+  //       throw new Error("Data kontrak tidak tersedia.");
+  //     }
+
+  //     const updatedContract = response.data.contract;
+  //     const blob = await pdfPromise;
+  //     const pdfBuffer = await blob.arrayBuffer();
+
+  //     const formData = new FormData();
+  //     formData.append("contractId", updatedContract.id);
+  //     formData.append("userId", updatedContract.userId);
+  //     formData.append(
+  //       "pdfFile",
+  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+  //     );
+
+  //     const uploadResponse = await axios.put(
+  //       "/api/contract/pdf/put",
+  //       formData,
+  //       {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       }
+  //     );
+
+  //     if (uploadResponse.status === 201) {
+  //       alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
+  //       form.reset();
+  //       setFeatures([""]);
+  //       getContractData();
+  //     } else {
+  //       throw new Error("Gagal mengunggah PDF ke server.");
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ Error:", err);
+  //     alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  // const handleSign = async () => {
+  //   if (!selectedContract || !signature) {
+  //     alert("Tanda tangan harus diisi!");
+  //     return;
+  //   }
+
+  //   setSigning(true); // Aktifkan loading state
+
+  //   try {
+  //     // 1. Update status kontrak
+  //     const response = await axios.put("/api/contract/put", {
+  //       ...selectedContract,
+  //       status: "AWAITING_PAYMENT", // Atau status lain sesuai flow kamu
+  //     });
+
+  //     if (!response.data?.contract) {
+  //       throw new Error("Data kontrak tidak tersedia.");
+  //     }
+
+  //     const updatedContract = response.data.contract;
+
+  //     // 2. Generate PDF
+  //     const data = {
+  //       fullName: updatedContract.fullName,
+  //       address: updatedContract.address,
+  //       contractName: updatedContract.contractName,
+  //       cost: updatedContract.cost,
+  //       startDate: updatedContract.startDate,
+  //       endDate: updatedContract.endDate,
+  //       descriptionContract: updatedContract.descriptionContract,
+  //       features: updatedContract.features,
+  //       scopeOfWork: updatedContract.scopeOfWork,
+  //       signature: updatedContract.signature,
+  //       adminSignature: signature
+  //     };
+  //     const blob = await pdf(<ContractPDF data={data} />).toBlob();
+  //     const pdfBuffer = await blob.arrayBuffer();
+
+  //     // 3. Upload PDF ke server
+  //     const formData = new FormData();
+  //     formData.append("contractId", updatedContract.id);
+  //     formData.append("userId", updatedContract.userId);
+  //     formData.append(
+  //       "pdfFile",
+  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+  //     );
+
+  //     const uploadResponse = await axios.put(
+  //       "/api/contract/pdf/put",
+  //       formData,
+  //       {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       }
+  //     );
+
+  //     if (uploadResponse.status === 201 || uploadResponse.status === 200) {
+  //       alert("Kontrak berhasil ditandatangani dan PDF telah dibuat!");
+  //       setSignature(null);
+  //       setSelectedContract(null);
+  //       setOpenDialog(false);
+  //       getContractData();
+  //     } else {
+  //       throw new Error("Gagal mengunggah PDF ke server.");
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ Error:", err);
+  //     alert("Terjadi kesalahan saat menandatangani kontrak.");
+  //   } finally {
+  //     setSigning(false); // Matikan loading state
+  //   }
+  // };
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
     try {
-      // Update kontrak dengan PUT request
+      // 1. Update kontrak ke status AWAITING_CLIENT_SIGNATURE
       const response = await axios.put("/api/contract/put", {
-        ...values, // Kirim data yang diperbarui
-        contractId: item.id, // Sesuai dengan API
-        status: "AWAITING_CLIENT_SIGNATURE", // atau "Processing"
+        ...data,
+        status: "AWAITING_CLIENT_SIGNATURE",
       });
 
-      // Cek apakah response.data berisi data kontrak yang benar
-      if (!response.data || !response.data.contract) {
-        throw new Error("Data kontrak tidak tersedia dalam response.");
+      if (!response.data?.contract) {
+        throw new Error("Data kontrak tidak tersedia.");
       }
 
       const updatedContract = response.data.contract;
 
-      // Kirim data ke API untuk pembuatan PDF
-      const pdfResponse = await axios.post(
-        "/api/contract/pdf/post",
-        updatedContract,
-        {
-          responseType: "arraybuffer",
+      // 2. Reset form, refresh data, tutup dialog secepatnya
+      form.reset();
+      setFeatures([""]);
+      getContractData();
+      alert("Data berhasil dikirim! PDF kontrak akan diunggah di background.");
+
+      // 3. Upload PDF ke server (background, tidak blocking)
+      (async () => {
+        try {
+          const pdfBlob = await pdf(
+            <ContractPDF data={updatedContract} />
+          ).toBlob();
+          const pdfBuffer = await pdfBlob.arrayBuffer();
+
+          const formData = new FormData();
+          formData.append("contractId", updatedContract.id);
+          formData.append("userId", updatedContract.userId);
+          formData.append(
+            "pdfFile",
+            new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+          );
+
+          await axios.put("/api/contract/pdf/put", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          // Optional: Toast sukses upload
+        } catch (err) {
+          console.error("Gagal upload PDF di background:", err);
         }
-      );
-
-      if (pdfResponse.status === 200) {
-        // Logika setelah PDF berhasil dibuat
-        const pdfBlob = new Blob([pdfResponse.data], {
-          type: "application/pdf",
-        });
-
-        const formData = new FormData();
-        formData.append("contractId", updatedContract.id);
-        formData.append("userId", updatedContract.userID);
-        formData.append(
-          "pdfFile",
-          new File([pdfBlob], "contract.pdf", { type: "application/pdf" })
-        );
-
-        // Upload PDF ke server
-        await axios.put("/api/contract/pdf/put", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
-        form.reset();
-        getContractData();
-      } else {
-        throw new Error("Gagal membuat PDF");
-      }
+      })();
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
+      alert("Terjadi kesalahan saat mengirim kontrak.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleRejectContract = async (id: string) => {
+  const handleSign = async () => {
+    if (!selectedContract || !signature) {
+      alert("Tanda tangan harus diisi!");
+      return;
+    }
+
+    try {
+      // 1. Update kontrak ke status berikutnya (misal AWAITING_PAYMENT)
+      const response = await axios.put("/api/contract/put", {
+        ...selectedContract,
+        status: "AWAITING_PAYMENT",
+      });
+
+      if (!response.data?.contract) {
+        throw new Error("Data kontrak tidak tersedia.");
+      }
+
+      const updatedContract = response.data.contract;
+
+      // 2. Tutup dialog, refresh data, notifikasi
+      setSignature(null);
+      setSelectedContract(null);
+      setOpenDialog(false);
+      getContractData();
+      alert(
+        "Kontrak berhasil ditandatangani! File PDF akan diunggah di background."
+      );
+
+      // 3. Upload PDF di background (tidak blocking UI)
+      (async () => {
+        try {
+          const data = {
+            fullName: updatedContract.fullName,
+            address: updatedContract.address,
+            contractName: updatedContract.contractName,
+            cost: updatedContract.cost,
+            startDate: updatedContract.startDate,
+            endDate: updatedContract.endDate,
+            descriptionContract: updatedContract.descriptionContract,
+            features: updatedContract.features,
+            scopeOfWork: updatedContract.scopeOfWork,
+            signature: updatedContract.signature,
+            adminSignature: signature,
+          };
+          const blob = await pdf(<ContractPDF data={data} />).toBlob();
+          const pdfBuffer = await blob.arrayBuffer();
+
+          const formData = new FormData();
+          formData.append("contractId", updatedContract.id);
+          formData.append("userId", updatedContract.userId);
+          formData.append(
+            "pdfFile",
+            new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
+          );
+
+          await axios.put("/api/contract/pdf/put", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          // Optional: toast sukses upload
+        } catch (err) {
+          console.error("Gagal upload PDF di background:", err);
+        }
+      })();
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Terjadi kesalahan saat menandatangani kontrak.");
+    }
+  };
+
+  const handleRejectContract = async (id) => {
     try {
       const confirmDelete = confirm(
         "Apakah kamu yakin ingin menolak kontrak ini?"
@@ -168,8 +401,6 @@ const Contract: React.FC = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-
-      {/* Table */}
       <div className="bg-white shadow rounded-lg p-4 dark:bg-black">
         <div className="overflow-x-auto">
           <Table className="min-w-full divide-y divide-gray-200 mt-4">
@@ -179,7 +410,6 @@ const Contract: React.FC = () => {
                 <TableHead>Id Contract</TableHead>
                 <TableHead>Product</TableHead>
                 <TableHead>Id User</TableHead>
-                {/* <TableHead>Price</TableHead> */}
                 <TableHead>Status</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Contract</TableHead>
@@ -192,7 +422,6 @@ const Contract: React.FC = () => {
                 <TableRow key={idx}>
                   <TableCell>{item.id}</TableCell>
                   <TableCell>{item.product?.name || "Unknown"}</TableCell>
-                  {/* <TableCell>{item.price}</TableCell> */}
                   <TableCell>{item.userId}</TableCell>
                   <TableCell>
                     <span
@@ -207,7 +436,6 @@ const Contract: React.FC = () => {
                       {item.status}
                     </span>
                   </TableCell>
-
                   <TableCell>
                     <Dialog>
                       <DialogTrigger asChild>
@@ -215,6 +443,7 @@ const Contract: React.FC = () => {
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>Info Data Client</DialogHeader>
+                        {/* Add client info here */}
                         <div className="grid grid-cols-2 items-center gap-4">
                           <span>Full Name</span>
                           <span>{item.fullName}</span>
@@ -235,23 +464,36 @@ const Contract: React.FC = () => {
                           <span>Description Contract</span>
                           <span>{item.descriptionContract}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <span>Features</span>
-                          <ul>
-                            {item.features.map((item, index) => (
-                              <li key={index}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className="grid grid-cols-2 items-center gap-4">
-                          <span>Scope of Work</span>
-                          <span>{item.scopeOfWork}</span>
-                        </div>
                       </DialogContent>
                     </Dialog>
                   </TableCell>
                   <TableCell>
-                    {item.status != "PENDING_APPROVAL" ? (
+                    {item.status === "REVISION_REQUESTED" ? (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button>View Feedback</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>Feedback</DialogHeader>
+                          {/* Ambil feedback paling baru */}
+                          {item.feedback && item.feedback.length > 0 ? (
+                            <>
+                              <div className="whitespace-pre-wrap mb-2">
+                                {item.feedback[0].content}
+                              </div>
+                              <div className="mb-2 text-gray-700">
+                                <strong>Tanggal:</strong>{" "}
+                                {new Date(
+                                  item.feedback[0].createdAt
+                                ).toLocaleString()}
+                              </div>
+                            </>
+                          ) : (
+                            <div>Tidak ada feedback untuk kontrak ini.</div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    ) : item.status !== "PENDING_APPROVAL" ? (
                       <Button
                         onClick={() => handlePreview(item.filename)}
                         className="bg-gray-400 text-black px-2 py-2 rounded-md"
@@ -264,89 +506,202 @@ const Contract: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-4">
-                      {item.status == "PENDING_APPROVAL" && (
-                        <Dialog>
+                      {(item.status === "PENDING_APPROVAL" ||
+                        item.status === "REVISION_REQUESTED") && (
+                        <Dialog
+                          open={
+                            openDialog &&
+                            selectedContract &&
+                            selectedContract.id === item.id
+                          }
+                          onOpenChange={(open) => {
+                            setOpenDialog(open);
+                            if (open) {
+                              setSelectedContract(item);
+                            }
+                          }}
+                        >
                           <DialogTrigger asChild>
-                            <Button>Fill Data and Sign</Button>
+                            <Button>
+                              {item.status === "PENDING_APPROVAL"
+                                ? "Fill Data"
+                                : "Revisi Data"}
+                            </Button>
                           </DialogTrigger>
                           <DialogContent>
-                            <DialogHeader>Fill Data and Sign</DialogHeader>
-                            <div>
-                              <Form {...form}>
-                                <form
-                                  onSubmit={form.handleSubmit(() =>
-                                    onSubmit(item)
+                            <DialogHeader>
+                              {item.status === "PENDING_APPROVAL"
+                                ? "Fill Data"
+                                : "Revisi Data Kontrak"}
+                            </DialogHeader>
+                            <Form {...form}>
+                              <form
+                                onSubmit={form.handleSubmit((data) =>
+                                  onSubmit({ ...item, ...data })
+                                )}
+                                className="space-y-8"
+                              >
+                                {/* Contract Name */}
+                                <FormField
+                                  control={form.control}
+                                  name="contractName"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Contract Name</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="text"
+                                          placeholder="Contract Name"
+                                          {...field}
+                                          required
+                                        />
+                                      </FormControl>
+                                    </FormItem>
                                   )}
-                                  className="space-y-8"
-                                >
-                                  {[
-                                    {
-                                      name: "contractName",
-                                      label: "Contract Name",
-                                      type: "text",
-                                    },
-                                    {
-                                      name: "cost",
-                                      label: "Cost",
-                                      type: "number",
-                                    },
-                                  ].map(({ name, label, type }) => (
-                                    <FormField
-                                      key={name}
-                                      control={form.control}
-                                      name={name}
-                                      render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>{label}</FormLabel>
-                                          <FormControl>
-                                            <Input
-                                              placeholder={label}
-                                              type={type}
-                                              {...field}
-                                              required
-                                            />
-                                          </FormControl>
-                                        </FormItem>
-                                      )}
-                                    ></FormField>
-                                  ))}
-                                  <SignaturePad
-                                    onSave={(signature) =>
-                                      form.setValue("signature", signature)
-                                    }
-                                  />
-                                  <div className="flex items-center gap-2 mt-4">
-                                    <FormField
-                                      control={form.control}
-                                      name="agreement"
-                                      render={({ field }) => (
-                                        <FormItem>
-                                          <FormControl>
-                                            <Checkbox
-                                              checked={field.value}
-                                              onCheckedChange={field.onChange}
-                                              required
-                                            />
-                                          </FormControl>
-                                          <span>Setuju</span>
-                                        </FormItem>
-                                      )}
-                                    />
-                                  </div>
+                                />
+                                {/* Cost */}
+                                <FormField
+                                  control={form.control}
+                                  name="cost"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Cost</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          placeholder="Cost"
+                                          {...field}
+                                          required
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
 
+                                {/* Features */}
+                                <div>
+                                  <FormLabel>Features</FormLabel>
+                                  <div className="space-y-2">
+                                    {features.map((feature, index) => (
+                                      <div
+                                        key={index}
+                                        className="flex gap-2 items-center"
+                                      >
+                                        <Input
+                                          placeholder={`Feature ${index + 1}`}
+                                          type="text"
+                                          value={feature}
+                                          onChange={(e) =>
+                                            handleFeatureChange(
+                                              index,
+                                              e.target.value
+                                            )
+                                          }
+                                          required
+                                        />
+                                        <Button
+                                          type="button"
+                                          variant="destructive"
+                                          onClick={() =>
+                                            handleDeleteFeature(index)
+                                          }
+                                        >
+                                          Delete
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
                                   <Button
-                                    type="submit"
-                                    className="mt-4 w-full bg-black text-white"
-                                    disabled={!agreement}
+                                    type="button"
+                                    className="mt-2 bg-gray-100 text-black"
+                                    onClick={handleAddFeature}
                                   >
-                                    Create Contract
+                                    + Tambah Feature
                                   </Button>
-                                </form>
-                              </Form>
-                            </div>
+                                </div>
+
+                                {/* Scope Of Work */}
+                                <FormField
+                                  control={form.control}
+                                  name="scopeOfWork"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Scope Of Work</FormLabel>
+                                      <FormControl>
+                                        <textarea
+                                          className="w-full border border-gray-300 p-2 rounded"
+                                          placeholder="Scope Of Work"
+                                          rows={4}
+                                          {...field}
+                                          required
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+
+                                {/* Agreement Checkbox */}
+                                <div className="flex items-center gap-2 mt-4">
+                                  <FormField
+                                    control={form.control}
+                                    name="agreement"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                            required
+                                          />
+                                        </FormControl>
+                                        <span>Setuju</span>
+                                      </FormItem>
+                                    )}
+                                  />
+                                </div>
+                                <Button
+                                  type="submit"
+                                  className="mt-4 w-full bg-black text-white"
+                                  disabled={!agreement || isSubmitting}
+                                >
+                                  {isSubmitting
+                                    ? item.status === "PENDING_APPROVAL"
+                                      ? "Creating..."
+                                      : "Updating..."
+                                    : item.status === "PENDING_APPROVAL"
+                                    ? "Create Contract"
+                                    : "Update Contract"}
+                                </Button>
+                              </form>
+                            </Form>
                           </DialogContent>
                         </Dialog>
                       )}
+
+                      {item.status == "AWAITING_ADMIN_SIGNATURE" && (
+                        <Dialog
+                          open={
+                            openDialog &&
+                            selectedContract &&
+                            selectedContract.id === item.id
+                          }
+                          onOpenChange={(open) => {
+                            setOpenDialog(open);
+                            if (open) setSelectedContract(item);
+                          }}
+                        >
+                          <DialogTrigger>
+                            <Button>Sign</Button>
+                          </DialogTrigger>
+                          <DialogContent className="w-fit max-w-full">
+                            <SignaturePad onSave={setSignature} />
+                            <Button onClick={handleSign}>
+                              Confirm and Accept Contract
+                            </Button>
+                          </DialogContent>
+                        </Dialog>
+                      )}
+
                       <Button
                         className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit"
                         onClick={() => handleRejectContract(item.id)}
@@ -361,25 +716,24 @@ const Contract: React.FC = () => {
             </TableBody>
           </Table>
         </div>
-      </div>
-
-      {/* Modal Info*/}
-      {pdfUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Preview Contract</h2>
-              <Button
-                onClick={() => setPdfUrl(null)}
-                className="bg-red-500 text-white px-4 py-2 rounded-md"
-              >
-                Close
-              </Button>
+        {/* Modal PDF Preview */}
+        {pdfUrl && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Preview Contract</h2>
+                <Button
+                  onClick={() => setPdfUrl(null)}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md"
+                >
+                  Close
+                </Button>
+              </div>
+              <iframe src={pdfUrl} className="w-full flex-grow" />
             </div>
-            <iframe src={pdfUrl} className="w-full flex-grow" />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

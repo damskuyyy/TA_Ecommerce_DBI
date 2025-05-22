@@ -15,59 +15,31 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import { TabsContent } from "@radix-ui/react-tabs";
 import Gallery from "@/components/ui/galery";
 import Head from "next/head";
-import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { PenBoxIcon, Trash2Icon } from "lucide-react";
 import { ItemDataType } from "@/types/itemsDataTypes";
-import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
 import formattedPrice from "@/utils/formattedPrice";
 import { useProductStore } from "@/store/product";
-
-const ModalCheckout = dynamic(() => import("@/components/ui/modals/checkout"), {
-  //mengimpor dua komponen secra dinamis
-  ssr: false,
-});
-const ModalAddReview = dynamic(
-  () => import("@/components/ui/modals/addReview"),
-  { ssr: false } //opsi ssr = komponen hanya dimuat disisi klien, mencegah potensi masalah saat ssr
-);
 
 const Details = ({
   //komponen menerima 2 properti
   items, // array yang menyimpan daftar item dalam keranjang
-  setItems, // fungsi untuk memperbarui daftar item dalam keranjang
 }: {
   items: ItemDataType[];
   setItems: Dispatch<SetStateAction<ItemDataType[]>>; //menggunakan tipe data TypeScript
 }) => {
   const { id } = useRouter().query; //deklarasi state, mengambil parameter id dari url menggunakan userouter untuk menentukan produk yg sedang dilihat
-  const { data: session, status }: any = useSession(); //mengambil data sesi pengguna (login)
   const [product, setProduct] = useState<ProductDataType>(
     {} as ProductDataType
   ); //menyimpan data produk dari api
   const [variant, setVariant] = useState(""); //menyimpan varian produk yang dipilih
   const [qty, setQty] = useState(1); //mengelola jumlah produk yg ingin ditambahkan ke keranjang, default 1
-  const [isReply, setIsReply] = useState(false); //status untuk menampilkan/menghilangkan balasan
-  const replyRefs = useRef<HTMLFormElement>(null); //referensi dom untuk elemen form balasan
   const [load, setLoad] = useState(false); //loading data
-  const hasReviews = product?.reviews && product.reviews.length > 0;
-  const hasDiscuss = product?.discusses && product.discusses.length > 0;
-  const [notesView, setNotesView] = useState(false); //status untuk buka/tutup modal catatan
-  const [notes, setNotes] = useState(""); //menyimpan catatan yg ditambahkan pengguna
-  const [notesDone, setNotesDone] = useState(false); //menandai apakah catatan telah diisi
-  const notesRef = useRef<HTMLTextAreaElement>(null); //referensi dom untuk elemen teks area catetan
-  const [discussView, setDiscussView] = useState(false); //mirip dengan catatan tapi untuk diskusi
-  const [discuss, setDiscuss] = useState("");
-  const [discussDone, setDiscussDone] = useState(false);
-  const discussRef = useRef<HTMLTextAreaElement>(null);
-  const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
   const [updated, setUpdated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
 
   const router = useRouter();
@@ -82,37 +54,6 @@ const Details = ({
       setQty(1);
     }
   };
-
-  const handleViewReply = () => {
-    setIsReply(!isReply);
-    setTimeout(() => {
-      if (replyRefs.current) {
-        replyRefs.current.scrollIntoView();
-      }
-    }, 10); //buka/tutup form balsan
-  };
-
-  const handleViewNotes = () => {
-    setNotesView(true); //membuka modal catatan
-  };
-  const handleCloseNotes = () => {
-    setNotesView(false); //menutup modal
-  };
-  const handleDoneNotes = () => {
-    setNotesView(false);
-    if (notesRef.current) {
-      setNotes(notesRef.current.value);
-      notesRef.current.value = notes;
-    } //menyimpan catatan yang ditulis
-  };
-
-  useEffect(() => {
-    if (notes === "") {
-      setNotesDone(false);
-    } else {
-      setNotesDone(true);
-    }
-  }, [notes]); //memastikan status notesdone diperbarui berdasarkan isi catetan
 
   const handleAddDiscuss = () => {
     const updatedProduct = { ...product, variant: variant };
@@ -152,47 +93,6 @@ const Details = ({
     return price * qty; //menghitung subtotal harga berdasarkan harga per unit dikalikan jumlah produk
   };
 
-  const handlePushItems = () => {
-    if (status === "authenticated" && session.user.role === "user") {
-      setItems((prevItems) => {
-        const itemExists = prevItems.some(
-          (item) => item.code_product === String(id)
-        );
-
-        if (itemExists) {
-          toast({
-            title: "Ouch!",
-            description:
-              "You have added into cart 😒! If you wanna update quantity, please update it on cart icon in the top right😁",
-            variant: "destructive",
-          }); //jika produk sdh berada di keranjang, akan ditampilkan notifikasi menggunkan toast ini
-          return prevItems;
-        } else {
-          toast({
-            title: "Thank you 😁",
-            description:
-              'The product has been added in your cart. Click "Cart icon" on top right to view your recent cart 😊',
-            variant: "default",
-          }); // menmabhakan produk ke keranjang jika pengguna sudah login
-          return [
-            ...prevItems,
-            { code_product: String(id), qty, variant, notes },
-          ];
-        }
-      });
-    } else {
-      toast({
-        className: cn(
-          "flex fixed md:max-w-[420px] md:top-4 md:right-4 top-0 right-0"
-        ),
-        title: "Uh Oh! 😒",
-        variant: "destructive",
-        description:
-          "You're not logged in 😑. Please login first to product into cart!",
-      }); //jika belum login, pengguna dieri peringatan untuk login menggunakan toast ini
-    }
-  };
-
   return (
     <>
       <Head>
@@ -230,24 +130,6 @@ const Details = ({
                         dangerouslySetInnerHTML={{ __html: product.desc }}
                       />
                     )}
-                    <div className="flex justify-between flex-wrap w-fit gap-3 items-center">
-                      <div className="flex items-center gap-1">
-                        <p className="text-sm font-medium">
-                          Sold {product.sold}
-                        </p>
-                      </div>
-                      <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                      <div className="flex items-center gap-1">
-                        <StarIcon color="orange" />
-                        <p className="text-sm font-medium">{product.rate}</p>
-                      </div>
-                      <div className="w-1 h-1 bg-zinc-900 rounded-full"></div>
-                      <div className="flex items-center gap-1">
-                        <p className="text-sm font-medium">
-                          Discuss ({product.discusses?.length})
-                        </p>
-                      </div>
-                    </div>
                   </div>
                   {load ? (
                     <Skeleton className="w-3/4 h-5" />
@@ -256,29 +138,7 @@ const Details = ({
                       {formattedPrice.toIDR(product.price)}
                     </h1>
                   )}
-                  <hr />
-                  <div className="flex flex-col gap-3">
-                    <h1 className="font-semibold">Choose Variants :</h1>
-                    <div className="flex items-center gap-3">
-                      {load ? (
-                        <Skeleton className="w-1/4 h-5" />
-                      ) : (
-                        product.variants?.map((item, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => setVariant(item)}
-                            size={"sm"}
-                            variant={variant === item ? "default" : "outline"}
-                            className="capitalize"
-                          >
-                            {item}
-                          </Button>
-                        ))
-                      )}
-                    </div>
-                    <div></div>
-                  </div>
-                  <hr />
+                  <h1 className="font-semibold text-sm">(Harga dapat berubah sesuai permintaan)</h1>
                   <Tabs
                     defaultValue="details"
                     className="w-full flex flex-col gap-5 items-start"
@@ -374,16 +234,9 @@ const Details = ({
             <div className="w-full">
               <Card className="flex flex-col">
                 <CardHeader className="font-bold text-lg">
-                  Set Amount and Notes
+                  Set Amount
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
-                  <p className="text-gray-500">
-                    Variant:{" "}
-                    <span className="font-medium text-black capitalize">
-                      {variant}
-                    </span>
-                  </p>
-                  <hr />
                   <div className="flex items-center gap-2">
                     <div className="border rounded-md flex justify-between items-center gap-1">
                       <Button
@@ -431,69 +284,7 @@ const Details = ({
                       </span>{" "}
                     </p>
                   </div>
-                  {notesView ? (
-                    <div className="flex flex-col gap-3 w-full items-end mb-3">
-                      <Textarea
-                        className="h-20 text-sm"
-                        placeholder="Type a notes here..."
-                        ref={notesRef}
-                        onChange={(e) => setNotes(e.target.value)}
-                        value={notes}
-                      />
-                      <div className="flex items-center gap-3">
-                        <Button
-                          onClick={handleCloseNotes}
-                          size={"sm"}
-                          variant={"destructive"}
-                        >
-                          Cancel
-                        </Button>
-                        <Button size={"sm"} onClick={handleDoneNotes}>
-                          Done
-                        </Button>
-                      </div>
-                    </div>
-                  ) : notesDone && notes !== "" ? (
-                    <div className="text-sm text-gray-500 p-2 border rounded-md w-full flex relative">
-                      <div className="flex flex-col gap-1 w-full">
-                        <p className="text-sm font-medium text-zinc-950">
-                          Notes :
-                        </p>
-                        <span className="text-wrap overflow-hidden">
-                          {notes}
-                        </span>
-                      </div>
-                      <div className="flex items-center w-fit gap-2 right-2 justify-between absolute">
-                        <button
-                          onClick={() => {
-                            setNotesDone(false);
-                            setNotes("");
-                          }}
-                          className="hover:opacity-100 opacity-50"
-                        >
-                          <Trash2Icon color="#000000" size={16} />
-                        </button>
-                        <button
-                          onClick={() => setNotesView(true)}
-                          className="hover:opacity-100 opacity-50"
-                        >
-                          <PenBoxIcon size={16} color="#000000" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <Button
-                      disabled={items.some(
-                        (item) => item.code_product === String(id)
-                      )}
-                      onClick={handleViewNotes}
-                      variant={"outline"}
-                      className="flex text-sm items-center justify-start gap-2"
-                    >
-                      <Pencil2Icon />
-                      Add Notes
-                    </Button>
-                  )}
+
                   <div className="flex justify-between">
                     <h1 className="text-gray-500 font-medium">Subtotal</h1>
                     <h1 className="font-medium">
@@ -501,19 +292,9 @@ const Details = ({
                     </h1>
                   </div>
                   <div className="mt-5 w-full flex flex-col gap-3">
-                    <Button
-                      disabled={items.some(
-                        (item) => item.code_product === String(id)
-                      )}
-                      variant={"outline"}
-                      onClick={handlePushItems}
-                    >
-                      Add to cart
-                    </Button>
                     <Button onClick={handleCreateContract}>
                       Create Contract
                     </Button>
-                    {/* {load ? "" : <ModalCheckout data={product} />} */}
                   </div>
                 </CardContent>
                 <CardFooter></CardFooter>
