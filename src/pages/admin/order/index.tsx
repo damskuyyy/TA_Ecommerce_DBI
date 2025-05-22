@@ -152,13 +152,24 @@ const OrderTable: React.FC = () => {
     getOrderData();
   }, []);
 
-  const handleAccept = (id: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === id ? { ...order, status: "success" } : order
-      )
-    );
-  };
+ const handleAccept = async (id: string) => {
+  try {
+    const res = await axios.put(`/api/order/put?id=${id}`, {
+      status: "Success", // <== Sesuaikan dengan enum Prisma
+    });
+
+    if (res.status === 200) {
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === id ? { ...order, status: "Success" } : order
+        )
+      );
+    }
+  } catch (error) {
+    console.error("Failed to update status", error);
+  }
+};
+
 
   return (
     <div className="p-4 space-y-6">
@@ -253,9 +264,9 @@ const OrderTable: React.FC = () => {
                     <TableCell>
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          order.status === "success"
+                          order.status === "Success"
                             ? "bg-green-100 text-green-800"
-                            : order.status === "failed"
+                            : order.status === "Failed"
                             ? "bg-red-100 text-red-800"
                             : "bg-purple-100 text-purple-800"
                         }`}
@@ -296,7 +307,7 @@ const OrderTable: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {order.status === "success" ? (
+                      {order.status === "Success" ? (
                         <button
                           disabled
                           className="bg-blue-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1"
