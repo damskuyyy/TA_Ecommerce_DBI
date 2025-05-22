@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Upload } from "lucide-react";
+import { ArrowLeft, Send, Upload } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useProductStore } from "@/store/product";
 import io from "socket.io-client";
 import UploadImageDiscuss from "../../components/ui/modals/uploadImageDiscuss/index";
+import { useRouter } from "next/router";
 
 const socket = io({
   path: "/api/socket",
@@ -45,6 +46,7 @@ export default function Discuss() {
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [image, setImage] = useState<File[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -179,6 +181,11 @@ export default function Discuss() {
   };
 
   return (
+    <div>
+      <button className="flex items-center gap-2" onClick={() => router.back()}>
+        <ArrowLeft />
+        <div className="text-lg cursor-pointer font-semibold">Diskusi</div>
+      </button>
     <main className="flex-1 flex h-screen flex-col bg-gray-200 p-2 gap-1">
       {selectedProduct ? (
         <Card className="p-4 flex items-center justify-between">
@@ -284,5 +291,6 @@ export default function Discuss() {
         setImage={setImage}
       />
     </main>
+    </div>
   );
 }
