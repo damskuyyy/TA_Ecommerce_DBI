@@ -92,6 +92,29 @@ const Monitoring: React.FC = () => {
     setPdfUrl(fileUrl);
   };
 
+  const handleCompletedProgres = async (item: any) => {
+    if (!item) return;
+
+    try {
+      const response = await axios.put("/api/contract/put", {
+        ...item,
+        contractId: item.id,
+        status: "COMPLETED",
+      });
+
+      if (response.status === 200) {
+        alert("✅ Kontrak berhasil ditandai sebagai COMPLETED");
+        getContractData?.();
+      } else {
+        console.warn("⚠️ Status bukan 200:", response.status);
+        alert("Gagal memperbarui status kontrak");
+      }
+    } catch (error) {
+      console.error("❌ Gagal update status:", error);
+      alert("Terjadi kesalahan saat menyelesaikan kontrak.");
+    }
+  };
+
   return (
     <div className="p-4 space-y-6">
       <div className="space-y-2">
@@ -219,7 +242,12 @@ const Monitoring: React.FC = () => {
                           </div>
                         </DialogContent>
                       </Dialog>
-                      <Button variant={"default"}>Completed</Button>
+                      <Button
+                        variant={"default"}
+                        onClick={() => handleCompletedProgres(item)}
+                      >
+                        Completed
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

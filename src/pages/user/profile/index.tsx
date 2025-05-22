@@ -865,7 +865,11 @@ const ProfilePage = ({
                     <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950 dark:divide-gray-700">
                       {contractData.length > 0 &&
                         contractData
-                          .filter((item) => item.status === "ACTIVE")
+                          .filter(
+                            (item) =>
+                              item.status === "ACTIVE" ||
+                              item.status === "COMPLETED"
+                          )
                           .map((item, idx) => (
                             <TableRow key={idx}>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
