@@ -294,6 +294,7 @@ const ModalCheckout = ({
     qr: "",
   });
   const [isTransactionSuccessOpen, setTransactionSuccessOpen] = useState(false);
+  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
 
   const cryptoData = [
     {
@@ -323,13 +324,13 @@ const ModalCheckout = ({
     {
       name: "USDT",
       logo: "https://www.cryptologos.cc/logos/tether-usdt-logo.svg?v=040",
-      address: "0x0x0x",
+      address: "-",
       qr: "",
     },
     {
       name: "USDC",
       logo: "https://www.cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=040",
-      address: "0x0x0x",
+      address: "-",
       qr: "",
     },
   ];
@@ -360,7 +361,8 @@ const ModalCheckout = ({
     };
 
     const handleViewOrder = () => {
-      router.push("/user/profile");
+      onClose();
+      router.push("/user/profile"); // Redirect ke halaman order
     };
 
     return (
@@ -486,7 +488,7 @@ const ModalCheckout = ({
   };
 
   return (
-  <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="flex justify-between gap-5">
         <DialogHeader className="w-1/2">
           <DialogTitle>
@@ -689,7 +691,7 @@ const ModalCheckout = ({
         isOpen={isTransactionSuccessOpen}
         onClose={() => setTransactionSuccessOpen(false)}
       />
-    </Dialog>
+    </Dialog> 
   );
 };
 export default ModalCheckout;

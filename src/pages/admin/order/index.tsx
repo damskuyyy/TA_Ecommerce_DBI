@@ -155,7 +155,7 @@ const OrderTable: React.FC = () => {
  const handleAccept = async (id: string) => {
   try {
     const res = await axios.put(`/api/order/put?id=${id}`, {
-      status: "Success", // <== Sesuaikan dengan enum Prisma
+      status: "Success", 
     });
 
     if (res.status === 200) {
