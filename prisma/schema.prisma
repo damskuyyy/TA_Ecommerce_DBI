@@ -87,13 +87,11 @@ model Message {
   createdAt  DateTime @default(now())
 }
 
-
 enum OrderStatus {
   Pending
   Success
   Failed
 }
-
 model Orders {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   orderId        String       @default("") 
@@ -182,8 +180,6 @@ model ContractProgress {
 
   @@index([contractId])
 }
-
-
 
 model Admin {
   id       String @id @default(auto()) @map("_id") @db.ObjectId

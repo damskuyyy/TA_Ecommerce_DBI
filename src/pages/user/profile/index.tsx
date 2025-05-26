@@ -777,7 +777,7 @@ const ProfilePage = ({
                                   Sign
                                 </Button>
                               )}
-                              {item.status == "AWAITING_PAYMENT" && (
+                              {item.status === "AWAITING_PAYMENT" && (
                                 <Button
                                   onClick={() =>
                                     handleOpenCheckout({
@@ -798,6 +798,7 @@ const ProfilePage = ({
                                   Pay
                                 </Button>
                               )}
+
                               <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
                                 Cancel
                               </Button>
