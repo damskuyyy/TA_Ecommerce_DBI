@@ -44,7 +44,7 @@ const Contract = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedContract, setSelectedContract] = useState(null);
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [features, setFeatures] = useState([""]);
 
   const [signature, setSignature] = useState<string | null>(null);
@@ -59,22 +59,25 @@ const Contract = () => {
     },
   });
 
+  type Contract = {
+  contractName: string;
+  cost: string;
+  features: string[];
+  scopeOfWork: string;
+};
+
   // Reset form setiap kali dialog open/selectedContract berubah
   useEffect(() => {
     if (openDialog && selectedContract) {
-      form.reset({
-        contractName: selectedContract.contractName || "",
-        cost: selectedContract.cost || "",
-        features: selectedContract.features || [""],
-        scopeOfWork: selectedContract.scopeOfWork || "",
-        agreement: false,
-      });
-      setFeatures(
-        selectedContract.features && selectedContract.features.length > 0
-          ? selectedContract.features
-          : [""]
-      );
-    }
+  const contract = selectedContract as any; 
+  form.reset({
+    contractName: contract.contractName || "",
+    cost: contract.cost || "",
+    features: contract.features || [""],
+    scopeOfWork: contract.scopeOfWork || "",
+    agreement: false,
+  });
+}
     // eslint-disable-next-line
   }, [openDialog, selectedContract]);
 
