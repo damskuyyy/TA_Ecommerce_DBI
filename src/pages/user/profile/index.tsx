@@ -47,6 +47,27 @@ import ModalCheckout from "@/components/ui/modals/checkout";
 import ContractPDF from "@/pages/pdf";
 import { pdf } from "@react-pdf/renderer";
 
+export type Product = {
+  name: string;
+  image: string | string[];
+  code_product: string;
+  variants?: string[];
+};
+
+export type ContractItem = {
+  id: string;
+  product: Product;
+  cost: number;
+  status:
+    | "AWAITING_CLIENT_SIGNATURE"
+    | "AWAITING_PAYMENT"
+    | "ACTIVE"
+    | "COMPLETED"
+    | "OTHER_STATUSES";
+  filename?: string;
+  contractName?: string;
+};
+
 const ProfilePage = ({
   items,
   setItems,
@@ -81,11 +102,13 @@ const ProfilePage = ({
   const [nameLoad, setNameLoad] = useState(false);
   const [emailLoad, setEmailLoad] = useState(false);
 
-  const [contractData, setContractData] = useState([]);
+  const [contractData, setContractData] = useState<ContractItem[]>([]);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isSignature, setIsSignature] = useState<boolean>(false);
   const [signature, setSignature] = useState<string | null>(null);
-  const [selectedContract, setSelectedContract] = useState({});
+  const [selectedContract, setSelectedContract] = useState<ContractItem | null>(
+    null
+  ); // Initialize as null
   const [openCheckout, setOpenCheckout] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -183,63 +206,12 @@ const ProfilePage = ({
     }
   };
 
-  // const incrementQty = (index: number) => {
-  //   setProducts((prevProducts) =>
-  //     prevProducts.map((item, i) =>
-  //       i === index ? { ...item, quantity: (item.quantity ?? 1) + 1 } : item
-  //     )
-  //   );
-  //   setItems((prevItems) =>
-  //     prevItems.map((item, i) =>
-  //       i === index ? { ...item, qty: (item.qty ?? 1) + 1 } : item
-  //     )
-  //   );
-  // };
-
-  // const decrementQty = (index: number) => {
-  //   setProducts((prevProducts) => {
-  //     const updatedProducts = prevProducts
-  //       .map((item, i) =>
-  //         i === index ? { ...item, quantity: (item.quantity ?? 1) - 1 } : item
-  //       )
-  //       .filter((item) => item.quantity && item.quantity > 0);
-
-  //     if (updatedProducts.length === 0) {
-  //       setProducts([]);
-  //       return [];
-  //     } else {
-  //       return updatedProducts;
-  //     }
-  //   });
-
-  //   setItems((prevItems) => {
-  //     const updatedItems = prevItems
-  //       .map((item, i) =>
-  //         i === index ? { ...item, qty: (item.qty ?? 1) - 1 } : item
-  //       )
-  //       .filter((item) => item.qty && item.qty > 0);
-
-  //     if (updatedItems.length === 0) {
-  //       setItems([]);
-  //       return [];
-  //     } else {
-  //       return updatedItems;
-  //     }
-  //   });
-  // };
-
-  // Handle preview PDF
   const handlePreview = (filename: string) => {
     if (!filename) return;
     setIsPreviewDialogOpen(true);
     const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
     setPdfUrl(fileUrl);
   };
-
-  // const handlePreview = (contract) => {
-  //   setSelectedContract(contract);
-  //   setIsPreviewDialogOpen(true);
-  // };
 
   const handleSendFeedback = async () => {
     if (!feedback.trim()) {
@@ -250,7 +222,7 @@ const ProfilePage = ({
     try {
       console.log("SelectedContract: ", selectedContract);
       const res = await axios.post("/api/contract/post/feedback", {
-        contractId: selectedContract.id,
+        contractId: selectedContract?.id,
         content: feedback,
       });
 
@@ -267,72 +239,15 @@ const ProfilePage = ({
     }
   };
 
-  // // Handle Sign
-  // const handleSign = async () => {
-  //   try {
-  //     // Update kontrak dengan PUT request
-  //     const response = await axios.put("/api/contract/put", {
-  //       ...selectedContract, // Kirim data yang diperbarui
-  //       contractId: selectedContract.id,
-  //       status: "AWAITING_ADMIN_SIGNATURE",
-  //     });
-
-  //     // Cek apakah response.data berisi data kontrak yang benar
-  //     if (!response.data || !response.data.contract) {
-  //       throw new Error("Data kontrak tidak tersedia dalam response.");
-  //     }
-
-  //     const updatedContract = response.data.contract;
-
-  //     const data = {
-  //       fullName: updatedContract.fullName,
-  //       address: updatedContract.address,
-  //       contractName: updatedContract.contractName,
-  //       cost: updatedContract.cost,
-  //       startDate: updatedContract.startDate,
-  //       endDate: updatedContract.endDate,
-  //       descriptionContract: updatedContract.descriptionContract,
-  //       features: updatedContract.features,
-  //       scopeOfWork: updatedContract.scopeOfWork,
-  //       signature: signature,
-  //     };
-
-  //     const blob = await pdf(<ContractPDF data={data} />).toBlob();
-
-  //     const pdfBuffer = await blob.arrayBuffer();
-
-  //     const formData = new FormData();
-  //     formData.append("contractId", updatedContract.id);
-  //     formData.append("userId", updatedContract.userID);
-  //     formData.append(
-  //       "pdfFile",
-  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
-  //     );
-
-  //     // Upload PDF ke server
-  //     await axios.put("/api/contract/pdf/put", formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-
-  //     alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
-  //     setIsSignature(false);
-  //     getContractData();
-  //   } catch (err) {
-  //     console.error("❌ Error:", err);
-  //     alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
-  //   }
-  // };
-
   const handleSign = async () => {
     if (!signature) {
       alert("Silakan tanda tangani kontrak terlebih dahulu!");
       return;
     }
     try {
-      // 1. Update status kontrak segera
       const response = await axios.put("/api/contract/put", {
         ...selectedContract,
-        contractId: selectedContract.id,
+        contractId: selectedContract?.id,
         status: "AWAITING_ADMIN_SIGNATURE",
         signature: signature,
       });
@@ -342,14 +257,12 @@ const ProfilePage = ({
       }
       const updatedContract = response.data.contract;
 
-      // 2. Segera tutup dialog, refresh data, tampilkan notifikasi
       setIsSignature(false);
       getContractData();
       alert(
         "Kontrak berhasil ditandatangani! File PDF akan diunggah di background."
       );
 
-      // 3. Upload PDF di background (tidak await)
       (async () => {
         try {
           const data = {
@@ -381,10 +294,8 @@ const ProfilePage = ({
           await axios.put("/api/contract/pdf/put", formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-          // Bisa tambahkan notif/alert sukses upload di background jika mau
         } catch (err) {
           console.error("Gagal upload PDF di background:", err);
-          // Bisa tambahkan notif/alert gagal upload jika mau
         }
       })();
     } catch (err) {
@@ -392,21 +303,6 @@ const ProfilePage = ({
       alert("Terjadi kesalahan saat memperbarui kontrak.");
     }
   };
-
-  // const transactionValue = 0.05; // 5% transaction fee
-  // const applicationValue = 0.02; // 2% application fee
-  // const taxRate = 0.1; // 10% tax
-
-  // const subtotal = calculateSubtotal(products);
-  // const transactionFee = calculateTransactionFee(subtotal, transactionValue);
-  // const applicationFee = calculateApplicationFee(subtotal, applicationValue);
-  // const tax = calculateTax(subtotal, taxRate);
-  // const total = calculateTotal(
-  //   products,
-  //   transactionValue,
-  //   applicationValue,
-  //   taxRate
-  // );
 
   const handleViewProgress = (id: string) => {
     try {
@@ -751,7 +647,7 @@ const ProfilePage = ({
                               {item.filename ? (
                                 <Button
                                   onClick={() => {
-                                    handlePreview(item.filename);
+                                    handlePreview(item.filename ?? "");
                                     setSelectedContract(item);
                                   }}
                                   className="bg-gray-400 text-black px-2 py-2 rounded-md"
@@ -761,10 +657,6 @@ const ProfilePage = ({
                               ) : (
                                 "-"
                               )}
-                              {/* 
-                              <Button onClick={() => handlePreview(item)}>
-                                Preview
-                              </Button> */}
                             </TableCell>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
                               {item.status == "AWAITING_CLIENT_SIGNATURE" && (
@@ -864,7 +756,9 @@ const ProfilePage = ({
                           .map((item, idx) => (
                             <TableRow key={idx}>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
-                                {item.contractName}
+                                {"contractName" in item && item.contractName
+                                  ? item.contractName
+                                  : "-"}
                               </TableCell>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
                                 {item.product.name}
@@ -873,9 +767,10 @@ const ProfilePage = ({
                                 {item.cost ? item.cost : "-"}
                               </TableCell>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
-                                {/* {item.filename ? ( */}
                                 <Button
-                                  onClick={() => handlePreview(item.filename)}
+                                  onClick={() =>
+                                    handlePreview(item.filename ?? "")
+                                  }
                                   className="bg-gray-400 text-black px-2 py-2 rounded-md"
                                 >
                                   Preview
@@ -928,25 +823,28 @@ const ProfilePage = ({
                     </Button>
                   </div>
                   <iframe src={pdfUrl} className="w-full flex-grow" />
-                  {selectedContract.status == "AWAITING_CLIENT_SIGNATURE" && (
-                    <div className="space-y-2">
-                      <div className="mt-6">
-                        <h3 className="font-semibold mb-2">
-                          Feedback Pengguna
-                        </h3>
-                        <textarea
-                          className="w-full p-2 border rounded-md mb-2"
-                          rows={3}
-                          placeholder="Tulis feedback Anda di sini..."
-                          value={feedback}
-                          onChange={(e) => setFeedback(e.target.value)}
-                        />
-                        <Button onClick={handleSendFeedback}>
-                          Kirim Feedback
-                        </Button>
+                  {selectedContract &&
+                    "status" in selectedContract &&
+                    (selectedContract as ContractItem).status ===
+                      "AWAITING_CLIENT_SIGNATURE" && (
+                      <div className="space-y-2">
+                        <div className="mt-6">
+                          <h3 className="font-semibold mb-2">
+                            Feedback Pengguna
+                          </h3>
+                          <textarea
+                            className="w-full p-2 border rounded-md mb-2"
+                            rows={3}
+                            placeholder="Tulis feedback Anda di sini..."
+                            value={feedback}
+                            onChange={(e) => setFeedback(e.target.value)}
+                          />
+                          <Button onClick={handleSendFeedback}>
+                            Kirim Feedback
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             )}

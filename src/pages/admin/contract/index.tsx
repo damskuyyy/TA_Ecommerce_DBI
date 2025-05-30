@@ -39,17 +39,70 @@ import { pdf } from "@react-pdf/renderer";
 import SignaturePad from "@/components/ui/signature-pad";
 
 const Contract = () => {
-  const [contractData, setContractData] = useState([]);
-  const [pdfUrl, setPdfUrl] = useState(null);
+  const [contractData, setContractData] = useState<ContractItem[]>([]);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
-  const [features, setFeatures] = useState([""]);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [selectedContract, setSelectedContract] = useState<ContractItem | null>(
+    null
+  );
+  const [features, setFeatures] = useState<string[]>([]);
 
   const [signature, setSignature] = useState<string | null>(null);
 
-  const form = useForm({
+  interface Product {
+    name: string;
+  }
+
+  interface ContractItem {
+    id: string;
+    userId: string;
+    productId: string;
+    product?: Product;
+
+    contractName?: string;
+    fullName?: string;
+    address?: string;
+    cost?: number;
+    startDate?: Date | string;
+    endDate?: Date | string;
+
+    descriptionContract: string;
+    features: string[];
+    scopeOfWork?: string;
+
+    filename?: string;
+    isFinalized: boolean;
+    signature?: string;
+    status:
+      | "PENDING_APPROVAL"
+      | "AWAITING_CLIENT_SIGNATURE"
+      | "AWAITING_ADMIN_SIGNATURE"
+      | "AWAITING_PAYMENT"
+      | "REVISION_REQUESTED"
+      | "ACTIVE"
+      | "COMPLETED"
+      | "CANCELED"
+      | "PROCESSING"; // Added "PROCESSING" here
+
+    createdAt: string | Date;
+    updatedAt: string | Date;
+    feedback?: {
+      content: string;
+      createdAt: string | Date;
+    }[];
+  }
+
+  type ContractFormValues = {
+    contractName: string;
+    cost: string;
+    features: string[];
+    scopeOfWork: string;
+    agreement: boolean;
+  };
+
+  const form = useForm<ContractFormValues>({
     defaultValues: {
       contractName: "",
       cost: "",
@@ -60,24 +113,24 @@ const Contract = () => {
   });
 
   type Contract = {
-  contractName: string;
-  cost: string;
-  features: string[];
-  scopeOfWork: string;
-};
+    contractName: string;
+    cost: string;
+    features: string[];
+    scopeOfWork: string;
+  };
 
   // Reset form setiap kali dialog open/selectedContract berubah
   useEffect(() => {
     if (openDialog && selectedContract) {
-  const contract = selectedContract as any; 
-  form.reset({
-    contractName: contract.contractName || "",
-    cost: contract.cost || "",
-    features: contract.features || [""],
-    scopeOfWork: contract.scopeOfWork || "",
-    agreement: false,
-  });
-}
+      const contract = selectedContract as any;
+      form.reset({
+        contractName: contract.contractName || "",
+        cost: contract.cost || "",
+        features: contract.features || [""],
+        scopeOfWork: contract.scopeOfWork || "",
+        agreement: false,
+      });
+    }
     // eslint-disable-next-line
   }, [openDialog, selectedContract]);
 
@@ -94,157 +147,35 @@ const Contract = () => {
     getContractData();
   }, []);
 
-  const handlePreview = (filename) => {
+  const handlePreview = (filename: string) => {
     if (!filename) return;
     const fileUrl = `http://localhost:3000/api/contract/pdf/get?filename=${filename}`;
     console.log(fileUrl);
     setPdfUrl(fileUrl);
   };
 
-  const agreement = form.watch("agreement");
-
   const handleAddFeature = () => {
-    const newFeatures = [...features, ""];
+    const newFeatures: string[] = [...features, ""];
     setFeatures(newFeatures);
     form.setValue("features", newFeatures);
   };
 
-  const handleFeatureChange = (index, value) => {
-    const newFeatures = [...features];
+  const handleFeatureChange = (index: number, value: string) => {
+    const newFeatures: string[] = [...features];
     newFeatures[index] = value;
     setFeatures(newFeatures);
     form.setValue("features", newFeatures);
   };
 
-  const handleDeleteFeature = (index) => {
-    const newFeatures = features.filter((_, i) => i !== index);
+  const handleDeleteFeature = (index: number) => {
+    const newFeatures: string[] = features.filter((_, i) => i !== index);
     setFeatures(newFeatures);
     form.setValue("features", newFeatures);
   };
 
-  // const onSubmit = async (data) => {
-  //   setIsSubmitting(true);
-  //   try {
-  //     const pdfPromise = pdf(<ContractPDF data={data} />).toBlob();
+  const agreement = form.watch("agreement");
 
-  //     const response = await axios.put("/api/contract/put", {
-  //       ...data,
-  //       status: "AWAITING_CLIENT_SIGNATURE",
-  //     });
-
-  //     if (!response.data?.contract) {
-  //       throw new Error("Data kontrak tidak tersedia.");
-  //     }
-
-  //     const updatedContract = response.data.contract;
-  //     const blob = await pdfPromise;
-  //     const pdfBuffer = await blob.arrayBuffer();
-
-  //     const formData = new FormData();
-  //     formData.append("contractId", updatedContract.id);
-  //     formData.append("userId", updatedContract.userId);
-  //     formData.append(
-  //       "pdfFile",
-  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
-  //     );
-
-  //     const uploadResponse = await axios.put(
-  //       "/api/contract/pdf/put",
-  //       formData,
-  //       {
-  //         headers: { "Content-Type": "multipart/form-data" },
-  //       }
-  //     );
-
-  //     if (uploadResponse.status === 201) {
-  //       alert("Kontrak berhasil diperbarui dan PDF telah dibuat!");
-  //       form.reset();
-  //       setFeatures([""]);
-  //       getContractData();
-  //     } else {
-  //       throw new Error("Gagal mengunggah PDF ke server.");
-  //     }
-  //   } catch (err) {
-  //     console.error("❌ Error:", err);
-  //     alert("Terjadi kesalahan saat memperbarui kontrak atau membuat PDF.");
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
-  // const handleSign = async () => {
-  //   if (!selectedContract || !signature) {
-  //     alert("Tanda tangan harus diisi!");
-  //     return;
-  //   }
-
-  //   setSigning(true); // Aktifkan loading state
-
-  //   try {
-  //     // 1. Update status kontrak
-  //     const response = await axios.put("/api/contract/put", {
-  //       ...selectedContract,
-  //       status: "AWAITING_PAYMENT", // Atau status lain sesuai flow kamu
-  //     });
-
-  //     if (!response.data?.contract) {
-  //       throw new Error("Data kontrak tidak tersedia.");
-  //     }
-
-  //     const updatedContract = response.data.contract;
-
-  //     // 2. Generate PDF
-  //     const data = {
-  //       fullName: updatedContract.fullName,
-  //       address: updatedContract.address,
-  //       contractName: updatedContract.contractName,
-  //       cost: updatedContract.cost,
-  //       startDate: updatedContract.startDate,
-  //       endDate: updatedContract.endDate,
-  //       descriptionContract: updatedContract.descriptionContract,
-  //       features: updatedContract.features,
-  //       scopeOfWork: updatedContract.scopeOfWork,
-  //       signature: updatedContract.signature,
-  //       adminSignature: signature
-  //     };
-  //     const blob = await pdf(<ContractPDF data={data} />).toBlob();
-  //     const pdfBuffer = await blob.arrayBuffer();
-
-  //     // 3. Upload PDF ke server
-  //     const formData = new FormData();
-  //     formData.append("contractId", updatedContract.id);
-  //     formData.append("userId", updatedContract.userId);
-  //     formData.append(
-  //       "pdfFile",
-  //       new File([pdfBuffer], "contract.pdf", { type: "application/pdf" })
-  //     );
-
-  //     const uploadResponse = await axios.put(
-  //       "/api/contract/pdf/put",
-  //       formData,
-  //       {
-  //         headers: { "Content-Type": "multipart/form-data" },
-  //       }
-  //     );
-
-  //     if (uploadResponse.status === 201 || uploadResponse.status === 200) {
-  //       alert("Kontrak berhasil ditandatangani dan PDF telah dibuat!");
-  //       setSignature(null);
-  //       setSelectedContract(null);
-  //       setOpenDialog(false);
-  //       getContractData();
-  //     } else {
-  //       throw new Error("Gagal mengunggah PDF ke server.");
-  //     }
-  //   } catch (err) {
-  //     console.error("❌ Error:", err);
-  //     alert("Terjadi kesalahan saat menandatangani kontrak.");
-  //   } finally {
-  //     setSigning(false); // Matikan loading state
-  //   }
-  // };
-
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: ContractFormValues) => {
     setIsSubmitting(true);
     try {
       // 1. Update kontrak ke status AWAITING_CLIENT_SIGNATURE
@@ -366,7 +297,7 @@ const Contract = () => {
     }
   };
 
-  const handleRejectContract = async (id) => {
+  const handleRejectContract = async (id: string) => {
     try {
       const confirmDelete = confirm(
         "Apakah kamu yakin ingin menolak kontrak ini?"
@@ -429,11 +360,11 @@ const Contract = () => {
                   <TableCell>
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        item.status === "Completed"
+                        item.status === "COMPLETED"
                           ? "bg-green-100 text-green-800"
-                          : item.status === "Processing"
+                          : item.status === "PROCESSING"
                           ? "bg-purple-100 text-purple-800"
-                          : "bg-red-100 text-red-800"
+                          : "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {item.status}
@@ -457,11 +388,19 @@ const Contract = () => {
                         </div>
                         <div className="grid grid-cols-2 items-center gap-4">
                           <span>Start Date</span>
-                          <span>{item.startDate}</span>
+                          <span>
+                            {item.startDate
+                              ? new Date(item.startDate).toLocaleDateString()
+                              : "-"}
+                          </span>
                         </div>
                         <div className="grid grid-cols-2 items-center gap-4">
                           <span>End Date</span>
-                          <span>{item.endDate}</span>
+                          <span>
+                            {item.endDate
+                              ? new Date(item.endDate).toLocaleDateString()
+                              : "-"}
+                          </span>
                         </div>
                         <div className="grid grid-cols-2 items-center gap-4">
                           <span>Description Contract</span>
@@ -498,7 +437,7 @@ const Contract = () => {
                       </Dialog>
                     ) : item.status !== "PENDING_APPROVAL" ? (
                       <Button
-                        onClick={() => handlePreview(item.filename)}
+                        onClick={() => handlePreview(item.filename ?? "")}
                         className="bg-gray-400 text-black px-2 py-2 rounded-md"
                       >
                         Preview
@@ -514,7 +453,7 @@ const Contract = () => {
                         <Dialog
                           open={
                             openDialog &&
-                            selectedContract &&
+                            selectedContract !== null &&
                             selectedContract.id === item.id
                           }
                           onOpenChange={(open) => {
@@ -685,12 +624,16 @@ const Contract = () => {
                         <Dialog
                           open={
                             openDialog &&
-                            selectedContract &&
+                            selectedContract !== null &&
                             selectedContract.id === item.id
                           }
                           onOpenChange={(open) => {
                             setOpenDialog(open);
-                            if (open) setSelectedContract(item);
+                            if (open) {
+                              setSelectedContract(item);
+                            } else {
+                              setSelectedContract(null); 
+                            }
                           }}
                         >
                           <DialogTrigger>
@@ -713,7 +656,13 @@ const Contract = () => {
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell>{item.createdAt}</TableCell>
+                  <TableCell>
+                    {typeof item.createdAt === "string"
+                      ? item.createdAt
+                      : item.createdAt instanceof Date
+                      ? item.createdAt.toLocaleString()
+                      : ""}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

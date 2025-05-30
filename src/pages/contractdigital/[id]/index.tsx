@@ -23,6 +23,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { InputProps } from "@/components/ui/input";
 
 const Contractdigital = () => {
   const { id } = useRouter().query;
@@ -38,7 +39,16 @@ const Contractdigital = () => {
   const router = useRouter();
   const { selectedProduct } = useProductStore();
 
-  const form = useForm({
+  interface ContractFormValues {
+    fullName: string;
+    address: string;
+    startDate: string;
+    endDate: string;
+    descriptionContract: string;
+    agreement: boolean;
+  }
+
+  const form = useForm<ContractFormValues>({
     defaultValues: {
       fullName: "",
       address: "",
@@ -50,37 +60,16 @@ const Contractdigital = () => {
     mode: "onChange",
   });
 
+  interface FormFieldConfig {
+    name: string;
+    label: string;
+    className?: string;
+    type?: React.HTMLInputTypeAttribute;
+    component?: "input" | "textarea" | "checkbox";
+  }
+
   const agreement = form.watch("agreement");
-
-  // const onSubmit = async (data: any) => {
-  //   if (
-  //     !Object.values(data).every((value) => value !== "" && value !== false)
-  //   ) {
-  //     toast({ title: "Error", description: "All fields are required!" });
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await axios.post("/api/contract/post/user", {
-  //       userId: session.user?.id,
-  //       productId: product.id,
-  //       ...data,
-  //     });
-
-  //     if (response.status === 201) {
-  //       console.log("✅ Draft contract created:", response.data);
-  //       alert("Draft kontrak berhasil disimpan.");
-  //     } else {
-  //       console.warn("⚠️ Kontrak dibuat, tapi respons tidak sesuai:", response);
-  //       alert("Terjadi sesuatu yang tidak terduga.");
-  //     }
-  //   } catch (error: any) {
-  //     console.error("❌ Error generating contract:", error);
-  //     alert("Terjadi kesalahan saat membuat kontrak.");
-  //   }
-  // };
-
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ContractFormValues) => {
     if (
       !Object.values(data).every((value) => value !== "" && value !== false)
     ) {
@@ -300,30 +289,36 @@ const Contractdigital = () => {
               >
                 <h2 className="text-xl font-bold my-4">Personal Info</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {[
-                    {
-                      name: "fullName",
-                      label: "Full Name",
-                      className: "col-span-2",
-                    },
-                    {
-                      name: "address",
-                      label: "Address",
-                      className: "col-span-2",
-                    },
-                  ].map(({ name, label, type, className }) => (
+                  {(
+                    [
+                      {
+                        name: "fullName",
+                        label: "Full Name",
+                        className: "col-span-2",
+                        type: "text",
+                        component: "input",
+                      },
+                      {
+                        name: "address",
+                        label: "Address",
+                        className: "col-span-2",
+                        type: "text",
+                        component: "input",
+                      },
+                    ] as const
+                  ).map((field) => (
                     <FormField
-                      key={name}
+                      key={field.name}
                       control={form.control}
-                      name={name}
-                      render={({ field }) => (
-                        <FormItem className={className}>
-                          <FormLabel>{label}</FormLabel>
+                      name={field.name}
+                      render={({ field: formField }) => (
+                        <FormItem className={field.className}>
+                          <FormLabel>{field.label}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={label}
-                              type={type}
-                              {...field}
+                              placeholder={field.label}
+                              type={field.type}
+                              {...formField}
                               required
                             />
                           </FormControl>
@@ -335,22 +330,34 @@ const Contractdigital = () => {
 
                 <h2 className="text-xl font-bold my-4">Contract Info</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { name: "startDate", label: "Start Date", type: "date" },
-                    { name: "endDate", label: "End Date", type: "date" },
-                  ].map(({ name, label, type }) => (
+                  {(
+                    [
+                      {
+                        name: "startDate",
+                        label: "Start Date",
+                        type: "date",
+                        component: "input",
+                      },
+                      {
+                        name: "endDate",
+                        label: "End Date",
+                        type: "date",
+                        component: "input",
+                      },
+                    ] as const
+                  ).map((field) => (
                     <FormField
-                      key={name}
+                      key={field.name}
                       control={form.control}
-                      name={name}
-                      render={({ field }) => (
+                      name={field.name}
+                      render={({ field: formField }) => (
                         <FormItem>
-                          <FormLabel>{label}</FormLabel>
+                          <FormLabel>{field.label}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={label}
-                              type={type}
-                              {...field}
+                              placeholder={field.label}
+                              type={field.type}
+                              {...formField}
                               required
                             />
                           </FormControl>
@@ -358,6 +365,8 @@ const Contractdigital = () => {
                       )}
                     />
                   ))}
+
+                  {/* Description Contract Field */}
                   <FormField
                     control={form.control}
                     name="descriptionContract"
@@ -375,25 +384,6 @@ const Contractdigital = () => {
                     )}
                   />
                 </div>
-                <div className="flex items-center gap-2 mt-4">
-                  <FormField
-                    control={form.control}
-                    name="agreement"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            required
-                          />
-                        </FormControl>
-                        <span>Setuju</span>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
                 <Button
                   type="submit"
                   className="mt-4 w-full bg-black text-white"

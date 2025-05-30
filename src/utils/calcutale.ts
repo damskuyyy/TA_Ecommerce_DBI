@@ -2,7 +2,7 @@ import { ProductDataType } from "@/types/productDataTypes";
 
 const calculateSubtotal = (products: ProductDataType[]): number => {
   return products.reduce((acc, item) => {
-    return acc + (item.price * (item.qty ?? 1))
+    return acc + (item.price * ((item as any).qty ?? 1))
   }, 0)
 }
 

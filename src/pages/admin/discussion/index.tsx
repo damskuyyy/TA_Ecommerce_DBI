@@ -6,6 +6,30 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EllipsisVertical, Send, Upload } from "lucide-react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+
+// Extend the session user type to include 'id'
+import "next-auth";
+import "next-auth/jwt";
+
+declare module "next-auth" {
+  interface User {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  }
+}
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
+  }
+}
 import io from "socket.io-client";
 import UploadImageDiscuss from "@/components/ui/modals/uploadImageDiscuss";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -25,8 +49,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from "@/components/ui/alert-dialog"
-
+} from "@/components/ui/alert-dialog";
 
 const socket = io({
   path: "/api/socket",
@@ -113,8 +136,11 @@ export default function Discussion() {
     };
 
     socket.on("chatMessage", handleNewMessage);
-    return () => socket.off("chatMessage", handleNewMessage);
-  }, []);
+
+    return () => {
+      socket.off("chatMessage", handleNewMessage);
+    };
+  }, [socket, fetchDiscussion]);
 
   const handleDeleteDiscussion = async (id: string) => {
     try {
@@ -144,7 +170,10 @@ export default function Discussion() {
       id: tempId,
       content: message || (base64Image ? "[Gambar]" : undefined),
       image: base64Image || undefined,
-      admin: session.user.id,
+      admin: {
+        id: session.user.id,
+        username: session.user.name ? session.user.name : "",
+      },
       createdAt: new Date().toISOString(),
       status: "pending",
     };
@@ -173,11 +202,11 @@ export default function Discussion() {
       setSelectedDiscussion((prev) =>
         prev
           ? {
-            ...prev,
-            messages: prev.messages.map((msg) =>
-              msg.id === tempId ? { ...newMessage, status: "sent" } : msg
-            ),
-          }
+              ...prev,
+              messages: prev.messages.map((msg) =>
+                msg.id === tempId ? { ...newMessage, status: "sent" } : msg
+              ),
+            }
           : prev
       );
 
@@ -190,11 +219,11 @@ export default function Discussion() {
       setSelectedDiscussion((prev) =>
         prev
           ? {
-            ...prev,
-            messages: prev.messages.map((msg) =>
-              msg.id === tempId ? { ...msg, status: "failed" } : msg
-            ),
-          }
+              ...prev,
+              messages: prev.messages.map((msg) =>
+                msg.id === tempId ? { ...msg, status: "failed" } : msg
+              ),
+            }
           : prev
       );
     }
@@ -229,10 +258,11 @@ export default function Discussion() {
                 <div
                   key={d.id}
                   onClick={() => setSelectedDiscussion(d)}
-                  className={`p-2 ${selectedDiscussion?.id === d.id
+                  className={`p-2 ${
+                    selectedDiscussion?.id === d.id
                       ? "bg-gray-900 text-white hover:bg-gray-900"
                       : "text-gray-900"
-                    } rounded-lg cursor-pointer flex gap-2 items-center hover:bg-gray-200 mb-2`}
+                  } rounded-lg cursor-pointer flex gap-2 items-center hover:bg-gray-200 mb-2`}
                 >
                   <Avatar>
                     <AvatarImage src={d.product.image[0]} />
@@ -244,8 +274,8 @@ export default function Discussion() {
                       {d.messages[d.messages.length - 1]?.content
                         ? d.messages[d.messages.length - 1]?.content
                         : d.messages[d.messages.length - 1]?.image
-                          ? "Image"
-                          : "Belum ada pesan"}
+                        ? "Image"
+                        : "Belum ada pesan"}
                     </p>
                   </div>
                   <DropdownMenu>
@@ -270,9 +300,12 @@ export default function Discussion() {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Konfirmasi Penghapusan</AlertDialogTitle>
+                              <AlertDialogTitle>
+                                Konfirmasi Penghapusan
+                              </AlertDialogTitle>
                               <AlertDialogDescription>
-                                Apakah kamu yakin ingin menghapus diskusi ini? Tindakan ini tidak dapat dibatalkan.
+                                Apakah kamu yakin ingin menghapus diskusi ini?
+                                Tindakan ini tidak dapat dibatalkan.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -318,14 +351,16 @@ export default function Discussion() {
                 {selectedDiscussion.messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex ${msg?.admin ? "justify-end" : "justify-start"
-                      } mb-2`}
+                    className={`flex ${
+                      msg?.admin ? "justify-end" : "justify-start"
+                    } mb-2`}
                   >
                     <div
-                      className={`px-4 py-2 rounded-lg ${msg?.admin
+                      className={`px-4 py-2 rounded-lg ${
+                        msg?.admin
                           ? "bg-gray-900 text-white rounded-br-none"
                           : "bg-white text-gray-900 rounded-bl-none"
-                        }`}
+                      }`}
                     >
                       {msg.image ? (
                         <img

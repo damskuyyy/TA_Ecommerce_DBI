@@ -74,17 +74,20 @@ export default function Discuss() {
   }, [session?.user?.id, selectedProduct?.id]);
 
   useEffect(() => {
-    const handleNewMessage = (newMessage: Message) => {
-      setSelectedDiscussion((prev) => {
-        if (!prev) return prev;
-        if (prev.messages.some((msg) => msg.id === newMessage.id)) return prev;
-        return { ...prev, messages: [...prev.messages, newMessage] };
-      });
-    };
+  const handleNewMessage = (newMessage: Message) => {
+    setSelectedDiscussion((prev) => {
+      if (!prev) return prev;
+      if (prev.messages.some((msg) => msg.id === newMessage.id)) return prev;
+      return { ...prev, messages: [...prev.messages, newMessage] };
+    });
+  };
 
-    socket.on("chatMessage", handleNewMessage);
-    return () => socket.off("chatMessage", handleNewMessage);
-  }, []);
+  socket.on("chatMessage", handleNewMessage);
+
+  return () => {
+    socket.off("chatMessage", handleNewMessage);
+  };
+}, []);
 
   const sendMessage = async () => {
     if (
@@ -112,15 +115,31 @@ export default function Discuss() {
 
     // ✅ Tambahkan pesan sementara ke UI agar tidak menunggu API
     setSelectedDiscussion((prev) => {
-      if (!prev) {
-        return {
-          id: `temp-discussion-${Date.now()}`,
-          product: selectedProduct,
-          messages: [tempMessage],
-        };
-      }
-      return { ...prev, messages: [...prev.messages, tempMessage] };
-    });
+  if (!prev) {
+    if (
+      !selectedProduct?.id ||
+      !selectedProduct?.name ||
+      !selectedProduct?.variants ||
+      !selectedProduct?.image
+    ) {
+      console.error("Selected product tidak lengkap");
+      return prev;
+    }
+
+    return {
+      id: `temp-discussion-${Date.now()}`,
+      product: {
+        id: selectedProduct.id,
+        name: selectedProduct.name,
+        variants: selectedProduct.variants,
+        image: selectedProduct.image,
+      },
+      messages: [tempMessage],
+    };
+  }
+
+  return { ...prev, messages: [...prev.messages, tempMessage] };
+});
 
     setMessage(""); // Kosongkan input setelah mengirim
     setImage([]); // Kosongkan gambar setelah mengirim

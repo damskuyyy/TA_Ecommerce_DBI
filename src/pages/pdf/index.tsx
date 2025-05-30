@@ -12,6 +12,19 @@ import {
 } from "@react-pdf/renderer";
 import mudapedia from "@/utils/mudapedia";
 
+interface ContractData {
+  fullName: string;
+  address: string;
+  contractName: string;
+  descriptionContract: string;
+  scopeOfWork: string;
+  startDate: string;
+  endDate: string;
+  cost: string;
+  features: string[];
+  signature?: string;
+  adminSignature?: string;
+}
 // Styling dokumen
 const styles = StyleSheet.create({
   page: {
@@ -115,7 +128,7 @@ const styles = StyleSheet.create({
   listBullet: { fontWeight: "bold" },
 });
 
-const ContractPDF = ({ data }: { data: any }) => (
+const ContractPDF = ({ data }: { data: ContractData }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.headerContainer}>
@@ -202,7 +215,7 @@ const ContractPDF = ({ data }: { data: any }) => (
         <Text style={styles.listNumber}>6.</Text> Fitur utama :
       </Text>
       {data.features && data.features.length > 0 ? (
-        data.features.map((feature, i) => (
+        (data.features as string[]).map((feature: string, i: number) => (
           <Text key={i} style={[styles.marginLeft40, styles.featureItem]}>
             <Text style={styles.listBullet}>{`${i + 1}. `}</Text>
             {feature}

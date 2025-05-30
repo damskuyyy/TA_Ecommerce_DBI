@@ -34,10 +34,33 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 
+interface Product {
+  id: string;
+  name: string;
+  variants: string[];
+  image: string[];
+}
+
+interface ContractItem {
+  id: string;
+  contractName: string;
+  product: Product;
+  cost: number;
+  filename: string;
+  status?: string;
+  createdAt: string;
+  description?: string;
+}
+
+interface ProgressItem {
+  description: string;
+  createdAt: string;
+}
+
 const Monitoring: React.FC = () => {
-  const [contractData, setContractData] = useState([]);
+  const [contractData, setContractData] = useState<ContractItem[]>([]);
+  const [progressData, setProgressData] = useState<ProgressItem[]>([]);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [progressData, setProgressData] = useState([]);
 
   const form = useForm({
     defaultValues: {
@@ -163,7 +186,7 @@ const Monitoring: React.FC = () => {
             </TableHeader>
             <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950">
               {contractData.length > 0 &&
-                contractData.map((item, idx) => (
+                contractData.map((item: ContractItem, idx) => (
                   <TableRow key={idx}>
                     <TableCell className="px-6 py-4 whitespace-nowrap">
                       {item.contractName}

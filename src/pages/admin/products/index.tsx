@@ -163,7 +163,7 @@ const ProductsPage = () => {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger>
-                              <DeleteDialog onDelete={() => handleDelete(item.id)} load={load} modalDeleteView={modalDeleteView} setModalDeleteView={setModalDeleteView} />
+                              <DeleteDialog onDelete={() => item.id && handleDelete(item.id)} load={load} modalDeleteView={modalDeleteView} setModalDeleteView={setModalDeleteView} />
                             </TooltipTrigger>
                             <TooltipContent className='bg-foreground text-background p-3 rounded-md'>
                               <p>Delete</p>
