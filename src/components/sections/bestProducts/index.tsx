@@ -5,8 +5,14 @@ import { useEffect, useState } from "react";
 import { ProductDataType } from "@/types/productDataTypes";
 import axios from "axios";
 import SkeletonGrid from "@/components/ui/skeletonGrid";
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic'
 import upcommingAnimation from '../../../../public/animations/upcomming.json'
+
+// Dynamically import Lottie with SSR disabled
+const Lottie = dynamic(() => import('lottie-react'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-gray-100 rounded-lg animate-pulse" />
+});
 
 const BestProducts = () => {
   const categoryView = [
