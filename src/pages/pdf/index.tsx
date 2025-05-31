@@ -11,20 +11,8 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import mudapedia from "@/utils/mudapedia";
+import { ContractDataType } from "@/types/contractDataTypes";
 
-interface ContractData {
-  fullName: string;
-  address: string;
-  contractName: string;
-  descriptionContract: string;
-  scopeOfWork: string;
-  startDate: string;
-  endDate: string;
-  cost: string;
-  features: string[];
-  signature?: string;
-  adminSignature?: string;
-}
 // Styling dokumen
 const styles = StyleSheet.create({
   page: {
@@ -128,7 +116,7 @@ const styles = StyleSheet.create({
   listBullet: { fontWeight: "bold" },
 });
 
-const ContractPDF = ({ data }: { data: ContractData }) => (
+const ContractPDF = ({ data }: { data: any }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.headerContainer}>
@@ -163,10 +151,10 @@ const ContractPDF = ({ data }: { data: ContractData }) => (
         </Text>
       </View>
       <Text style={[styles.marginLeft40, styles.bold]}>
-        Nama : {data.fullName}
+        Nama : {data?.fullName ?? "-"}
       </Text>
       <Text style={[styles.marginLeft40, styles.bold]}>
-        Alamat : {data.address}
+        Alamat : {data?.address ?? "-"}
       </Text>
 
       <View style={styles.listItem}>
@@ -195,11 +183,11 @@ const ContractPDF = ({ data }: { data: ContractData }) => (
       </Text>
       <Text style={styles.marginLeft20}>
         <Text style={styles.listNumber}>1.</Text>Nama proyek :{" "}
-        {data.contractName}
+        {data?.contractName ?? "-"}
       </Text>
       <Text style={styles.marginLeft20}>
         <Text style={styles.listNumber}>2.</Text>Deskripsi proyek :
-        {data.descriptionContract}
+        {data?.descriptionContract ?? "-"}
       </Text>
       <Text style={styles.marginLeft20}>
         <Text style={styles.listNumber}>3.</Text>Platform :{" "}
@@ -209,13 +197,13 @@ const ContractPDF = ({ data }: { data: ContractData }) => (
       </Text>
       <Text style={styles.marginLeft20}>
         <Text style={styles.listNumber}>5.</Text>Scope of Work :
-        {data.scopeOfWork}
+        {data?.scopeOfWork ?? "-"}
       </Text>
       <Text style={styles.marginLeft20}>
         <Text style={styles.listNumber}>6.</Text> Fitur utama :
       </Text>
-      {data.features && data.features.length > 0 ? (
-        (data.features as string[]).map((feature: string, i: number) => (
+      {data?.features?.length > 0 ? (
+        data.features.map((feature: string, i: number) => (
           <Text key={i} style={[styles.marginLeft40, styles.featureItem]}>
             <Text style={styles.listBullet}>{`${i + 1}. `}</Text>
             {feature}
@@ -228,11 +216,11 @@ const ContractPDF = ({ data }: { data: ContractData }) => (
       <Text style={styles.pasal}>Pasal 2 - Jangka Waktu Pengerjaan</Text>
       <Text style={styles.text}>
         <Text style={styles.listNumber}>1.</Text>Pengerjaan dimulai pada tanggal{" "}
-        {data.startDate}
+        {data?.startDate ?? "-"}
       </Text>
       <Text style={styles.text}>
         <Text style={styles.listNumber}>2.</Text>Pengerjaan harus selesai dengan
-        estimasi tanggal selesai {data.endDate}
+        estimasi tanggal selesai {data?.endDate ?? "-"}
       </Text>
       <Text style={styles.text}>
         <Text style={styles.listNumber}>3.</Text> Jika terdapat keterlambatan
@@ -243,7 +231,7 @@ const ContractPDF = ({ data }: { data: ContractData }) => (
       <Text style={styles.pasal}>Pasal 3 - Biaya dan Pembayaran</Text>
       <Text style={styles.text}>
         <Text style={styles.listNumber}>1.</Text>Total biaya pengerjaan
-        perangkat lunak adalah {data.cost}.
+        perangkat lunak adalah {data?.cost ?? "-"}.
       </Text>
 
       <Text style={styles.pasal}>Pasal 4 - Hak dan Kewajiban</Text>
@@ -300,16 +288,16 @@ const ContractPDF = ({ data }: { data: ContractData }) => (
       <View style={styles.signatureSection}>
         <View style={styles.signatureBox}>
           <Text>Pihak Pertama</Text>
-          {data.signature && (
-            <Image style={styles.signature} src={data.signature} />
+          {data?.signature && (
+            <Image style={styles.signature} src={data?.signature} />
           )}
           <View style={styles.spacer} />
-          <Text>{data.fullName}</Text>
+          <Text>{data?.fullName ?? "-"}</Text>
         </View>
         <View style={styles.signatureBox}>
           <Text>Pihak Kedua</Text>
-          {data.adminSignature && (
-            <Image style={styles.signature} src={data.adminSignature} />
+          {data?.adminSignature && (
+            <Image style={styles.signature} src={data?.adminSignature} />
           )}
           <View style={styles.spacer} />
           <Text>Ramzi Daffa</Text>
