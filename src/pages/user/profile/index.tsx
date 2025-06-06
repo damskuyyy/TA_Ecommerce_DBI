@@ -13,12 +13,12 @@ import {
   LoaderCircle,
   LockKeyholeIcon,
   PenSquareIcon,
+  Shell,
   ShoppingBasketIcon,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import emailVerified from "../../../../public/animations/emailVerified.json";
-import Lottie from "lottie-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -46,27 +46,22 @@ import { useRouter } from "next/router";
 import ModalCheckout from "@/components/ui/modals/checkout";
 import ContractPDF from "@/pages/pdf";
 import { pdf } from "@react-pdf/renderer";
+import { ContractDataType } from "@/types/contractDataTypes";
+import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import dynamic from "next/dynamic";
 
-export type Product = {
-  name: string;
-  image: string | string[];
-  code_product: string;
-  variants?: string[];
-};
-
-export type ContractItem = {
-  id: string;
-  product: Product;
-  cost: number;
-  status:
-    | "AWAITING_CLIENT_SIGNATURE"
-    | "AWAITING_PAYMENT"
-    | "ACTIVE"
-    | "COMPLETED"
-    | "OTHER_STATUSES";
-  filename?: string;
-  contractName?: string;
-};
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false })
 
 const ProfilePage = ({
   items,
@@ -102,15 +97,16 @@ const ProfilePage = ({
   const [nameLoad, setNameLoad] = useState(false);
   const [emailLoad, setEmailLoad] = useState(false);
 
-  const [contractData, setContractData] = useState<ContractItem[]>([]);
+  const [contractData, setContractData] = useState<ContractDataType[]>([]);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isSignature, setIsSignature] = useState<boolean>(false);
   const [signature, setSignature] = useState<string | null>(null);
-  const [selectedContract, setSelectedContract] = useState<ContractItem | null>(
-    null
-  ); // Initialize as null
+  const [selectedContract, setSelectedContract] =
+    useState<ContractDataType | null>(null);
+
   const [openCheckout, setOpenCheckout] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isSignLoading, setIsSignLoading] = useState(false);
 
   const handleOpenCheckout = (productData: any) => {
     if (!productData.variants || !Array.isArray(productData.variants)) {
@@ -150,13 +146,17 @@ const ProfilePage = ({
       const resp = await axios(`/api/contract/get?userId=${user.id}`);
       setContractData(resp.data);
     } catch (err) {
-      console.log(err);
+      console.error("❌ Error fetching contract data:", err);
     }
   };
 
   useEffect(() => {
-    getContractData();
-  }, []);
+    if (!user.id) return;
+    (async () => {
+      await getContractData();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -206,6 +206,7 @@ const ProfilePage = ({
     }
   };
 
+  // Handle preview PDF
   const handlePreview = (filename: string) => {
     if (!filename) return;
     setIsPreviewDialogOpen(true);
@@ -214,15 +215,16 @@ const ProfilePage = ({
   };
 
   const handleSendFeedback = async () => {
+    if (!selectedContract) return;
+
     if (!feedback.trim()) {
       alert("Feedback tidak boleh kosong");
       return;
     }
 
     try {
-      console.log("SelectedContract: ", selectedContract);
       const res = await axios.post("/api/contract/post/feedback", {
-        contractId: selectedContract?.id,
+        contractId: selectedContract.id,
         content: feedback,
       });
 
@@ -238,16 +240,21 @@ const ProfilePage = ({
       setFeedback("");
     }
   };
-
   const handleSign = async () => {
+    if (!selectedContract) return;
     if (!signature) {
-      alert("Silakan tanda tangani kontrak terlebih dahulu!");
+      toast({
+        title: "Signature Required",
+        description: "Please sign the contract first!",
+        variant: "destructive",
+      });
       return;
     }
     try {
+      setIsSignLoading(true);
       const response = await axios.put("/api/contract/put", {
         ...selectedContract,
-        contractId: selectedContract?.id,
+        contractId: selectedContract.id,
         status: "AWAITING_ADMIN_SIGNATURE",
         signature: signature,
       });
@@ -258,11 +265,14 @@ const ProfilePage = ({
       const updatedContract = response.data.contract;
 
       setIsSignature(false);
-      getContractData();
-      alert(
-        "Kontrak berhasil ditandatangani! File PDF akan diunggah di background."
-      );
+      await getContractData();
 
+      toast({
+        title: "Contract signed successfully!",
+        description: "The PDF file will be uploaded in the background.",
+        variant: "default",
+      });
+      setIsSignLoading(false);
       (async () => {
         try {
           const data = {
@@ -294,13 +304,55 @@ const ProfilePage = ({
           await axios.put("/api/contract/pdf/put", formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
+
+          toast({
+            title: "PDF uploaded successfully!",
+            description: "Your contract PDF file is now available.",
+            variant: "default",
+          });
         } catch (err) {
           console.error("Gagal upload PDF di background:", err);
+          toast({
+            title: "PDF Upload Failed",
+            description:
+              "An error occurred while uploading the PDF in the background.",
+            variant: "destructive",
+          });
         }
       })();
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Terjadi kesalahan saat memperbarui kontrak.");
+      toast({
+        title: "Error",
+        description: "An error occurred while updating the contract.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // const transactionValue = 0.05; // 5% transaction fee
+  // const applicationValue = 0.02; // 2% application fee
+  // const taxRate = 0.1; // 10% tax
+
+  // const subtotal = calculateSubtotal(products);
+  // const transactionFee = calculateTransactionFee(subtotal, transactionValue);
+  // const applicationFee = calculateApplicationFee(subtotal, applicationValue);
+  // const tax = calculateTax(subtotal, taxRate);
+  // const total = calculateTotal(
+  //   products,
+  //   transactionValue,
+  //   applicationValue,
+  //   taxRate
+  // );
+
+  const handleRejectContract = async (id: string) => {
+    if (!id) return;
+    try {
+      await axios.delete(`/api/contract/delete/${id}`);
+      toast({ title: "Kontrak berhasil dibatalkan" });
+      await getContractData();
+    } catch (e) {
+      toast({ title: "Gagal menolak kontrak", variant: "destructive" });
     }
   };
 
@@ -628,7 +680,7 @@ const ProfilePage = ({
                       </TableRow>
                     </TableHeader>
                     <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-950 dark:divide-gray-700">
-                      {contractData && contractData.length > 0 ? (
+                      {contractData?.length > 0 ? (
                         contractData.map((item, idx) => (
                           <TableRow key={idx}>
                             <TableCell className="px-6 py-4 whitespace-nowrap">
@@ -647,7 +699,7 @@ const ProfilePage = ({
                               {item.filename ? (
                                 <Button
                                   onClick={() => {
-                                    handlePreview(item.filename ?? "");
+                                    handlePreview(item.filename);
                                     setSelectedContract(item);
                                   }}
                                   className="bg-gray-400 text-black px-2 py-2 rounded-md"
@@ -658,7 +710,7 @@ const ProfilePage = ({
                                 "-"
                               )}
                             </TableCell>
-                            <TableCell className="px-6 py-4 whitespace-nowrap">
+                            <TableCell className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
                               {item.status == "AWAITING_CLIENT_SIGNATURE" && (
                                 <Button
                                   onClick={() => {
@@ -690,10 +742,44 @@ const ProfilePage = ({
                                   Pay
                                 </Button>
                               )}
-
-                              <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
-                                Cancel
-                              </Button>
+                              {[
+                                "PENDING_APPROVAL",
+                                "AWAITING_CLIENT_SIGNATURE",
+                                "REVISION_REQUESTED",
+                                "AWAITING_ADMIN_SIGNATURE",
+                                "AWAITING_PAYMENT",
+                              ].includes(item.status) && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger>
+                                    <Button className="bg-gray-50 text-black px-2 py-2 rounded-md w-fit">
+                                      Cancel
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent className="w-fit">
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        As a result, the discussion will be
+                                        permanently deleted.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() =>
+                                          handleRejectContract(item.id)
+                                        }
+                                      >
+                                        Confirm
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))
@@ -756,9 +842,7 @@ const ProfilePage = ({
                           .map((item, idx) => (
                             <TableRow key={idx}>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
-                                {"contractName" in item && item.contractName
-                                  ? item.contractName
-                                  : "-"}
+                                {item.contractName}
                               </TableCell>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
                                 {item.product.name}
@@ -767,10 +851,9 @@ const ProfilePage = ({
                                 {item.cost ? item.cost : "-"}
                               </TableCell>
                               <TableCell className="px-6 py-4 whitespace-nowrap">
+                                {/* {item.filename ? ( */}
                                 <Button
-                                  onClick={() =>
-                                    handlePreview(item.filename ?? "")
-                                  }
+                                  onClick={() => handlePreview(item.filename)}
                                   className="bg-gray-400 text-black px-2 py-2 rounded-md"
                                 >
                                   Preview
@@ -792,6 +875,7 @@ const ProfilePage = ({
                 <div className="overflow-x-auto shadow-md"></div>
               </div>
             </TabsContent>
+
             {isSignature && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div className="bg-white p-4 rounded-lg shadow-lg flex flex-col">
@@ -804,12 +888,24 @@ const ProfilePage = ({
                       Close
                     </Button>
                     <Button onClick={handleSign}>
-                      Confirm and Accept Contract
+                      {isSignLoading ? (
+                        <>
+                          <Shell
+                            size={24}
+                            strokeWidth={2}
+                            className="animate-spin"
+                          />
+                          Loading...
+                        </>
+                      ) : (
+                        "Confirm and Accept Contract"
+                      )}
                     </Button>
                   </div>
                 </div>
               </div>
             )}
+
             {pdfUrl && isPreviewDialogOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div className="bg-white p-4 rounded-lg shadow-lg w-[90%] h-[90%] flex flex-col">
@@ -823,28 +919,25 @@ const ProfilePage = ({
                     </Button>
                   </div>
                   <iframe src={pdfUrl} className="w-full flex-grow" />
-                  {selectedContract &&
-                    "status" in selectedContract &&
-                    (selectedContract as ContractItem).status ===
-                      "AWAITING_CLIENT_SIGNATURE" && (
-                      <div className="space-y-2">
-                        <div className="mt-6">
-                          <h3 className="font-semibold mb-2">
-                            Feedback Pengguna
-                          </h3>
-                          <textarea
-                            className="w-full p-2 border rounded-md mb-2"
-                            rows={3}
-                            placeholder="Tulis feedback Anda di sini..."
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                          />
-                          <Button onClick={handleSendFeedback}>
-                            Kirim Feedback
-                          </Button>
-                        </div>
+                  {selectedContract?.status == "AWAITING_CLIENT_SIGNATURE" && (
+                    <div className="space-y-2">
+                      <div className="mt-6">
+                        <h3 className="font-semibold mb-2">
+                          Feedback Pengguna
+                        </h3>
+                        <textarea
+                          className="w-full p-2 border rounded-md mb-2"
+                          rows={3}
+                          placeholder="Tulis feedback Anda di sini..."
+                          value={feedback}
+                          onChange={(e) => setFeedback(e.target.value)}
+                        />
+                        <Button onClick={handleSendFeedback}>
+                          Kirim Feedback
+                        </Button>
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

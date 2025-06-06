@@ -11,7 +11,6 @@ import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import formattedPrice from "@/utils/formattedPrice";
-import { useProductStore } from "@/store/product";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,10 +22,31 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { InputProps } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Shell } from "lucide-react";
+import { ContractDataType } from "@/types/contractDataTypes";
+
+type ContractFormData = {
+  fullName: string;
+  address: string;
+  startDate: string;
+  endDate: string;
+  descriptionContract: string;
+  agreement: boolean;
+};
 
 const Contractdigital = () => {
-  const { id } = useRouter().query;
+  const router = useRouter();
+  const { id } = router.query;
   const { data: session, status }: any = useSession(); //mengambil data sesi pengguna (login)
   const [product, setProduct] = useState<ProductDataType>(
     {} as ProductDataType
@@ -35,20 +55,14 @@ const Contractdigital = () => {
   const [load, setLoad] = useState(false); //loading data
   const { toast } = useToast(); //untuk menampilkan notifikasi kepada pengguna
   const [updated] = useState(false); //menandai perubahan sehingga dapat memicu pengambilan ulang data
+  const [openAlert, setOpenAlert] = useState(false);
+  const [unpaidContracts, setUnpaidContracts] = useState<ContractDataType[]>(
+    []
+  );
+  const [pendingSubmit, setPendingSubmit] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const router = useRouter();
-  const { selectedProduct } = useProductStore();
-
-  interface ContractFormValues {
-    fullName: string;
-    address: string;
-    startDate: string;
-    endDate: string;
-    descriptionContract: string;
-    agreement: boolean;
-  }
-
-  const form = useForm<ContractFormValues>({
+  const form = useForm({
     defaultValues: {
       fullName: "",
       address: "",
@@ -60,16 +74,42 @@ const Contractdigital = () => {
     mode: "onChange",
   });
 
-  interface FormFieldConfig {
-    name: string;
-    label: string;
-    className?: string;
-    type?: React.HTMLInputTypeAttribute;
-    component?: "input" | "textarea" | "checkbox";
-  }
-
   const agreement = form.watch("agreement");
-  const onSubmit = async (data: ContractFormValues) => {
+
+  const createContract = async (data: ContractFormData) => {
+    try {
+      const response = await axios.post("/api/contract/post/user", {
+        userId: session.user?.id,
+        productId: product.id,
+        ...data,
+      });
+
+      if (response.status === 201) {
+        toast({
+          title: "Success!",
+          description: "Draft contract has been saved successfully.",
+          variant: "default",
+        });
+        form.reset();
+      } else {
+        toast({
+          title: "Oops!",
+          description: "Something unexpected happened.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "An error occurred while creating the contract.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmit = async (data: ContractFormData) => {
     if (
       !Object.values(data).every((value) => value !== "" && value !== false)
     ) {
@@ -78,7 +118,7 @@ const Contractdigital = () => {
     }
 
     try {
-      // 1. Cek apakah ada kontrak belum dibayar
+      setIsLoading(true);
       const unpaidStatuses = [
         "PENDING_APPROVAL",
         "AWAITING_CLIENT_SIGNATURE",
@@ -90,45 +130,28 @@ const Contractdigital = () => {
       const checkRes = await axios(
         `/api/contract/get?userId=${session.user?.id}`
       );
-
-      const unpaidContracts = checkRes.data.filter((contract: any) =>
+      const unpaid = checkRes.data.filter((contract: any) =>
         unpaidStatuses.includes(contract.status)
       );
 
-      if (unpaidContracts.length > 0) {
-        const confirm = window.confirm(
-          "Anda masih memiliki kontrak yang belum dibayar. Apakah ingin membatalkan kontrak lama dan membuat yang baru?"
-        );
-
-        if (!confirm) return;
-
-        await Promise.all(
-          unpaidContracts.map((contract: any) =>
-            axios.delete(`/api/contract/delete/${contract.id}`)
-          )
-        );
+      if (unpaid.length > 0) {
+        setUnpaidContracts(unpaid);
+        setPendingSubmit(data);
+        setOpenAlert(true);
+        return;
       }
 
-      console.log("hahai");
-      // 3. Lanjut buat kontrak baru
-      const response = await axios.post("/api/contract/post/user", {
-        userId: session.user?.id,
-        productId: product.id,
-        ...data,
-      });
-
-      if (response.status === 201) {
-        console.log("✅ Draft contract created:", response.data);
-        alert("Draft kontrak berhasil disimpan.");
-      } else {
-        console.warn("⚠️ Kontrak dibuat, tapi respons tidak sesuai:", response);
-        alert("Terjadi sesuatu yang tidak terduga.");
-      }
+      await createContract(data);
     } catch (error: any) {
-      console.error("❌ Error generating contract:", error);
-      alert("Terjadi kesalahan saat membuat kontrak.");
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat membuat kontrak.",
+      });
+      setIsLoading(false);
     }
   };
+
+  const handleDeleteContract = async () => {};
 
   const getData = async () => {
     setLoad(true);
@@ -289,36 +312,32 @@ const Contractdigital = () => {
               >
                 <h2 className="text-xl font-bold my-4">Personal Info</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {(
-                    [
-                      {
-                        name: "fullName",
-                        label: "Full Name",
-                        className: "col-span-2",
-                        type: "text",
-                        component: "input",
-                      },
-                      {
-                        name: "address",
-                        label: "Address",
-                        className: "col-span-2",
-                        type: "text",
-                        component: "input",
-                      },
-                    ] as const
-                  ).map((field) => (
+                  {[
+                    {
+                      name: "fullName",
+                      label: "Full Name",
+                      type: "text",
+                      className: "col-span-2",
+                    },
+                    {
+                      name: "address",
+                      label: "Address",
+                      type: "text",
+                      className: "col-span-2",
+                    },
+                  ].map(({ name, label, type, className }) => (
                     <FormField
-                      key={field.name}
+                      key={name}
                       control={form.control}
-                      name={field.name}
-                      render={({ field: formField }) => (
-                        <FormItem className={field.className}>
-                          <FormLabel>{field.label}</FormLabel>
+                      name={name as "fullName" | "address"}
+                      render={({ field }) => (
+                        <FormItem className={className}>
+                          <FormLabel>{label}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={field.label}
-                              type={field.type}
-                              {...formField}
+                              placeholder={label}
+                              type={type}
+                              {...field}
                               required
                             />
                           </FormControl>
@@ -330,34 +349,22 @@ const Contractdigital = () => {
 
                 <h2 className="text-xl font-bold my-4">Contract Info</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {(
-                    [
-                      {
-                        name: "startDate",
-                        label: "Start Date",
-                        type: "date",
-                        component: "input",
-                      },
-                      {
-                        name: "endDate",
-                        label: "End Date",
-                        type: "date",
-                        component: "input",
-                      },
-                    ] as const
-                  ).map((field) => (
+                  {[
+                    { name: "startDate", label: "Start Date", type: "date" },
+                    { name: "endDate", label: "End Date", type: "date" },
+                  ].map(({ name, label, type }) => (
                     <FormField
-                      key={field.name}
+                      key={name}
                       control={form.control}
-                      name={field.name}
-                      render={({ field: formField }) => (
+                      name={name as "startDate" | "endDate"}
+                      render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{field.label}</FormLabel>
+                          <FormLabel>{label}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={field.label}
-                              type={field.type}
-                              {...formField}
+                              placeholder={label}
+                              type={type}
+                              {...field}
                               required
                             />
                           </FormControl>
@@ -365,8 +372,6 @@ const Contractdigital = () => {
                       )}
                     />
                   ))}
-
-                  {/* Description Contract Field */}
                   <FormField
                     control={form.control}
                     name="descriptionContract"
@@ -384,16 +389,84 @@ const Contractdigital = () => {
                     )}
                   />
                 </div>
+                <div className="flex items-center gap-2 mt-4">
+                  <FormField
+                    control={form.control}
+                    name="agreement"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center gap-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            required
+                          />
+                        </FormControl>
+                        <span>Agree</span>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <Button
                   type="submit"
-                  className="mt-4 w-full bg-black text-white"
-                  disabled={!agreement}
+                  disabled={isLoading || !agreement}
+                  className="w-full flex items-center gap-2"
                 >
-                  Create Contract
+                  {isLoading ? (
+                    <>
+                      <Shell
+                        size={24}
+                        strokeWidth={2}
+                        className="animate-spin"
+                      />
+                      Loading...
+                    </>
+                  ) : (
+                    "Create an account!"
+                  )}
                 </Button>
               </form>
             </Form>
           </div>
+          <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
+            <AlertDialogContent className="w-fit">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to proceed with this digital contract?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  By confirming, this contract will be officially created and
+                  recorded.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel
+                  className=""
+                  onClick={() => setOpenAlert(false)}
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={async () => {
+                    // Hapus kontrak-kontrak lama
+                    await Promise.all(
+                      unpaidContracts.map((contract: any) =>
+                        axios.delete(`/api/contract/delete/${contract.id}`)
+                      )
+                    );
+                    setOpenAlert(false);
+                    if (pendingSubmit) {
+                      await createContract(pendingSubmit);
+                      setPendingSubmit(null);
+                    }
+                  }}
+                >
+                  Confirm
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
     </>
